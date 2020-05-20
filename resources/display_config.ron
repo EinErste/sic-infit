@@ -1,0 +1,4 @@
+(
+  title: "Sic infit",
+  dimensions: Some((800, 600)),
+)
