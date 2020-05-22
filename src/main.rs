@@ -29,7 +29,7 @@ fn main() -> amethyst::Result<()> {
                 )
                 .with_plugin(RenderFlat2D::default()),
         )?;
-
+    println!("test");
     let mut game = Application::new(resources, state::MyState, game_data)?;
     game.run();
 
