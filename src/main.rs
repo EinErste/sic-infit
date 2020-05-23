@@ -1,13 +1,3 @@
-// use specs::{Builder, World, WorldExt};
-// use specs_physics::{
-//     colliders::Shape,
-//     nalgebra::{Isometry3, Vector3},
-//     nphysics::object::BodyStatus,
-//     physics_dispatcher,
-//     PhysicsBodyBuilder,
-//     PhysicsColliderBuilder,
-//     SimplePosition,
-// };
 use amethyst::{
     core::transform::TransformBundle,
     prelude::*,
@@ -24,6 +14,8 @@ use crate::states::GameplayState;
 mod states;
 mod systems;
 mod components;
+
+
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
 
@@ -49,6 +41,7 @@ fn main() -> amethyst::Result<()> {
         )?
         .with_bundle(input_bundle)?
         .with_bundle(UiBundle::<StringBindings>::new())?;
+
     let mut game = Application::new(resources, GameplayState::default(), game_data)?;
     game.run();
     Ok(())

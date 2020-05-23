@@ -1,7 +1,7 @@
 (
   axes: {
     "move": Emulated(neg: Key(Left), pos: Key(Right)),
-    "camera": Emulated(neg: Key(Up), pos: Key(Down)),
+    //"camera": Emulated(neg: Key(Up), pos: Key(Down)),
   },
   actions: {},
 )

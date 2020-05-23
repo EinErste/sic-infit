@@ -1,5 +1,5 @@
-mod character;
+mod camera;
 
 pub use self::{
-    character::CharacterSystem,
+    camera::CameraSystem,
 };
