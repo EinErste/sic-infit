@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use amethyst::{
     assets::{AssetStorage, Loader},
     core::transform::Transform,
@@ -6,6 +7,7 @@ use amethyst::{
     prelude::*,
     renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
     window::ScreenDimensions,
+    ui::{Anchor, TtfFormat, UiText, UiTransform},
 };
 use log::info;
 use amethyst::ecs::prelude::Dispatcher;
@@ -29,7 +31,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
         let sprites = load_sprites(world);
         init_sprites(world, &sprites, &dimensions);
 
-
+        init_ui(world);
 
         let mut dispatcher_builder = DispatcherBuilder::new();
         dispatcher_builder.add(CharacterSystem, "character_system", &[]);
@@ -48,7 +50,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
             }
 
             if is_key_down(&event, VirtualKeyCode::P) {
-                return Trans::Push(Box::new(PauseState));
+                return Trans::Push(Box::new(PauseState::default()));
             }
             if let Some(event) = get_key(&event) {
                 info!("handling key event: {:?}", event);
@@ -74,7 +76,7 @@ fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
     let mut transform = Transform::default();
     transform.set_translation_xyz(dimensions.width()/6 as f32, dimensions.height()/6 as f32, 300.);
 
-    let my_entity = world
+    world
         .create_entity()
         .with(Camera::standard_3d(dimensions.width()/3 as f32, dimensions.height()/3 as f32))
         .with(transform)
@@ -131,5 +133,8 @@ fn init_sprites(world: &mut World, sprites: &[SpriteRender], dimensions: &Screen
     //     .with(b.clone())
     //     .with(transform)
     //     .build();
+}
+
+fn init_ui(world: &mut World) {
 
 }

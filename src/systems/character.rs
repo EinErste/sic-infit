@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use amethyst::core::{Transform, SystemDesc};
 use amethyst::derive::SystemDesc;
 use amethyst::ecs::{Join, Read, ReadStorage, System, SystemData, World, WriteStorage};
@@ -24,7 +25,7 @@ impl<'s> System<'s> for CharacterSystem {
         and give us access to the actual components,
         immutable for the Camera and mutable for the Transform.
          */
-        for (camera, transform) in (&cameras, &mut transforms).join() {
+        for (_camera, transform) in (&cameras, &mut transforms).join() {
             let movement =  input.axis_value("move");
             if let Some(mv_amount) = movement {
                 if mv_amount != 0.0 {
