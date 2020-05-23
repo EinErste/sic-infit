@@ -11,15 +11,13 @@ pub struct Motion {
 
 impl Default for Motion {
     fn default() -> Self {
-        Self::new()
+        Motion { velocity: Vector2::new(0., 0.) }
     }
 }
 
 impl Motion {
     pub fn new() -> Self {
-        Motion {
-            velocity: Vector2::new(0., 0.),
-        }
+        Self::default()
     }
 
     pub fn update_velocity(
