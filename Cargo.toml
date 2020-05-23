@@ -9,7 +9,6 @@ edition = "2018"
 [dependencies]
 log = { version = "0.4.8", features = ["serde"] }
 amethyst = "0.15.0"
-specs-physics = "0.3.0"
 
 
 [features]

@@ -8,10 +8,9 @@ use amethyst::{
     renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
     window::ScreenDimensions,
     ui::{Anchor, TtfFormat, UiText, UiTransform},
+    ecs::prelude::{Dispatcher, DispatcherBuilder},
 };
 use log::info;
-use amethyst::ecs::prelude::Dispatcher;
-use amethyst::ecs::prelude::DispatcherBuilder;
 use crate::systems::CharacterSystem;
 use crate::states::PauseState;
 
