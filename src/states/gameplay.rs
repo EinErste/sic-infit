@@ -7,17 +7,18 @@ use amethyst::{
     renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
     window::ScreenDimensions,
 };
-
-
 use log::info;
+use amethyst::ecs::prelude::Dispatcher;
+use amethyst::ecs::prelude::DispatcherBuilder;
+use crate::systems::CharacterSystem;
+use crate::states::PauseState;
 
-pub struct Background{
-
+#[derive(Default)]
+pub struct GameplayState<'a, 'b>{
+    dispatcher: Option<Dispatcher<'a, 'b>>,
 }
 
-pub struct MyState;
-
-impl SimpleState for MyState {
+impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
 
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
@@ -27,6 +28,17 @@ impl SimpleState for MyState {
 
         let sprites = load_sprites(world);
         init_sprites(world, &sprites, &dimensions);
+
+
+
+        let mut dispatcher_builder = DispatcherBuilder::new();
+        dispatcher_builder.add(CharacterSystem, "character_system", &[]);
+
+        // Build and setup the `Dispatcher`.
+        let mut dispatcher = dispatcher_builder.build();
+        dispatcher.setup(world);
+
+        self.dispatcher = Some(dispatcher);
     }
 
     fn handle_event(&mut self, mut _data: StateData<'_, GameData<'_, '_>>, event: StateEvent, ) -> SimpleTrans {
@@ -35,19 +47,28 @@ impl SimpleState for MyState {
                 return Trans::Quit;
             }
 
+            if is_key_down(&event, VirtualKeyCode::P) {
+                return Trans::Push(Box::new(PauseState));
+            }
             if let Some(event) = get_key(&event) {
                 info!("handling key event: {:?}", event);
             }
 
         }
-
-        // Keep going
         Trans::None
     }
+
+    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
+        if let Some(dispatcher) = self.dispatcher.as_mut() {
+            dispatcher.dispatch(&data.world);
+        }
+
+        Trans::None
+    }
+
 }
 
 fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
-
 
     //Hardcoded camera size
     let mut transform = Transform::default();
@@ -67,7 +88,7 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
         let loader = world.read_resource::<Loader>();
         let texture_storage = world.read_resource::<AssetStorage<Texture>>();
         loader.load(
-            "sprites/spritesheet1.png",
+            "sprites/spritesheet.png",
             ImageFormat::default(),
             (),
             &texture_storage,
@@ -103,12 +124,12 @@ fn init_sprites(world: &mut World, sprites: &[SpriteRender], dimensions: &Screen
         .with(transform)
         .build();
 
-    let mut transform = Transform::default();
-    transform.set_translation_xyz(0 as f32, 180 as f32, -100.).set_scale( Vector3::from_element(1.35));
-    world
-        .create_entity()
-        .with(b.clone())
-        .with(transform)
-        .build();
+    // let mut transform = Transform::default();
+    // transform.set_translation_xyz(0 as f32, 180 as f32, -100.).set_scale( Vector3::from_element(1.35));
+    // world
+    //     .create_entity()
+    //     .with(b.clone())
+    //     .with(transform)
+    //     .build();
 
 }

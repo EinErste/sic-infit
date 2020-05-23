@@ -1,16 +1,22 @@
-use amethyst::{
-    core::transform::TransformBundle,
-    prelude::*,
-    renderer::{
-        plugins::{RenderFlat2D, RenderToWindow},
-        types::DefaultBackend,
-        RenderingBundle,
-    },
-    utils::application_root_dir,
-    input::{InputBundle, StringBindings},
-};
+// use specs::{Builder, World, WorldExt};
+// use specs_physics::{
+//     colliders::Shape,
+//     nalgebra::{Isometry3, Vector3},
+//     nphysics::object::BodyStatus,
+//     physics_dispatcher,
+//     PhysicsBodyBuilder,
+//     PhysicsColliderBuilder,
+//     SimplePosition,
+// };
 
-mod state;
+use amethyst::{core::transform::TransformBundle, prelude::*, renderer::{
+    plugins::{RenderFlat2D, RenderToWindow},
+    types::DefaultBackend,
+    RenderingBundle,
+}, utils::application_root_dir, input::{InputBundle, StringBindings}};
+use crate::states::GameplayState;
+
+mod states;
 mod systems;
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
@@ -34,10 +40,9 @@ fn main() -> amethyst::Result<()> {
                 )
                 .with_plugin(RenderFlat2D::default()),
         )?
-        .with_bundle(input_bundle)?
-        .with(systems::CharacterSystem, "character_system", &["input_system"]);
-    let mut game = Application::new(resources, state::MyState, game_data)?;
+        .with_bundle(input_bundle)?;
+        //.with(systems::CharacterSystem, "character_system", &["input_system"]);
+    let mut game = Application::new(resources, GameplayState::default(), game_data)?;
     game.run();
-
     Ok(())
 }
