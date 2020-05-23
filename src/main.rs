@@ -23,6 +23,7 @@ use amethyst::{
 use crate::states::GameplayState;
 mod states;
 mod systems;
+mod components;
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
 
