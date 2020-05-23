@@ -14,8 +14,9 @@ use amethyst::{
     },
 };
 use log::info;
-use crate::systems::CameraSystem;
+use crate::systems::{CameraSystem, CharacterSystem, MotionSystem};
 use crate::states::PauseState;
+use crate::components::Motion;
 
 #[derive(Default)]
 pub struct GameplayState<'a, 'b> {
@@ -25,15 +26,17 @@ pub struct GameplayState<'a, 'b> {
 impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
+        world.register::<Motion>();
+
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
 
         let camera = init_camera(world, &dimensions);
         let character = init_sprites(world, &dimensions);
 
-        init_ui(world);
-
         let mut dispatcher = DispatcherBuilder::new()
-            .with(CameraSystem { character, camera }, "character_system", &[])
+            .with(MotionSystem{}, "motion_system", &[])
+            .with(CameraSystem { character, camera }, "camera_system", &[])
+            .with(CharacterSystem {character},"character_system", &[] )
             .build();
 
         dispatcher.setup(world);
@@ -141,7 +144,7 @@ fn init_sprites(world: &mut World, dimensions: &ScreenDimensions) -> Entity {
         .build();
 
     let c = &sprites[1];
-    let mut transform =
+    let transform =
         Transform::default()
             .set_translation_xyz(100., 100., 1.)
             .to_owned();
@@ -149,6 +152,7 @@ fn init_sprites(world: &mut World, dimensions: &ScreenDimensions) -> Entity {
         .create_entity()
         .with(c.clone())
         .with(transform)
+        .with(Motion::new())
         .named("character")
         .build()
 }
