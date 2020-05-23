@@ -2,7 +2,7 @@ use amethyst::{
     derive::SystemDesc,
     ecs::{Entity, Read, System, SystemData, WriteStorage},
     input::{InputHandler, StringBindings},
-    core::math::Vector2
+    core::math::Vector2,
 };
 
 use crate::components::Motion;
@@ -10,9 +10,18 @@ use crate::components::Motion;
 ///This system controls the character control
 #[derive(SystemDesc)]
 pub struct CharacterSystem {
-    pub(crate) character: Entity,
+    character: Entity,
 }
 
+impl CharacterSystem {
+    pub(crate) fn new(character: Entity) -> Self {
+        CharacterSystem {
+            character,
+        }
+    }
+}
+
+#[allow(dead_code)]
 impl<'s> System<'s> for CharacterSystem {
     type SystemData = (
         WriteStorage<'s, Motion>,
@@ -20,21 +29,19 @@ impl<'s> System<'s> for CharacterSystem {
     );
 
     fn run(&mut self, (mut motions, input): Self::SystemData) {
-        let char_transform = motions.get_mut(self.character).unwrap();
+        let char = motions.get_mut(self.character).unwrap();
 
-        const Y_SCALE: f32 = 0.1;
-        const X_SCALE: f32 = 0.1;
+        let speed = 4.;
 
         if let Some(x) = input.axis_value("x-axis") {
-            char_transform.update_velocity(
-                Vector2::new(x * X_SCALE, 0.)
-            )
-        }
-
-        if let Some(y) = input.axis_value("y-axis") {
-            char_transform.update_velocity(
-                Vector2::new(0., y * Y_SCALE)
-            )
+            if x == 0. {
+               char.update_velocity((0.,0.));
+            } else {
+                let speed = speed * x;
+                char.update_velocity(
+                    (speed , 0.)
+                );
+            }
         }
     }
 }

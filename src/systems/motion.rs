@@ -1,5 +1,5 @@
 use amethyst::{
-    ecs::{Join, Entity, ReadStorage, System, SystemData, WriteStorage},
+    ecs::{Join, ReadStorage, System, SystemData, WriteStorage},
     derive::SystemDesc,
     core::Transform
 };

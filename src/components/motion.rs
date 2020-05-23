@@ -24,9 +24,9 @@ impl Motion {
 
     pub fn update_velocity(
         &mut self,
-        acceleration: Vector2<f32>,
+        (x, y): (f32, f32),
     ) {
-        self.velocity.x += acceleration.x;
-        self.velocity.y += acceleration.y;
+        self.velocity.x = x;
+        self.velocity.y = y;
     }
 }

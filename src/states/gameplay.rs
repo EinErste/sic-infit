@@ -36,7 +36,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
         let mut dispatcher = DispatcherBuilder::new()
             .with(MotionSystem{}, "motion_system", &[])
             .with(CameraSystem { character, camera }, "camera_system", &[])
-            .with(CharacterSystem {character},"character_system", &[] )
+            .with(CharacterSystem::new(character),"character_system", &[] )
             .build();
 
         dispatcher.setup(world);
@@ -132,7 +132,7 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
         }]
 }
 
-fn init_sprites(world: &mut World, dimensions: &ScreenDimensions) -> Entity {
+fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
     let sprites = load_sprites(world);
     let b = &sprites[0];
     let mut transform = Transform::default();
