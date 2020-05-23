@@ -14,9 +14,9 @@ use amethyst::{
     },
 };
 use log::info;
-use crate::systems::{CameraSystem, CharacterSystem, MotionSystem};
+use crate::systems::{CameraSystem, CharacterSystem, MotionSystem, DirectionSystem};
 use crate::states::PauseState;
-use crate::components::Motion;
+use crate::components::{Motion, Directions, Direction};
 
 #[derive(Default)]
 pub struct GameplayState<'a, 'b> {
@@ -27,6 +27,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         world.register::<Motion>();
+        world.register::<Direction>();
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
 
@@ -35,6 +36,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
 
         let mut dispatcher = DispatcherBuilder::new()
             .with(MotionSystem{}, "motion_system", &[])
+            .with(DirectionSystem{}, "direction_system", &[])
             .with(CameraSystem { character, camera }, "camera_system", &[])
             .with(CharacterSystem::new(character),"character_system", &[] )
             .build();
@@ -153,6 +155,7 @@ fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
         .with(c.clone())
         .with(transform)
         .with(Motion::new())
+        .with(Direction{dir: Directions::Right})
         .named("character")
         .build()
 }

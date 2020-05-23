@@ -2,7 +2,6 @@ use amethyst::{
     derive::SystemDesc,
     ecs::{Entity, Read, System, SystemData, WriteStorage},
     input::{InputHandler, StringBindings},
-    core::math::Vector2,
 };
 
 use crate::components::Motion;

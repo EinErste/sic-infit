@@ -1,10 +1,14 @@
 use amethyst::{
-    ecs::Component
+    ecs::{Component, DenseVecStorage}
 };
 
 #[derive(Component)]
 #[storage(DenseVecStorage)]
-pub enum Direction {
+pub struct Direction{
+    pub(crate) dir: Directions
+}
+
+pub enum Directions {
     Left, Right
 }
 

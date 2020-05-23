@@ -1,3 +1,4 @@
+mod direction;
 mod camera;
 mod character;
 mod motion;
@@ -5,5 +6,6 @@ mod motion;
 pub use self::{
     camera::CameraSystem,
     character::CharacterSystem,
-    motion::MotionSystem
+    motion::MotionSystem,
+    direction::DirectionSystem
 };
