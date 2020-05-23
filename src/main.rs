@@ -10,7 +10,9 @@ use amethyst::{
     input::{InputBundle, StringBindings},
     ui::{RenderUi, UiBundle},
 };
+
 use crate::states::GameplayState;
+
 mod states;
 mod systems;
 mod components;
