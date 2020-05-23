@@ -27,10 +27,18 @@ impl<'s> System<'s> for CharacterSystem {
          */
         for (_camera, transform) in (&cameras, &mut transforms).join() {
             let movement =  input.axis_value("move");
+            let scale =  input.axis_value("camera");
             if let Some(mv_amount) = movement {
                 if mv_amount != 0.0 {
                     let scaled_amount = 4 as f32 * mv_amount as f32;
                     transform.prepend_translation_x(scaled_amount);
+                }
+            }
+
+            if let Some(mv_scale) = scale {
+                if mv_scale != 0.0 {
+                    let scaled_amount = 6 as f32 * mv_scale as f32;
+                    transform.prepend_translation_z(scaled_amount);
                 }
             }
         }
