@@ -14,9 +14,9 @@ use amethyst::{
     },
 };
 use log::info;
-use crate::systems::{CameraSystem, CharacterSystem, MotionSystem, DirectionSystem};
+use crate::systems::{CameraSystem, CharacterSystem, MotionSystem, DirectionSystem, SimpleAnimationSystem};
 use crate::states::PauseState;
-use crate::components::{Motion, Directions, Direction};
+use crate::components::{Motion, Directions, Direction, SimpleAnimation};
 
 #[derive(Default)]
 pub struct GameplayState<'a, 'b> {
@@ -28,6 +28,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
         let world = data.world;
         world.register::<Motion>();
         world.register::<Direction>();
+        world.register::<SimpleAnimation>();
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
 
@@ -39,6 +40,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
             .with(DirectionSystem{}, "direction_system", &[])
             .with(CameraSystem { character, camera }, "camera_system", &[])
             .with(CharacterSystem::new(character),"character_system", &[] )
+            .with(SimpleAnimationSystem{},"animation_system", &[] )
             .build();
 
         dispatcher.setup(world);
@@ -90,13 +92,13 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
         let texture_storage = world.read_resource::<AssetStorage<Texture>>();
         (
             loader.load(
-                "sprites/spritesheet.png",
+                "assets/spritesheet.png",
                 ImageFormat::default(),
                 (),
                 &texture_storage,
             ),
             loader.load(
-                "sprites/character/character.png",
+                "assets/character/player_anim_run64.png",
                 ImageFormat::default(),
                 (),
                 &texture_storage,
@@ -109,13 +111,13 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
         let sheet_storage = world.read_resource::<AssetStorage<SpriteSheet>>();
         (
             loader.load(
-                "sprites/spritesheet.ron",
+                "assets/spritesheet.ron",
                 SpriteSheetFormat(texture_handle),
                 (),
                 &sheet_storage,
             ),
             loader.load(
-                "sprites/character/character.ron",
+                "assets/character/player_anim_run64.ron",
                 SpriteSheetFormat(char_texture_handle),
                 (),
                 &sheet_storage,
@@ -136,19 +138,19 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
 
 fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
     let sprites = load_sprites(world);
+
     let b = &sprites[0];
-    let mut transform = Transform::default();
-    transform.set_translation_xyz(960., 180., 0.);
+    let transform =
+        Transform::default().set_translation_xyz(960., 180., 0.).to_owned();
     world
         .create_entity()
         .with(b.clone())
-        .with(transform.clone())
+        .with(transform)
         .build();
 
     let c = &sprites[1];
     let transform =
-        Transform::default()
-            .set_translation_xyz(100., 100., 1.)
+        Transform::default().set_translation_xyz(100., 100., 1.)
             .to_owned();
     world
         .create_entity()
@@ -157,5 +159,6 @@ fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
         .with(Motion::new())
         .with(Direction{dir: Directions::Right})
         .named("character")
+        .with(SimpleAnimation::new(2,8,0.1))
         .build()
 }
