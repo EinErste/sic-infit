@@ -30,7 +30,7 @@ impl<'s> System<'s> for CharacterSystem {
     fn run(&mut self, (mut motions, input): Self::SystemData) {
         let char = motions.get_mut(self.character).unwrap();
 
-        let speed = 2.;
+        let speed = 1.7;
 
         if let Some(x) = input.axis_value("x-axis") {
             if x == 0. {
