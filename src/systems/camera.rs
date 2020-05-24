@@ -17,8 +17,7 @@ impl<'s> System<'s> for CameraSystem {
     fn run(&mut self, mut transforms: Self::SystemData) {
         let char_translation = transforms.get(self.character).unwrap().translation().clone();
         let camera_transform = transforms.get_mut(self.camera).unwrap();
-        camera_transform.translation_mut().copy_from(&char_translation);
-        //TODO probably should change Z-level to something consistent
-        camera_transform.set_translation_z(1000.);
+        camera_transform.translation_mut().x = char_translation.x;
+        camera_transform.translation_mut().y = char_translation.y
     }
 }
