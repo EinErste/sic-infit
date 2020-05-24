@@ -2,10 +2,11 @@ use amethyst::{
     core::Time,
     derive::SystemDesc,
     ecs::{Join, System, SystemData, WriteStorage, Read},
-    renderer::SpriteRender
+    renderer::SpriteRender,
+    input::{InputHandler, StringBindings},
 };
 use crate::components::SimpleAnimation;
-
+use crate::components::StateAnimation;
 #[derive(SystemDesc)]
 pub struct SimpleAnimationSystem {}
 
@@ -13,19 +14,31 @@ impl<'s> System<'s> for SimpleAnimationSystem {
     type SystemData = (
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, SimpleAnimation>,
+        Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
     );
 
-    fn run(&mut self, (mut sprite_renders, mut animations, time): Self::SystemData) {
+    fn run(&mut self, (mut sprite_renders, mut animations, input, time): Self::SystemData) {
         for (sprite_render, anim) in (&mut sprite_renders, &mut animations).join() {
-            anim.elapsed_time += time.delta_seconds();
-            let frame_count = (anim.elapsed_time / anim.time_per_frame) as usize
-                % anim.frames;
-            if frame_count != anim.current_frame {
-                anim.current_frame = frame_count;
+
+            //TODO listen somewhere somehow more appropriate
+            if let Some(x) = input.axis_value("x-axis") {
+                if x != 0. {
+                    anim.change_state(StateAnimation::Go);
+                }
+                else{
+                    anim.change_state(StateAnimation::Idle);
+                }
+            }
+
+            let (start,end) = anim.states[anim.current_state];
+            let total = end - start;
+            anim.time_elapsed += time.delta_seconds();
+
+            let frame_count = ((anim.time_elapsed / anim.time_per_frame) as usize % total) + start;
+            if frame_count != sprite_render.sprite_number {
                 sprite_render.sprite_number = frame_count;
             }
-            //println!("{}", frame_count);
         }
     }
 }

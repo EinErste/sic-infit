@@ -16,7 +16,8 @@ use amethyst::{
 use log::info;
 use crate::systems::{CameraSystem, CharacterSystem, MotionSystem, DirectionSystem, SimpleAnimationSystem};
 use crate::states::PauseState;
-use crate::components::{Motion, Directions, Direction, SimpleAnimation};
+use crate::components::{Motion, Directions, Direction, SimpleAnimation, StateAnimation};
+use enum_map::{enum_map};
 
 #[derive(Default)]
 pub struct GameplayState<'a, 'b> {
@@ -151,7 +152,7 @@ fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
 
     let c = &sprites[1];
     let transform =
-        Transform::default().set_translation_xyz(100., 100., 1.).to_owned();
+        Transform::default().set_translation_xyz(320., 100., 1.).to_owned();
     world
         .create_entity()
         .with(c.clone())
@@ -159,6 +160,10 @@ fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
         .with(Motion::new())
         .with(Direction{dir: Directions::Right})
         .named("character")
-        .with(SimpleAnimation::new(2,8,0.1))
+        .with(SimpleAnimation::new(StateAnimation::Idle,0.1,enum_map!(
+            StateAnimation::Go => (0,8),
+            StateAnimation::Idle => (0,1),
+            _ => (0,1)
+        )))
         .build()
 }

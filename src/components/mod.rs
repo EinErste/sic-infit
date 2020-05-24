@@ -4,5 +4,5 @@ mod animation;
 pub use {
     motion::Motion,
     direction::{Direction, Directions},
-    animation::SimpleAnimation,
+    animation::{SimpleAnimation,StateAnimation}
 };
