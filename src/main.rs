@@ -10,13 +10,13 @@ use amethyst::{
     input::{InputBundle, StringBindings},
     ui::{RenderUi, UiBundle},
 };
-
-use crate::states::GameplayState;
+use specs::join::Join;
+use states::GameplayState;
 
 mod states;
 mod systems;
 mod components;
-
+mod recources;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
