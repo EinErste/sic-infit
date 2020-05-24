@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 log = { version = "0.4.8", features = ["serde"] }
 amethyst = "0.15.0"
-
+enum-map = "0.6.2"
 
 [features]
 default = ["vulkan"]
