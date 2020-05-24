@@ -80,7 +80,7 @@ fn init_camera(world: &mut World, dimensions: &ScreenDimensions) -> Entity {
 
     world
         .create_entity()
-        .with(Camera::standard_2d(dimensions.width() / 3 as f32, dimensions.height() / 3 as f32))
+        .with(Camera::standard_3d(dimensions.width() / 3 as f32, dimensions.height() / 3 as f32))
         .with(transform)
         .named("camera")
         .build()
@@ -133,7 +133,8 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
         SpriteRender {
             sprite_sheet: char_sheet_handle.clone(),
             sprite_number: 0,
-        }]
+        }
+    ]
 }
 
 fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
@@ -150,8 +151,7 @@ fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
 
     let c = &sprites[1];
     let transform =
-        Transform::default().set_translation_xyz(100., 100., 1.)
-            .to_owned();
+        Transform::default().set_translation_xyz(100., 100., 1.).to_owned();
     world
         .create_entity()
         .with(c.clone())
