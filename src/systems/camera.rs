@@ -15,11 +15,11 @@ impl<'s> System<'s> for CameraSystem {
     type SystemData = WriteStorage<'s, Transform>;
 
     fn run(&mut self, mut transforms: Self::SystemData) {
-        let char_translation = transforms.get(self.character).unwrap().translation().clone();
-        let camera_transform = transforms.get_mut(self.camera).unwrap();
+        let char = transforms.get(self.character).unwrap().translation().clone();
+        let cam = transforms.get_mut(self.camera).unwrap();
+
         //TODO
-        camera_transform.set_translation_xyz(char_translation[0]+250 as f32,char_translation[1]+80 as f32,300.);
-        //camera_transform.translation_mut().copy_from(&char_translation);
-        //camera_transform.set_translation_z(300.);
+        cam.translation_mut().x = char.x + 250.;
+        cam.translation_mut().y = char.y + 80.;
     }
 }

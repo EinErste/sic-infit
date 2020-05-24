@@ -1,10 +1,9 @@
 use amethyst::{
-    core::{Transform, Time},
+    core::Time,
     derive::SystemDesc,
-    ecs::{Entity, Component, System, SystemData, WriteStorage, Read},
+    ecs::{Join, System, SystemData, WriteStorage, Read},
     renderer::SpriteRender
 };
-use specs::join::Join;
 use crate::components::SimpleAnimation;
 
 #[derive(SystemDesc)]
