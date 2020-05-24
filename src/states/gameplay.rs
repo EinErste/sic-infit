@@ -161,7 +161,7 @@ fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
         .with(Direction{dir: Directions::Right})
         .named("character")
         .with(SimpleAnimation::new(StateAnimation::Idle,0.1,enum_map!(
-            StateAnimation::Go => (0,8),
+            StateAnimation::Go => (1,9),
             StateAnimation::Idle => (0,1),
             _ => (0,1)
         )))
