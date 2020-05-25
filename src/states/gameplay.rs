@@ -101,7 +101,7 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
                 &texture_storage,
             ),
             loader.load(
-                "assets/character/player_anim_run64.png",
+                "assets/character/player_anim.png",
                 ImageFormat::default(),
                 (),
                 &texture_storage,
@@ -120,7 +120,7 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
                 &sheet_storage,
             ),
             loader.load(
-                "assets/character/player_anim_run64.ron",
+                "assets/character/player_anim.ron",
                 SpriteSheetFormat(char_texture_handle),
                 (),
                 &sheet_storage,
@@ -200,10 +200,10 @@ fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
         .with(Motion::new())
         .with(Direction{dir: Directions::Right})
         .named("character")
-        .with(SimpleAnimation::new(StateAnimation::Idle,0.13,enum_map!(
-            StateAnimation::Run => (1,9),
-            StateAnimation::Idle => (0,1),
-            _ => (0,1)
+        .with(SimpleAnimation::new(StateAnimation::Idle,enum_map!(
+            StateAnimation::Run => (2,10,0.1),
+            StateAnimation::Idle => (0,2,0.8),
+            _ => (0,1,0.1)
         )))
         .build()
 }
