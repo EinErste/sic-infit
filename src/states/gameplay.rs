@@ -93,7 +93,7 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
         let texture_storage = world.read_resource::<AssetStorage<Texture>>();
         (
             loader.load(
-                "assets/daad.png",
+                "assets/HAHA.png",
                 ImageFormat::default(),
                 (),
                 &texture_storage,
@@ -161,7 +161,7 @@ fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
         .with(Direction{dir: Directions::Right})
         .named("character")
         .with(SimpleAnimation::new(StateAnimation::Idle,0.13,enum_map!(
-            StateAnimation::Go => (1,9),
+            StateAnimation::Run => (1,9),
             StateAnimation::Idle => (0,1),
             _ => (0,1)
         )))

@@ -21,16 +21,6 @@ impl<'s> System<'s> for SimpleAnimationSystem {
     fn run(&mut self, (mut sprite_renders, mut animations, input, time): Self::SystemData) {
         for (sprite_render, anim) in (&mut sprite_renders, &mut animations).join() {
 
-            //TODO listen somewhere somehow more appropriate
-            if let Some(x) = input.axis_value("x-axis") {
-                if x != 0. {
-                    anim.change_state(StateAnimation::Go);
-                }
-                else{
-                    anim.change_state(StateAnimation::Idle);
-                }
-            }
-
             let (start,end) = anim.states[anim.current_state];
             let total = end - start;
             anim.time_elapsed += time.delta_seconds();

@@ -4,7 +4,7 @@ use amethyst::{
     input::{InputHandler, StringBindings},
 };
 
-use crate::components::Motion;
+use crate::components::{Motion, SimpleAnimation, StateAnimation};
 
 ///This system controls the character control
 #[derive(SystemDesc)]
@@ -24,22 +24,25 @@ impl CharacterSystem {
 impl<'s> System<'s> for CharacterSystem {
     type SystemData = (
         WriteStorage<'s, Motion>,
+        WriteStorage<'s, SimpleAnimation>,
         Read<'s, InputHandler<StringBindings>>,
     );
 
-    fn run(&mut self, (mut motions, input): Self::SystemData) {
-        let char = motions.get_mut(self.character).unwrap();
-
+    fn run(&mut self, (mut motions, mut animations, input): Self::SystemData) {
+        let char_motion = motions.get_mut(self.character).unwrap();
+        let char_anim = animations.get_mut(self.character).unwrap();
         let speed = 1.7;
 
         if let Some(x) = input.axis_value("x-axis") {
             if x == 0. {
-               char.update_velocity((0.,0.));
+                char_motion.update_velocity((0.,0.));
+                char_anim.change_state(StateAnimation::Idle);
             } else {
                 let speed = speed * x;
-                char.update_velocity(
+                char_motion.update_velocity(
                     (speed , 0.)
                 );
+                char_anim.change_state(StateAnimation::Run);
             }
         }
     }

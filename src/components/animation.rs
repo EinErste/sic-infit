@@ -18,7 +18,7 @@ pub struct SimpleAnimation{
 pub enum StateAnimation{
     Static,
     Idle,
-    Go,
+    Run,
 }
 
 
