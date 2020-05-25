@@ -26,7 +26,7 @@ impl SimpleAnimation {
     {
         SimpleAnimation {
             current_state,
-            time_elapsed: 0.9,
+            time_elapsed: 0.0,
             state_changed: false,
             states
         }
@@ -35,7 +35,7 @@ impl SimpleAnimation {
     pub fn change_state(&mut self, new_state: StateAnimation){
 
         if new_state!=self.current_state {
-            self.time_elapsed = 0.9;
+            self.time_elapsed = 0.0;
             self.current_state = new_state;
         }
 
