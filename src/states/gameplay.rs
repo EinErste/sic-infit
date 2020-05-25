@@ -18,6 +18,8 @@ use crate::systems::{CameraSystem, CharacterSystem, MotionSystem, DirectionSyste
 use crate::states::PauseState;
 use crate::components::{Motion, Directions, Direction, SimpleAnimation, StateAnimation};
 use enum_map::{enum_map};
+use std::borrow::BorrowMut;
+use std::iter::Iterator;
 
 #[derive(Default)]
 pub struct GameplayState<'a, 'b> {
@@ -93,7 +95,7 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
         let texture_storage = world.read_resource::<AssetStorage<Texture>>();
         (
             loader.load(
-                "assets/HAHA.png",
+                "assets/da.png",
                 ImageFormat::default(),
                 (),
                 &texture_storage,
@@ -126,10 +128,45 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
         )
     };
 
+    // (0..4)
+    //     .map(|i| SpriteRender {
+    //         sprite_sheet: sheet_handle.clone(),
+    //         sprite_number: i,
+    //     })
+    //     .collect()
+
     vec![
         SpriteRender {
             sprite_sheet: sheet_handle.clone(),
             sprite_number: 0,
+        },
+        SpriteRender {
+            sprite_sheet: sheet_handle.clone(),
+            sprite_number: 1,
+        },
+        SpriteRender {
+            sprite_sheet: sheet_handle.clone(),
+            sprite_number: 2,
+        },
+        SpriteRender {
+            sprite_sheet: sheet_handle.clone(),
+            sprite_number: 3,
+        },
+        SpriteRender {
+            sprite_sheet: sheet_handle.clone(),
+            sprite_number: 4,
+        },
+        SpriteRender {
+            sprite_sheet: sheet_handle.clone(),
+            sprite_number: 5,
+        },
+        SpriteRender {
+            sprite_sheet: sheet_handle.clone(),
+            sprite_number: 6,
+        },
+        SpriteRender {
+            sprite_sheet: sheet_handle.clone(),
+            sprite_number: 7,
         },
         SpriteRender {
             sprite_sheet: char_sheet_handle.clone(),
@@ -140,17 +177,20 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
 
 fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
     let sprites = load_sprites(world);
+    let dist:Vec<f32> = vec![-50.,-30.,-15.,-7.,-5.0,-3.,0.,1.];
+    for (i,j) in dist.iter().enumerate(){
+        let b = &sprites[i].clone();
+        let transform =
+            Transform::default().set_translation_xyz(960., 180., *j).to_owned();
+        world
+            .create_entity()
+            .with(b.clone())
+            .with(transform)
+            .build();
+    }
 
-    let b = &sprites[0];
-    let transform =
-        Transform::default().set_translation_xyz(960., 180., 0.).to_owned();
-    world
-        .create_entity()
-        .with(b.clone())
-        .with(transform)
-        .build();
 
-    let c = &sprites[1];
+    let c = &sprites[8];
     let transform =
         Transform::default().set_translation_xyz(320., 100., 1.).to_owned();
     world
