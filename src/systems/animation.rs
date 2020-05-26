@@ -6,7 +6,6 @@ use amethyst::{
     input::{InputHandler, StringBindings},
 };
 use crate::components::SimpleAnimation;
-use crate::components::StateAnimation;
 #[derive(SystemDesc)]
 pub struct SimpleAnimationSystem {}
 

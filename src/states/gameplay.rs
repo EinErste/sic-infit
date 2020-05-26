@@ -1,24 +1,25 @@
 #[allow(unused_imports)]
 use amethyst::{
-    assets::{AssetStorage, Loader},
+    assets::{AssetStorage, Loader,ProgressCounter},
     core::transform::Transform,
     core::math::{Vector2, Vector3, Matrix4},
     input::{get_key, is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
     renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
     window::ScreenDimensions,
-    ui::{Anchor, TtfFormat, UiText, UiTransform},
+    ui::{Anchor, TtfFormat, UiText, UiTransform, UiCreator},
     ecs::{
         prelude::{Dispatcher, DispatcherBuilder},
         Entity,
     },
 };
-use log::info;
-use crate::systems::{CameraSystem, CharacterSystem, MotionSystem, DirectionSystem, SimpleAnimationSystem};
-use crate::states::PauseState;
-use crate::components::{Motion, Directions, Direction, SimpleAnimation, StateAnimation};
+use crate::{
+    systems::{CameraSystem, CharacterSystem, MotionSystem, DirectionSystem, SimpleAnimationSystem},
+    states::PauseState,
+    components::{Motion, Directions, Direction, SimpleAnimation, StateAnimation},
+};
+use log::{info};
 use enum_map::{enum_map};
-use std::borrow::BorrowMut;
 use std::iter::Iterator;
 
 #[derive(Default)]
@@ -34,7 +35,6 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
         world.register::<SimpleAnimation>();
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
-
         let camera = init_camera(world, &dimensions);
         let character = init_sprites(world, &dimensions);
 
@@ -45,7 +45,6 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
             .with(CharacterSystem::new(character),"character_system", &[] )
             .with(SimpleAnimationSystem{},"animation_system", &[] )
             .build();
-
         dispatcher.setup(world);
         self.dispatcher = Some(dispatcher);
     }
@@ -55,12 +54,11 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
             if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
                 return Trans::Quit;
             }
-
             if is_key_down(&event, VirtualKeyCode::P) {
                 return Trans::Push(Box::new(PauseState::default()));
             }
             if let Some(event) = get_key(&event) {
-                info!("handling key event: {:?}", event);
+                //info!("handling key event: {:?}", event);
             }
         }
         Trans::None
@@ -70,14 +68,13 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
         if let Some(dispatcher) = self.dispatcher.as_mut() {
             dispatcher.dispatch(&data.world);
         }
-
         Trans::None
     }
 }
 
 fn init_camera(world: &mut World, dimensions: &ScreenDimensions) -> Entity {
 
-    //Hardcoded camera size
+
     let mut transform = Transform::default();
     transform.set_translation_xyz(dimensions.width() / 6 as f32, dimensions.height() / 6 as f32, 300.);
 
@@ -95,13 +92,13 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
         let texture_storage = world.read_resource::<AssetStorage<Texture>>();
         (
             loader.load(
-                "assets/da.png",
+                "textures/background_forest.png",
                 ImageFormat::default(),
                 (),
                 &texture_storage,
             ),
             loader.load(
-                "assets/character/player_anim.png",
+                "textures/character.png",
                 ImageFormat::default(),
                 (),
                 &texture_storage,
@@ -114,13 +111,13 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
         let sheet_storage = world.read_resource::<AssetStorage<SpriteSheet>>();
         (
             loader.load(
-                "assets/spritesheet.ron",
+                "prefabs/background_forest.ron",
                 SpriteSheetFormat(texture_handle),
                 (),
                 &sheet_storage,
             ),
             loader.load(
-                "assets/character/player_anim.ron",
+                "prefabs/character.ron",
                 SpriteSheetFormat(char_texture_handle),
                 (),
                 &sheet_storage,
@@ -128,45 +125,10 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
         )
     };
 
-    // (0..4)
-    //     .map(|i| SpriteRender {
-    //         sprite_sheet: sheet_handle.clone(),
-    //         sprite_number: i,
-    //     })
-    //     .collect()
-
     vec![
         SpriteRender {
             sprite_sheet: sheet_handle.clone(),
             sprite_number: 0,
-        },
-        SpriteRender {
-            sprite_sheet: sheet_handle.clone(),
-            sprite_number: 1,
-        },
-        SpriteRender {
-            sprite_sheet: sheet_handle.clone(),
-            sprite_number: 2,
-        },
-        SpriteRender {
-            sprite_sheet: sheet_handle.clone(),
-            sprite_number: 3,
-        },
-        SpriteRender {
-            sprite_sheet: sheet_handle.clone(),
-            sprite_number: 4,
-        },
-        SpriteRender {
-            sprite_sheet: sheet_handle.clone(),
-            sprite_number: 5,
-        },
-        SpriteRender {
-            sprite_sheet: sheet_handle.clone(),
-            sprite_number: 6,
-        },
-        SpriteRender {
-            sprite_sheet: sheet_handle.clone(),
-            sprite_number: 7,
         },
         SpriteRender {
             sprite_sheet: char_sheet_handle.clone(),
@@ -176,21 +138,21 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
 }
 
 fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
-    let sprites = load_sprites(world);
+    let mut sprites = load_sprites(world);
     let dist:Vec<f32> = vec![-50.,-30.,-15.,-7.,-5.0,-3.,0.,1.];
     for (i,j) in dist.iter().enumerate(){
-        let b = &sprites[i].clone();
+        sprites[0].sprite_number = i;
+        let sprite = &sprites[0];
         let transform =
             Transform::default().set_translation_xyz(960., 180., *j).to_owned();
         world
             .create_entity()
-            .with(b.clone())
+            .with(sprite.clone())
             .with(transform)
             .build();
     }
 
-
-    let c = &sprites[8];
+    let c = &sprites[1];
     let transform =
         Transform::default().set_translation_xyz(320., 100., 1.).to_owned();
     world
