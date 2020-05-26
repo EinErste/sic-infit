@@ -2,7 +2,7 @@
 use amethyst::{
     assets::{AssetStorage, Loader,ProgressCounter},
     core::transform::Transform,
-    core::math::{Vector2, Vector3, Matrix4},
+    core::math::{Vector2, Vector3, Matrix4,},
     input::{get_key, is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
     renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
@@ -21,6 +21,8 @@ use crate::{
 use log::{info};
 use enum_map::{enum_map};
 use std::iter::Iterator;
+use crate::components::Parallax;
+use crate::systems::ParallaxSystem;
 
 #[derive(Default)]
 pub struct GameplayState<'a, 'b> {
@@ -33,6 +35,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
         world.register::<Motion>();
         world.register::<Direction>();
         world.register::<SimpleAnimation>();
+        world.register::<Parallax>();
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         let camera = init_camera(world, &dimensions);
@@ -43,6 +46,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
             .with(DirectionSystem{}, "direction_system", &[])
             .with(CameraSystem { character, camera }, "camera_system", &[])
             .with(CharacterSystem::new(character),"character_system", &[] )
+            .with(ParallaxSystem::new(character),"parallax_system", &[] )
             .with(SimpleAnimationSystem{},"animation_system", &[] )
             .build();
         dispatcher.setup(world);
@@ -139,16 +143,21 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
 
 fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
     let mut sprites = load_sprites(world);
-    let dist:Vec<f32> = vec![-50.,-30.,-15.,-7.,-5.0,-3.,0.,1.];
-    for (i,j) in dist.iter().enumerate(){
+    //let distances:Vec<f32> = vec![-100.,-30.,-15.,-7.,-5.0,-3.,0.,1.];
+    let distances:Vec<f32> = vec![-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,0.0,0.2];
+    let scales:Vec<f32> = vec![0.7,0.6,0.5,0.4,0.2,0.05,0.,-0.05];
+    for i in 0..8 {
         sprites[0].sprite_number = i;
         let sprite = &sprites[0];
-        let transform =
-            Transform::default().set_translation_xyz(960., 180., *j).to_owned();
+        let mut transform = Transform::default();
+        // transform.set_translation_xyz(960., 180., distances[i]).set_scale( Vector3::from_element(scales[i]));
+        transform.set_translation_xyz(960., 180., distances[i]);
         world
             .create_entity()
             .with(sprite.clone())
             .with(transform)
+            .with(Motion::default())
+            .with(Parallax::new(scales[i],0.))
             .build();
     }
 

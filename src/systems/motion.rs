@@ -18,15 +18,16 @@ impl<'s> System<'s> for MotionSystem {
     );
 
     fn run(&mut self, (motions, mut dirs, mut transforms): Self::SystemData) {
-        for (motion, dir, transform) in (&motions, &mut dirs, &mut transforms).join() {
+        for (motion, transform) in (&motions, &mut transforms).join() {
             transform.prepend_translation_x(motion.velocity.x);
+            transform.prepend_translation_y(motion.velocity.y);
+        }
+        for (motion, dir) in (&motions, &mut dirs,).join() {
             if motion.velocity.x < 0. {
                 dir.dir = Directions::Left;
-            } else if motion.velocity.x > 0. {
+            } else {
                 dir.dir = Directions::Right;
-            };
-
-            transform.prepend_translation_y(motion.velocity.y);
+            }
         }
     }
 }

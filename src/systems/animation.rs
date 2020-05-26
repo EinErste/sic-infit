@@ -13,14 +13,13 @@ impl<'s> System<'s> for SimpleAnimationSystem {
     type SystemData = (
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, SimpleAnimation>,
-        Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
     );
 
-    fn run(&mut self, (mut sprite_renders, mut animations, input, time): Self::SystemData) {
+    fn run(&mut self, (mut sprite_renders, mut animations, time): Self::SystemData) {
         for (sprite_render, anim) in (&mut sprite_renders, &mut animations).join() {
 
-            let (start,end, time_per_frame) = anim.states[anim.current_state];
+            let (start, end, time_per_frame) = anim.states[anim.current_state];
             let total = end - start;
             anim.time_elapsed += time.delta_seconds();
 

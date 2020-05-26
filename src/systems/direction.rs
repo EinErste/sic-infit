@@ -19,7 +19,7 @@ impl<'s> System<'s> for DirectionSystem {
         for (transform, dir) in (&mut transforms, &dirs).join() {
             match dir.dir {
                 Directions::Right => transform.set_rotation_y_axis(0.),
-                Directions::Left => transform.set_rotation_y_axis(std::f32::consts::PI)
+                Directions::Left => transform.set_rotation_y_axis(std::f32::consts::PI),
             };
         }
     }
