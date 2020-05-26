@@ -25,7 +25,7 @@ impl<'s> System<'s> for MotionSystem {
         for (motion, dir) in (&motions, &mut dirs,).join() {
             if motion.velocity.x < 0. {
                 dir.dir = Directions::Left;
-            } else {
+            } else if motion.velocity.x > 0.{
                 dir.dir = Directions::Right;
             }
         }
