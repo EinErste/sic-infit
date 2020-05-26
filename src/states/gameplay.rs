@@ -145,7 +145,7 @@ fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
     let mut sprites = load_sprites(world);
     //let distances:Vec<f32> = vec![-100.,-30.,-15.,-7.,-5.0,-3.,0.,1.];
     let distances:Vec<f32> = vec![-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,0.0,0.2];
-    let scales:Vec<f32> = vec![0.7,0.6,0.5,0.4,0.2,0.05,0.,-0.05];
+    let scales:Vec<f32> = vec![0.7,0.6,0.5,0.4,0.3,0.1,0.,0.1];
     for i in 0..8 {
         sprites[0].sprite_number = i;
         let sprite = &sprites[0];
