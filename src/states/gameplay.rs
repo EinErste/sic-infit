@@ -1,28 +1,24 @@
 #[allow(unused_imports)]
 use amethyst::{
-    assets::{AssetStorage, Loader,ProgressCounter},
+    assets::{AssetStorage, Loader,ProgressCounter,Handle},
     core::transform::Transform,
-    core::math::{Vector2, Vector3, Matrix4,},
     input::{get_key, is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
-    renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
     window::ScreenDimensions,
-    ui::{Anchor, TtfFormat, UiText, UiTransform, UiCreator},
     ecs::{
         prelude::{Dispatcher, DispatcherBuilder},
         Entity,
     },
 };
 use crate::{
-    systems::{CameraSystem, CharacterSystem, MotionSystem, DirectionSystem, SimpleAnimationSystem},
+    systems::{CameraSystem, CharacterSystem, MotionSystem, DirectionSystem, SimpleAnimationSystem,ParallaxSystem},
     states::PauseState,
-    components::{Motion, Directions, Direction, SimpleAnimation, StateAnimation},
+    components::{Motion, Direction, SimpleAnimation,Parallax},
+    resources::{load_assets,AssetType},
+    entities::{load_background_forest,load_character}
 };
 use log::{info};
-use enum_map::{enum_map};
-use std::iter::Iterator;
-use crate::components::Parallax;
-use crate::systems::ParallaxSystem;
+use crate::entities::init_camera;
 
 #[derive(Default)]
 pub struct GameplayState<'a, 'b> {
@@ -31,15 +27,20 @@ pub struct GameplayState<'a, 'b> {
 
 impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        let world = data.world;
+        let mut world = data.world;
         world.register::<Motion>();
         world.register::<Direction>();
         world.register::<SimpleAnimation>();
         world.register::<Parallax>();
 
-        let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
-        let camera = init_camera(world, &dimensions);
-        let character = init_sprites(world, &dimensions);
+        let camera = init_camera(world);
+
+        load_assets(&mut world,vec![
+                AssetType::BackgroundForest,
+                AssetType::Character
+            ]);
+        load_background_forest(&mut world);
+        let character = load_character(&mut world);
 
         let mut dispatcher = DispatcherBuilder::new()
             .with(MotionSystem{}, "motion_system", &[])
@@ -61,7 +62,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
             if is_key_down(&event, VirtualKeyCode::P) {
                 return Trans::Push(Box::new(PauseState::default()));
             }
-            if let Some(event) = get_key(&event) {
+            if let Some(_event) = get_key(&event) {
                 //info!("handling key event: {:?}", event);
             }
         }
@@ -74,107 +75,4 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
         }
         Trans::None
     }
-}
-
-fn init_camera(world: &mut World, dimensions: &ScreenDimensions) -> Entity {
-
-
-    let mut transform = Transform::default();
-    transform.set_translation_xyz(dimensions.width() / 6 as f32, dimensions.height() / 6 as f32, 300.);
-
-    world
-        .create_entity()
-        .with(Camera::standard_3d(dimensions.width() / 3 as f32, dimensions.height() / 3 as f32))
-        .with(transform)
-        .named("camera")
-        .build()
-}
-
-fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
-    let (texture_handle, char_texture_handle) = {
-        let loader = world.read_resource::<Loader>();
-        let texture_storage = world.read_resource::<AssetStorage<Texture>>();
-        (
-            loader.load(
-                "textures/background_forest.png",
-                ImageFormat::default(),
-                (),
-                &texture_storage,
-            ),
-            loader.load(
-                "textures/character.png",
-                ImageFormat::default(),
-                (),
-                &texture_storage,
-            )
-        )
-    };
-
-    let (sheet_handle, char_sheet_handle) = {
-        let loader = world.read_resource::<Loader>();
-        let sheet_storage = world.read_resource::<AssetStorage<SpriteSheet>>();
-        (
-            loader.load(
-                "prefabs/background_forest.ron",
-                SpriteSheetFormat(texture_handle),
-                (),
-                &sheet_storage,
-            ),
-            loader.load(
-                "prefabs/character.ron",
-                SpriteSheetFormat(char_texture_handle),
-                (),
-                &sheet_storage,
-            )
-        )
-    };
-
-    vec![
-        SpriteRender {
-            sprite_sheet: sheet_handle.clone(),
-            sprite_number: 0,
-        },
-        SpriteRender {
-            sprite_sheet: char_sheet_handle.clone(),
-            sprite_number: 0,
-        }
-    ]
-}
-
-fn init_sprites(world: &mut World, _dimensions: &ScreenDimensions) -> Entity {
-    let mut sprites = load_sprites(world);
-    //let distances:Vec<f32> = vec![-100.,-30.,-15.,-7.,-5.0,-3.,0.,1.];
-    let distances:Vec<f32> = vec![-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,0.0,0.2];
-    let scales:Vec<f32> = vec![0.7,0.6,0.5,0.4,0.3,0.1,0.,0.1];
-    for i in 0..8 {
-        sprites[0].sprite_number = i;
-        let sprite = &sprites[0];
-        let mut transform = Transform::default();
-        // transform.set_translation_xyz(960., 180., distances[i]).set_scale( Vector3::from_element(scales[i]));
-        transform.set_translation_xyz(960., 180., distances[i]);
-        world
-            .create_entity()
-            .with(sprite.clone())
-            .with(transform)
-            .with(Motion::default())
-            .with(Parallax::new(scales[i],0.))
-            .build();
-    }
-
-    let c = &sprites[1];
-    let transform =
-        Transform::default().set_translation_xyz(320., 100., 1.).to_owned();
-    world
-        .create_entity()
-        .with(c.clone())
-        .with(transform)
-        .with(Motion::new())
-        .with(Direction{dir: Directions::Right})
-        .named("character")
-        .with(SimpleAnimation::new(StateAnimation::Idle,enum_map!(
-            StateAnimation::Run => (2,10,0.1),
-            StateAnimation::Idle => (0,2,0.8),
-            _ => (0,1,0.1)
-        )))
-        .build()
 }

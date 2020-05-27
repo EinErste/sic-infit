@@ -3,7 +3,6 @@ use amethyst::{
     derive::SystemDesc,
     ecs::{Join, System, SystemData, WriteStorage, Read},
     renderer::SpriteRender,
-    input::{InputHandler, StringBindings},
 };
 use crate::components::SimpleAnimation;
 #[derive(SystemDesc)]

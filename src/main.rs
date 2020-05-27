@@ -16,13 +16,14 @@ mod states;
 mod systems;
 mod components;
 mod resources;
+mod entities;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
 
     let app_root = application_root_dir()?;
 
-    let resources = app_root.join("resources");
+    let resources = app_root.join("assets");
     let display_config = resources.join("display_config.ron");
 
 
