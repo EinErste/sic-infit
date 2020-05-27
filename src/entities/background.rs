@@ -1,6 +1,7 @@
 use amethyst::prelude::{World, WorldExt, Builder};
 use amethyst::core::transform::Transform;
 use amethyst::renderer::SpriteRender;
+use amethyst::ecs::Entity;
 use crate::resources::{SpriteSheetList, AssetType};
 use crate::components::{Motion, Parallax};
 
@@ -18,7 +19,6 @@ pub fn load_background_forest(world: &mut World){
             sprite_number: i,
         };
         let mut transform = Transform::default();
-        // transform.set_translation_xyz(960., 180., distances[i]).set_scale( Vector3::from_element(scales[i]));
         transform.set_translation_xyz(960., 180., distances[i]);
         world
             .create_entity()
@@ -28,5 +28,24 @@ pub fn load_background_forest(world: &mut World){
             .with(Parallax::new(speed_ratio[i],0.))
             .build();
     }
+}
+
+pub fn load_intro(world: &mut World) -> Entity{
+
+    let sprite_sheet_handle = {
+        let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
+        sprite_sheet_list.get(AssetType::Intro).unwrap().clone()
+    };
+    let sprite = SpriteRender {
+        sprite_sheet: sprite_sheet_handle.clone(),
+        sprite_number: 0,
+    };
+    let mut transform = Transform::default();
+    transform.set_translation_xyz(420., 180., 3.);
+    world
+        .create_entity()
+        .with(sprite.clone())
+        .with(transform)
+        .build()
 
 }

@@ -10,7 +10,7 @@ use amethyst::{
     input::{InputBundle, StringBindings},
     ui::{RenderUi, UiBundle},
 };
-use states::GameplayState;
+use crate::states::LoadingState;
 
 mod states;
 mod systems;
@@ -44,7 +44,7 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(input_bundle)?
         .with_bundle(UiBundle::<StringBindings>::new())?;
 
-    let mut game = Application::new(resources, GameplayState::default(), game_data)?;
+    let mut game = Application::new(resources, LoadingState::default(), game_data)?;
     game.run();
     Ok(())
 }
