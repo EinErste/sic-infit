@@ -37,12 +37,12 @@ impl SimpleState for LoadingState {
                 println!("end");
                 let mut world: &mut World = data.world;
                 let camera = init_camera(world);
-                let intro = load_intro(&mut world);
+                //let intro = load_intro(&mut world);
                 load_background_forest(&mut world);
                 let character = load_character(&mut world);
-                world.delete_entity(intro).unwrap();
+                //world.delete_entity(intro).unwrap();
                 return Trans::Switch(Box::new(GameplayState{dispatcher: None, character, camera}));
-            }else{
+            } else {
                 println!("start");
             }
         }

@@ -5,6 +5,9 @@ use amethyst::ecs::Entity;
 use crate::resources::{SpriteSheetList, AssetType};
 use crate::components::{Motion, Direction, SimpleAnimation, Directions, StateAnimation};
 use enum_map::{enum_map};
+use amethyst_physics::prelude::{ShapeDesc, RigidBodyDesc};
+use amethyst_physics::servers::PhysicsWorld;
+use amethyst::core::math::Vector3;
 
 pub fn load_character(world: &mut World) -> Entity{
     let sprite_sheet_handle = {
@@ -12,10 +15,21 @@ pub fn load_character(world: &mut World) -> Entity{
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
     };
     let transform =
-        Transform::default().set_translation_xyz(320., 100., 1.).to_owned();
+        Transform::default().set_translation_xyz(320., 300., 1.).to_owned();
     let sprite = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 0,
+    };
+    let shape = {
+        let desc = ShapeDesc::Cube {half_extents: Vector3::new(24.,32.,1.)};
+        let physics_world = world.fetch::<PhysicsWorld<f32>>();
+        physics_world.shape_server().create(&desc)
+    };
+
+    let rb = {
+        let mut rb_desc = RigidBodyDesc::default();
+        let physics_world = world.fetch::<PhysicsWorld<f32>>();
+        physics_world.rigid_body_server().create(&rb_desc)
     };
     world
         .create_entity()
@@ -24,6 +38,8 @@ pub fn load_character(world: &mut World) -> Entity{
         .with(Motion::new())
         .with(Direction{dir: Directions::Right})
         .named("character")
+        .with(shape)
+        .with(rb)
         .with(SimpleAnimation::new(StateAnimation::Idle,enum_map!(
             StateAnimation::Run => (2,10,0.1),
             StateAnimation::Idle => (0,2,0.8),
