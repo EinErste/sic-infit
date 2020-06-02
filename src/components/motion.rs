@@ -20,10 +20,7 @@ impl Motion {
         Self::default()
     }
 
-    pub fn update_velocity(
-        &mut self,
-        (x, y): (f32, f32),
-    ) {
+    pub fn update_velocity(&mut self, (x, y): (f32, f32), ) {
         self.velocity.x = x;
         self.velocity.y = y;
     }

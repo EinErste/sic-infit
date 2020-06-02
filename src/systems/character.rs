@@ -35,14 +35,22 @@ impl<'s> System<'s> for CharacterSystem {
 
         if let Some(x) = input.axis_value("x-axis") {
             if x == 0. {
-                char_motion.update_velocity((0.,0.));
+                char_motion.update_velocity((0., 0.));
+
                 char_anim.change_state(StateAnimation::Idle);
             } else {
                 let speed = speed * x;
-                char_motion.update_velocity(
-                    (speed , 0.)
-                );
+                char_motion.update_velocity((speed, 0.));
+
                 char_anim.change_state(StateAnimation::Run);
+            }
+        }
+
+        if let Some(jump) = input.action_is_down("Jump"){
+            if jump {
+                char_motion.update_velocity((char_motion.velocity.x, 1.));
+            } else {
+                char_motion.update_velocity((char_motion.velocity.x, 0.));
             }
         }
     }

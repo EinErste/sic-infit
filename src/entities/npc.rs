@@ -5,7 +5,7 @@ use amethyst::ecs::Entity;
 use crate::resources::{SpriteSheetList, AssetType};
 use crate::components::{Motion, Direction, SimpleAnimation, Directions, StateAnimation};
 use enum_map::{enum_map};
-use amethyst_physics::prelude::{ShapeDesc, RigidBodyDesc};
+use amethyst_physics::prelude::{ShapeDesc, RigidBodyDesc, BodyMode};
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst::core::math::Vector3;
 
@@ -28,6 +28,8 @@ pub fn load_character(world: &mut World) -> Entity{
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
+        rb_desc.lock_translation_z = true;
+        rb_desc.friction = 0.;
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };

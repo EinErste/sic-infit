@@ -12,6 +12,7 @@ amethyst = "0.15.0"
 amethyst_physics = "0.2.0"
 amethyst_nphysics = "0.2.0"
 enum-map = "0.6.2"
+almost = "0.2.0"
 
 [features]
 default = ["vulkan"]

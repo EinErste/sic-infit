@@ -5,10 +5,9 @@ use amethyst::{
 };
 use crate::components::{Motion, Direction, SimpleAnimation, Parallax};
 use crate::resources::{load_assets, AssetType};
-use crate::entities::{load_background_forest, load_character, init_camera, load_intro};
+use crate::entities::{load_character, init_camera, load_intro, load_forest};
 use amethyst::prelude::World;
 use crate::states::GameplayState;
-use std::{thread, time};
 
 #[derive(Default)]
 pub struct LoadingState {
@@ -38,7 +37,7 @@ impl SimpleState for LoadingState {
                 let mut world: &mut World = data.world;
                 let camera = init_camera(world);
                 //let intro = load_intro(&mut world);
-                load_background_forest(&mut world);
+                load_forest(&mut world);
                 let character = load_character(&mut world);
                 //world.delete_entity(intro).unwrap();
                 return Trans::Switch(Box::new(GameplayState{dispatcher: None, character, camera}));
