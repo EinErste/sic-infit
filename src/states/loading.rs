@@ -3,9 +3,9 @@ use amethyst::{
     prelude::{GameData, SimpleState, SimpleTrans, StateData, Trans, WorldExt},
     ui::UiCreator,
 };
-use crate::components::{Motion, Direction, SimpleAnimation, Parallax};
+use crate::components::{Motion, Direction, SimpleAnimation, Parallax, Player};
 use crate::resources::{load_assets, AssetType};
-use crate::entities::{load_character, init_camera, load_intro, load_forest};
+use crate::entities::{load_player, init_camera, load_intro, load_forest};
 use amethyst::prelude::World;
 use crate::states::GameplayState;
 
@@ -21,6 +21,7 @@ impl SimpleState for LoadingState {
         world.register::<Direction>();
         world.register::<SimpleAnimation>();
         world.register::<Parallax>();
+        world.register::<Player>();
         self.progress_counter = Some(load_assets(&mut world,vec![
             AssetType::BackgroundForest,
             AssetType::Character,
@@ -38,9 +39,9 @@ impl SimpleState for LoadingState {
                 let camera = init_camera(world);
                 //let intro = load_intro(&mut world);
                 load_forest(&mut world);
-                let character = load_character(&mut world);
+                let player = load_player(&mut world);
                 //world.delete_entity(intro).unwrap();
-                return Trans::Switch(Box::new(GameplayState{dispatcher: None, character, camera}));
+                return Trans::Switch(Box::new(GameplayState{dispatcher: None, player, camera}));
             } else {
                 println!("start");
             }

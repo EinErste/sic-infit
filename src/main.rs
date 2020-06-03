@@ -2,7 +2,7 @@ use amethyst::{
     core::transform::TransformBundle,
     prelude::*,
     renderer::{
-        plugins::{RenderFlat2D, RenderToWindow,RenderSkybox},
+        plugins::{RenderFlat2D, RenderToWindow},
         types::DefaultBackend,
         RenderingBundle,
     },
@@ -14,8 +14,10 @@ use amethyst::{
 use crate::states::LoadingState;
 use amethyst_physics::{PhysicsBundle,prelude::*};
 use amethyst_nphysics::NPhysicsBackend;
-use crate::systems::PhysicsSystem;
+use crate::systems::{PhysicsSystem, ParallaxSystem};
 use almost::*;
+use crate::components::Parallax;
+
 mod states;
 mod systems;
 mod components;
@@ -40,6 +42,7 @@ fn main() -> amethyst::Result<()> {
             .with_frames_per_seconds(60)
             .with_max_sub_steps(8)
             .with_pre_physics(PhysicsSystem::default(), String::from("physics_system"),vec![])
+            .with_pre_physics(ParallaxSystem::default(), String::from("parallax_system"),vec![])
         )?
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()

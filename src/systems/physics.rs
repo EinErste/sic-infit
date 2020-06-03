@@ -35,9 +35,7 @@ impl<'s> System<'s> for PhysicsSystem {
 
             let mut velocity = server.linear_velocity(body_tag.get());
 
-            let is_in_air = {
-              !almost::zero_with(velocity.y,0.2)
-            };
+            let is_in_air = !almost::zero_with(velocity.y,0.2);
 
             if motion.velocity.y != 0. && !is_in_air{
                 server.apply_impulse(
@@ -52,17 +50,17 @@ impl<'s> System<'s> for PhysicsSystem {
                    &Vector3::new(0.,-FORCE_GRAVITY,0.));
            }
 
-            server.apply_force(
-                body_tag.get(),
-                &Vector3::new(motion.velocity.x * FORCE_MULTIPLIER,0.,0.));
-
-
-            // let mut velocity = server.linear_velocity(body_tag.get());
-            // velocity.x = motion.velocity.x * FORCE_MULTIPLIER;
-            // //Push
-            // server.set_linear_velocity(
+            // server.apply_force(
             //     body_tag.get(),
-            //             &velocity);
+            //     &Vector3::new(motion.velocity.x * FORCE_MULTIPLIER,0.,0.));
+
+
+            let mut velocity = server.linear_velocity(body_tag.get());
+            velocity.x = motion.velocity.x * 70.;
+            //Push
+            server.set_linear_velocity(
+                body_tag.get(),
+                        &velocity);
 
             dbg!(server.linear_velocity(body_tag.get()));
 

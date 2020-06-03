@@ -32,7 +32,8 @@ pub fn load_forest_path(world: &mut World){
         let mut rb_desc = RigidBodyDesc::default();
         rb_desc.mode = BodyMode::Static;
         rb_desc.mass = 100.;
-        rb_desc.friction = 0.;
+        rb_desc.friction = 0.01;
+        rb_desc.bounciness = 0.01;
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };
@@ -48,7 +49,7 @@ pub fn load_forest_path(world: &mut World){
 
 
 pub fn load_forest(world: &mut World){
-    let distances:Vec<f32> = vec![-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,0.0,0.2];
+    let distances:Vec<f32> = vec![-12.8,-12.7,-12.6,-12.5,-12.4,-12.3,0.0,12.2];
     let speed_ratio:Vec<f32> = vec![0.7,0.6,0.5,0.4,0.3,0.1,0.0,0.1];
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
@@ -57,6 +58,18 @@ pub fn load_forest(world: &mut World){
 
     for i in 0..8 {
         if i == 6 {continue};
+        let shape = {
+            let desc = ShapeDesc::Cube {half_extents: Vector3::new(0.1,0.1,0.1)};
+            let physics_world = world.fetch::<PhysicsWorld<f32>>();
+            physics_world.shape_server().create(&desc)
+        };
+
+        let rb = {
+            let mut rb_desc = RigidBodyDesc::default();
+            rb_desc.mode = BodyMode::Kinematic;
+            let physics_world = world.fetch::<PhysicsWorld<f32>>();
+            physics_world.rigid_body_server().create(&rb_desc)
+        };
         let sprite = SpriteRender {
             sprite_sheet: sprite_sheet_handle.clone(),
             sprite_number: i,
@@ -67,8 +80,9 @@ pub fn load_forest(world: &mut World){
             .create_entity()
             .with(sprite.clone())
             .with(transform)
-            .with(Motion::default())
             .with(Parallax::new(speed_ratio[i],0.))
+            .with(shape)
+            .with(rb)
             .build();
 
     }
