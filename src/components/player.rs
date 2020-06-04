@@ -5,5 +5,4 @@ use amethyst::{
 
 #[derive(Component, Default)]
 #[storage(DenseVecStorage)]
-pub struct Player {
-}
+pub struct Player {}

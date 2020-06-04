@@ -5,16 +5,17 @@ use amethyst::{
     core::math::Vector3
 };
 
-use crate::components::{Motion};
+use crate::components::{PhysicsBodyDescription};
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst_physics::PhysicsTime;
 use amethyst_physics::objects::PhysicsHandle;
-use amethyst_physics::prelude::{PhysicsRigidBodyTag};
+use amethyst_physics::prelude::{PhysicsRigidBodyTag, RigidBodyDesc};
 
 
 const FORCE_MULTIPLIER: f32 = 1000000.0;
-const FORCE_GRAVITY: f32 = 5000000.;
-const IMPULSE_JUMP: f32 =  2000000.;
+const ACCELERATION_G: f32 = 10.;
+const FORCE_GRAVITY: f32 = 1000.;
+const IMPULSE_JUMP: f32 =  1000000.;
 
 
 ///This system controls the character control
@@ -26,43 +27,38 @@ impl<'s> System<'s> for PhysicsSystem {
         ReadExpect<'s,PhysicsWorld<f32>>,
         ReadExpect<'s, PhysicsTime>,
         ReadStorage<'s, PhysicsHandle<PhysicsRigidBodyTag>>,
-        ReadStorage<'s, Motion>,
+        ReadStorage<'s, PhysicsBodyDescription>,
     );
 
-    fn run(&mut self, (physics_world,physics_time, rigid_body_tags, motions): Self::SystemData) {
-        let server = physics_world.rigid_body_server();
-        for(motion, body_tag) in (&motions,&rigid_body_tags).join(){
+    fn run(&mut self, (physics_world,physics_time, rigid_body_tags, body_descs): Self::SystemData) {
+        let body_server = physics_world.rigid_body_server();
+        //TODO move this line somewhere out of system
+        physics_world.world_server().set_gravity(&Vector3::new(0.,-FORCE_GRAVITY,0.));
 
-            let mut velocity = server.linear_velocity(body_tag.get());
+        for(body_desc, body_tag) in (&body_descs,&rigid_body_tags).join(){
 
+            let mut velocity = body_server.linear_velocity(body_tag.get());
             let is_in_air = !almost::zero_with(velocity.y,0.2);
 
-            if motion.velocity.y != 0. && !is_in_air{
-                server.apply_impulse(
+            if body_desc.velocity_direction().y != 0. && !is_in_air{
+                body_server.apply_impulse(
                         body_tag.get(),
-                        &Vector3::new(0.,IMPULSE_JUMP,0.));
+                        &Vector3::new(0.,body_desc.mass()*IMPULSE_JUMP,0.));
             }
-
-           if is_in_air {
-               //Gravity
-               server.apply_force(
-                   body_tag.get(),
-                   &Vector3::new(0.,-FORCE_GRAVITY,0.));
-           }
 
             // server.apply_force(
             //     body_tag.get(),
             //     &Vector3::new(motion.velocity.x * FORCE_MULTIPLIER,0.,0.));
 
 
-            let mut velocity = server.linear_velocity(body_tag.get());
-            velocity.x = motion.velocity.x * 70.;
+            let mut velocity = body_server.linear_velocity(body_tag.get());
+            velocity.x = body_desc.velocity_direction().x * body_desc.velocity_max();
             //Push
-            server.set_linear_velocity(
+            body_server.set_linear_velocity(
                 body_tag.get(),
                         &velocity);
 
-            dbg!(server.linear_velocity(body_tag.get()));
+            dbg!(body_server.linear_velocity(body_tag.get()));
 
         }
     }

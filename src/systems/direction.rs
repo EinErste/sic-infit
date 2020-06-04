@@ -4,7 +4,7 @@ use amethyst::{
     ecs::{Join, System, SystemData, WriteStorage, ReadStorage},
 };
 
-use crate::components::{Directions, Direction, Motion};
+use crate::components::{Directions, Direction, PhysicsBodyDescription};
 
 #[derive(SystemDesc)]
 pub struct DirectionSystem {}
@@ -13,14 +13,14 @@ impl<'s> System<'s> for DirectionSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
         WriteStorage<'s, Direction>,
-        ReadStorage<'s, Motion>
+        ReadStorage<'s, PhysicsBodyDescription>
     );
 
-    fn run(&mut self, (mut transforms, mut dirs, motions): Self::SystemData) {
-        for (motion, dir) in (&motions, &mut dirs,).join() {
-            if motion.velocity.x < 0. {
+    fn run(&mut self, (mut transforms, mut dirs, descriptions): Self::SystemData) {
+        for (desc, dir) in (&descriptions, &mut dirs,).join() {
+            if desc.velocity_direction().x < 0. {
                 dir.dir = Directions::Left;
-            } else if motion.velocity.x > 0.{
+            } else if desc.velocity_direction().x > 0.{
                 dir.dir = Directions::Right;
             }
         }

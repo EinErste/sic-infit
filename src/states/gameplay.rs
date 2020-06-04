@@ -11,7 +11,7 @@ use amethyst::{
     },
 };
 use crate::{
-    systems::{CameraSystem, CharacterSystem, DirectionSystem, SimpleAnimationSystem},
+    systems::{CameraSystem, PlayerSystem, DirectionSystem, SimpleAnimationSystem},
     states::PauseState,
 
 };
@@ -29,7 +29,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
         let mut dispatcher = DispatcherBuilder::new()
             .with(DirectionSystem{}, "direction_system", &[])
             .with(CameraSystem { character: self.player, camera: self.camera }, "camera_system", &[])
-            .with(CharacterSystem::new(self.player),"character_system", &[] )
+            .with(PlayerSystem::new(self.player),"player_system", &[] )
             .with(SimpleAnimationSystem{},"animation_system", &[] )
             .build();
         dispatcher.setup(world);

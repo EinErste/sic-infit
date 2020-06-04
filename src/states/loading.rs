@@ -3,9 +3,9 @@ use amethyst::{
     prelude::{GameData, SimpleState, SimpleTrans, StateData, Trans, WorldExt},
     ui::UiCreator,
 };
-use crate::components::{Motion, Direction, SimpleAnimation, Parallax, Player};
+use crate::components::{Direction, SimpleAnimation, Parallax, Player, PhysicsBodyDescription};
 use crate::resources::{load_assets, AssetType};
-use crate::entities::{load_player, init_camera, load_intro, load_forest};
+use crate::entities::{load_player, init_camera, load_intro, load_forest, load_lion};
 use amethyst::prelude::World;
 use crate::states::GameplayState;
 
@@ -17,7 +17,7 @@ pub struct LoadingState {
 impl SimpleState for LoadingState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let mut world = data.world;
-        world.register::<Motion>();
+        world.register::<PhysicsBodyDescription>();
         world.register::<Direction>();
         world.register::<SimpleAnimation>();
         world.register::<Parallax>();
@@ -40,6 +40,7 @@ impl SimpleState for LoadingState {
                 //let intro = load_intro(&mut world);
                 load_forest(&mut world);
                 let player = load_player(&mut world);
+                load_lion(&mut world);
                 //world.delete_entity(intro).unwrap();
                 return Trans::Switch(Box::new(GameplayState{dispatcher: None, player, camera}));
             } else {

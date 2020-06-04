@@ -4,7 +4,7 @@ use amethyst::{
     core::math::Vector3
 };
 
-use crate::components::{Motion, Parallax, Directions, Direction, Player};
+use crate::components::{Parallax, Directions, Direction, Player};
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst_physics::objects::PhysicsHandle;
 use amethyst_physics::prelude::PhysicsRigidBodyTag;

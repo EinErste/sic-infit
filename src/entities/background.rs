@@ -3,7 +3,7 @@ use amethyst::core::transform::Transform;
 use amethyst::renderer::{SpriteRender};
 use amethyst::ecs::Entity;
 use crate::resources::{SpriteSheetList, AssetType};
-use crate::components::{Motion, Parallax};
+use crate::components::{Parallax};
 use amethyst_physics::prelude::{ShapeDesc, RigidBodyDesc, BodyMode};
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst::core::math::Vector3;
@@ -32,8 +32,8 @@ pub fn load_forest_path(world: &mut World){
         let mut rb_desc = RigidBodyDesc::default();
         rb_desc.mode = BodyMode::Static;
         rb_desc.mass = 100.;
-        rb_desc.friction = 0.01;
-        rb_desc.bounciness = 0.01;
+        rb_desc.friction = 0.9;
+        rb_desc.bounciness = 0.0;
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };
