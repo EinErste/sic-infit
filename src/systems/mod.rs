@@ -1,13 +1,13 @@
 mod direction;
 mod camera;
-mod character;
-mod motion;
+mod player;
+mod physics;
 mod animation;
 mod parallax;
 pub use self::{
     camera::CameraSystem,
-    character::CharacterSystem,
-    motion::MotionSystem,
+    player::PlayerSystem,
+    physics::PhysicsSystem,
     direction::DirectionSystem,
     animation::SimpleAnimationSystem,
     parallax::ParallaxSystem

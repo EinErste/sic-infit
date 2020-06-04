@@ -11,16 +11,15 @@ use amethyst::{
     },
 };
 use crate::{
-    systems::{CameraSystem, CharacterSystem, MotionSystem, DirectionSystem, SimpleAnimationSystem,ParallaxSystem},
+    systems::{CameraSystem, PlayerSystem, DirectionSystem, SimpleAnimationSystem},
     states::PauseState,
-    resources::{load_assets,AssetType},
-    entities::{load_background_forest,load_character}
+
 };
 use log::{info};
 
 pub struct GameplayState<'a, 'b> {
     pub dispatcher: Option<Dispatcher<'a, 'b>>,
-    pub character: Entity,
+    pub player: Entity,
     pub camera: Entity
 }
 
@@ -28,11 +27,9 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         let mut dispatcher = DispatcherBuilder::new()
-            .with(MotionSystem{}, "motion_system", &[])
             .with(DirectionSystem{}, "direction_system", &[])
-            .with(CameraSystem { character: self.character, camera: self.camera }, "camera_system", &[])
-            .with(CharacterSystem::new(self.character),"character_system", &[] )
-            .with(ParallaxSystem::new(self.character),"parallax_system", &[] )
+            .with(CameraSystem { character: self.player, camera: self.camera }, "camera_system", &[])
+            .with(PlayerSystem::new(self.player),"player_system", &[] )
             .with(SimpleAnimationSystem{},"animation_system", &[] )
             .build();
         dispatcher.setup(world);

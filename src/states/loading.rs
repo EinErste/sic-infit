@@ -3,12 +3,11 @@ use amethyst::{
     prelude::{GameData, SimpleState, SimpleTrans, StateData, Trans, WorldExt},
     ui::UiCreator,
 };
-use crate::components::{Motion, Direction, SimpleAnimation, Parallax};
+use crate::components::{Direction, SimpleAnimation, Parallax, Player, PhysicsBodyDescription};
 use crate::resources::{load_assets, AssetType};
-use crate::entities::{load_background_forest, load_character, init_camera, load_intro};
+use crate::entities::{load_player, init_camera, load_intro, load_forest, load_lion};
 use amethyst::prelude::World;
 use crate::states::GameplayState;
-use std::{thread, time};
 
 #[derive(Default)]
 pub struct LoadingState {
@@ -18,10 +17,11 @@ pub struct LoadingState {
 impl SimpleState for LoadingState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let mut world = data.world;
-        world.register::<Motion>();
+        world.register::<PhysicsBodyDescription>();
         world.register::<Direction>();
         world.register::<SimpleAnimation>();
         world.register::<Parallax>();
+        world.register::<Player>();
         self.progress_counter = Some(load_assets(&mut world,vec![
             AssetType::BackgroundForest,
             AssetType::Character,
@@ -38,10 +38,11 @@ impl SimpleState for LoadingState {
                 let mut world: &mut World = data.world;
                 let camera = init_camera(world);
                 //let intro = load_intro(&mut world);
-                load_background_forest(&mut world);
-                let character = load_character(&mut world);
+                load_forest(&mut world);
+                let player = load_player(&mut world);
+                load_lion(&mut world);
                 //world.delete_entity(intro).unwrap();
-                return Trans::Switch(Box::new(GameplayState{dispatcher: None, character, camera}));
+                return Trans::Switch(Box::new(GameplayState{dispatcher: None, player, camera}));
             } else {
                 println!("start");
             }
