@@ -1,26 +1,14 @@
-use amethyst::{
-    renderer::RenderFlat2D,
-    prelude::*,
-    core::transform::{TransformBundle},
-    renderer::RenderToWindow,
-    renderer::types::DefaultBackend,
-    renderer::{RenderingBundle},
-    utils::application_root_dir,
-    InputBundle,
-    StringBindings,
-    RenderUi,
-    UiBundle,
-    ecs::prelude::ReadExpect,
-    StateMachine
-};
+use amethyst::{core::transform::TransformBundle, prelude::*, renderer::types::DefaultBackend,
+               renderer::RenderFlat2D,
+               renderer::RenderToWindow,
+               renderer::RenderingBundle,
+               utils::application_root_dir, input::{InputBundle, StringBindings}, ui::{RenderUi, UiBundle}, ecs::prelude::ReadExpect, StateMachine};
+use crate::states::LoadingState;
 use amethyst_physics::{PhysicsBundle,prelude::*};
 use amethyst_nphysics::NPhysicsBackend;
-use crate::{
-    states::LoadingState,
-    systems::{PhysicsSystem, ParallaxSystem, CurrentState},
-    components::Parallax
-};
+use crate::systems::{PhysicsSystem, ParallaxSystem, CurrentState};
 use almost::*;
+use crate::components::Parallax;
 
 mod states;
 mod systems;
