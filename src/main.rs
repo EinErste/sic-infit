@@ -4,11 +4,9 @@ use amethyst::{core::transform::TransformBundle, prelude::*, renderer::types::De
                renderer::RenderingBundle,
                utils::application_root_dir, input::{InputBundle, StringBindings}, ui::{RenderUi, UiBundle}, ecs::prelude::ReadExpect, StateMachine};
 use crate::states::LoadingState;
-use amethyst_physics::{PhysicsBundle,prelude::*};
+use amethyst_physics::{PhysicsBundle};
 use amethyst_nphysics::NPhysicsBackend;
-use crate::systems::{PhysicsSystem, ParallaxSystem, CurrentState};
-use almost::*;
-use crate::components::Parallax;
+use crate::systems::{PhysicsSystem};
 
 mod states;
 mod systems;
@@ -34,7 +32,6 @@ fn main() -> amethyst::Result<()> {
             .with_frames_per_seconds(60)
             .with_max_sub_steps(4)
             .with_pre_physics(PhysicsSystem::default(), String::from("physics_system"),vec![])
-            .with_pre_physics(ParallaxSystem::default(), String::from("parallax_system"),vec![])
         )?
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()

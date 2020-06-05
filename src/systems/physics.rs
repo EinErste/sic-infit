@@ -59,7 +59,7 @@ impl<'s> System<'s> for PhysicsSystem {
             //     body_tag.get(),
             //             &velocity);
 
-            dbg!(body_server.linear_velocity(body_tag.get()));
+            //dbg!(body_server.linear_velocity(body_tag.get()));
 
         }
     }

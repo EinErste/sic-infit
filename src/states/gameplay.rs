@@ -15,7 +15,6 @@ use crate::{
     states::PauseState,
 
 };
-use log::{info};
 use amethyst_physics::PhysicsTime;
 
 pub struct GameplayState<'a, 'b> {
