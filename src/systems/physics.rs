@@ -8,7 +8,7 @@ use amethyst::{
 use crate::components::{PhysicsBodyDescription};
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst_physics::PhysicsTime;
-use amethyst_physics::objects::PhysicsHandle;
+use amethyst_physics::objects::{PhysicsHandle, CollisionGroup};
 use amethyst_physics::prelude::{PhysicsRigidBodyTag, RigidBodyDesc};
 
 
@@ -16,7 +16,6 @@ const FORCE_MULTIPLIER: f32 = 1000000.0;
 const ACCELERATION_G: f32 = 10.;
 const FORCE_GRAVITY: f32 = 1000.;
 const IMPULSE_JUMP: f32 =  1000000.;
-
 
 ///This system controls the character control
 #[derive(SystemDesc,Default)]
@@ -46,16 +45,19 @@ impl<'s> System<'s> for PhysicsSystem {
                         &Vector3::new(0.,body_desc.mass()*IMPULSE_JUMP,0.));
             }
 
-            // body_server.apply_impulse(
-            //     body_tag.get(),
-            //     &Vector3::new(body_desc.velocity_direction().x * body_desc.velocity_max() * 100.,0.,0.));
-
             let mut velocity = body_server.linear_velocity(body_tag.get());
-            velocity.x = body_desc.velocity_direction().x * body_desc.velocity_max();
-            //Push
-            body_server.set_linear_velocity(
-                body_tag.get(),
-                        &velocity);
+            if !(velocity.x.abs() >= body_desc.velocity_max()) {
+                body_server.apply_impulse(
+                    body_tag.get(),
+                    &Vector3::new(body_desc.mass() * IMPULSE_JUMP/10. * body_desc.velocity_direction().x,0.,0.));
+            }
+
+            // let mut velocity = body_server.linear_velocity(body_tag.get());
+            // velocity.x = body_desc.velocity_direction().x * body_desc.velocity_max();
+            // //Push
+            // body_server.set_linear_velocity(
+            //     body_tag.get(),
+            //             &velocity);
 
             dbg!(body_server.linear_velocity(body_tag.get()));
 

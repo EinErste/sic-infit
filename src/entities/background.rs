@@ -31,8 +31,8 @@ pub fn load_forest_path(world: &mut World){
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
         rb_desc.mode = BodyMode::Static;
-        rb_desc.friction = 0.0;
-        rb_desc.bounciness = 0.0;
+        rb_desc.friction = 0.3;
+        rb_desc.bounciness = 0.00;
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };
@@ -49,7 +49,8 @@ pub fn load_forest_path(world: &mut World){
 
 pub fn load_forest(world: &mut World){
     let distances:Vec<f32> = vec![-12.8,-12.7,-12.6,-12.5,-12.4,-12.3,0.0,12.2];
-    let speed_ratio:Vec<f32> = vec![0.7,0.6,0.5,0.4,0.3,0.1,0.0,0.1];
+    let speed_ratio_x:Vec<f32> = vec![0.7,0.6,0.5,0.4,0.3,0.1,0.0,0.1];
+    let speed_ratio_y:Vec<f32> = vec![0.1,0.3,0.4,0.5,0.6,0.7,0.0,0.7];
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::BackgroundForest).unwrap().clone()
@@ -79,7 +80,7 @@ pub fn load_forest(world: &mut World){
             .create_entity()
             .with(sprite.clone())
             .with(transform)
-            .with(Parallax::new(speed_ratio[i],0.))
+            .with(Parallax::new(speed_ratio_x[i],-speed_ratio_y[i]))
             .with(shape)
             .with(rb)
             .build();
