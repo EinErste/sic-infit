@@ -8,6 +8,7 @@ use crate::resources::{load_assets, AssetType};
 use crate::entities::{load_player, init_camera, load_intro, load_forest, load_lion};
 use amethyst::prelude::World;
 use crate::states::GameplayState;
+use amethyst_physics::PhysicsTime;
 
 #[derive(Default)]
 pub struct LoadingState {
@@ -36,6 +37,9 @@ impl SimpleState for LoadingState {
             if progress_counter.is_complete() {
                 println!("end");
                 let mut world: &mut World = data.world;
+                //Pause physics
+                world.fetch_mut::<PhysicsTime>().set_frames_per_seconds(0);
+
                 let camera = init_camera(world);
                 //let intro = load_intro(&mut world);
                 load_forest(&mut world);

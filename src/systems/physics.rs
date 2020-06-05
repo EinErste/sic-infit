@@ -34,7 +34,7 @@ impl<'s> System<'s> for PhysicsSystem {
         let body_server = physics_world.rigid_body_server();
         //TODO move this line somewhere out of system
         physics_world.world_server().set_gravity(&Vector3::new(0.,-FORCE_GRAVITY,0.));
-
+        //physics_world.world_server().set_gravity(&Vector3::new(0.,0.,0.));
         for(body_desc, body_tag) in (&body_descs,&rigid_body_tags).join(){
 
             let mut velocity = body_server.linear_velocity(body_tag.get());
@@ -46,10 +46,9 @@ impl<'s> System<'s> for PhysicsSystem {
                         &Vector3::new(0.,body_desc.mass()*IMPULSE_JUMP,0.));
             }
 
-            // server.apply_force(
+            // body_server.apply_impulse(
             //     body_tag.get(),
-            //     &Vector3::new(motion.velocity.x * FORCE_MULTIPLIER,0.,0.));
-
+            //     &Vector3::new(body_desc.velocity_direction().x * body_desc.velocity_max() * 100.,0.,0.));
 
             let mut velocity = body_server.linear_velocity(body_tag.get());
             velocity.x = body_desc.velocity_direction().x * body_desc.velocity_max();

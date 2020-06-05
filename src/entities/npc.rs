@@ -43,7 +43,7 @@ pub fn load_player(world: &mut World) -> Entity{
         rb_desc.lock_rotation_z = true;
         rb_desc.friction = 0.0;
         rb_desc.bounciness = 0.0;
-        rb_desc.mass = 10000.;
+        rb_desc.mass = 10.;
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };
@@ -90,7 +90,8 @@ pub fn load_lion(world: &mut World){
         rb_desc.lock_rotation_z = true;
         rb_desc.friction = 0.0;
         rb_desc.bounciness = 0.0;
-        rb_desc.mass = 1.;
+        rb_desc.mass = 1000.;
+        rb_desc.mode = BodyMode::Dynamic;
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };

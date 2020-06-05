@@ -49,5 +49,13 @@ impl<'s> System<'s> for PlayerSystem {
                 player_desc.set_velocity_direction_y(0.);
             }
         }
+
+
+        // if player_anim.current_state == jump {
+        //     let (i,j,time_step) = player_anim.states[StateAnimation::Jump];
+        //     if player_anim.time_elapsed == time_step*(i-j){
+        //         player_anim.change_state(//Sosat);
+        //     }
+        // }
     }
 }
