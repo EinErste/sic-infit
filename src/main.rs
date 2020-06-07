@@ -14,6 +14,8 @@ use amethyst::{
 use crate::states::{LoadingState, StartState};
 use amethyst_physics::{PhysicsBundle,prelude::*};
 use amethyst_nphysics::NPhysicsBackend;
+use crate::systems::{PhysicsSystem};
+
 mod states;
 mod systems;
 mod components;
@@ -34,13 +36,16 @@ fn main() -> amethyst::Result<()> {
 
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
-        .with_bundle(PhysicsBundle::<f32,NPhysicsBackend>::new())?
+        .with_bundle(PhysicsBundle::<f32,NPhysicsBackend>::new()
+            .with_frames_per_seconds(60)
+            .with_max_sub_steps(4)
+            .with_pre_physics(PhysicsSystem::default(), String::from("physics_system"),vec![])
+        )?
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
                 .with_plugin(
                     RenderToWindow::from_config_path(display_config)?
                         .with_clear([0.34, 0.36, 0.52, 1.0]),
-
                 )
                 .with_plugin(RenderFlat2D::default())
                 .with_plugin(RenderUi::default()),
