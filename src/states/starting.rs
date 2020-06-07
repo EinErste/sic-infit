@@ -9,33 +9,32 @@ use amethyst::{
     ui::{Anchor, TtfFormat, UiText, UiFinder, UiTransform, UiCreator, UiEventType, UiWidget},
     ecs::prelude::{Entity, ResourceId},
 };
+use crate::states::LoadingState;
 
 #[derive(Default, Debug)]
-pub struct PauseState {
+pub struct StartState {
     ui: Option<Entity>,
     b1: Option<Entity>,
     b2: Option<Entity>,
     b3: Option<Entity>,
 }
 
-impl SimpleState for PauseState {
+impl SimpleState for StartState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         self.init_ui(data.world);
     }
 
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        // data.world.delete_entity(self.label.unwrap()).expect("Failed to delete entity. Was it already removed?");
-        if let Some(x) = self.ui {
-            data.world.delete_entity(x);
+        if let Some(ui) = self.ui {
+            data.world.delete_entity(ui);
         }
     }
-
 
     fn handle_event(&mut self, _data: StateData<'_, GameData<'_, '_>>, event: StateEvent) -> SimpleTrans {
         if let StateEvent::Ui(ui) = event {
             if ui.event_type == UiEventType::Click {
                 if ui.target == self.b1.unwrap() {
-                    return Trans::Pop;
+                    return Trans::Switch(Box::new(LoadingState::default()));
                 } else if ui.target == self.b2.unwrap() {
                     //TODO add here transition to settings
                 } else if ui.target == self.b3.unwrap() {
@@ -59,45 +58,10 @@ impl SimpleState for PauseState {
     }
 }
 
-impl PauseState {
+impl StartState {
     fn init_ui(&mut self, world: &mut World) {
         self.ui = world.exec(|mut creator: UiCreator<'_>| {
-            Some(creator.create("prefabs/ui/pause.ron", ()))
+            Some(creator.create("prefabs/ui/start.ron", ()))
         });
     }
 }
-// self.b1 = world.exec(|finder: UiFinder<'_>| finder.find("button_1"));
-// self.b2 = world.exec(|finder: UiFinder<'_>| finder.find("button_2"));
-// self.b3 = world.exec(|finder: UiFinder<'_>| finder.find("button_3"));
-//
-// dbg!(self);
-
-
-//
-// let font = world.read_resource::<Loader>().load(
-//     "../font/square.ttf",
-//     TtfFormat,
-//     (),
-//     &world.read_resource(),
-// );
-// let p1_transform = UiTransform::new(
-//     "PAUSE".to_string(),
-//     Anchor::Middle,
-//     Anchor::Middle,
-//     0.,
-//     0.,
-//     3.,
-//     640.,
-//     300.,
-// );
-//
-// world
-//     .create_entity()
-//     .with(p1_transform)
-//     .with(UiText::new(
-//         font.clone(),
-//         "PAUSE".to_string(),
-//         [0.,0.,0.,1.],
-//         100.,
-//     ))
-//     .build()

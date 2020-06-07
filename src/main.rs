@@ -11,7 +11,7 @@ use amethyst::{
     ui::{RenderUi, UiBundle},
     ecs::prelude::ReadExpect
 };
-use crate::states::LoadingState;
+use crate::states::{LoadingState, StartState};
 use amethyst_physics::{PhysicsBundle,prelude::*};
 use amethyst_nphysics::NPhysicsBackend;
 mod states;
@@ -49,7 +49,7 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(input_bundle)?
         .with_bundle(UiBundle::<StringBindings>::new())?;
 
-    let mut game = Application::new(resources, LoadingState::default(), game_data)?;
+    let mut game = Application::new(resources, StartState::default(), game_data)?;
     game.run();
     Ok(())
 }

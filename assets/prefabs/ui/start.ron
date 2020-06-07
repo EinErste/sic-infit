@@ -6,7 +6,7 @@ Container(
         height: 1080,
         mouse_reactive: false,
     ),
-    background: Texture(File("textures/ui/pause.png", ("IMAGE", ()))),
+    background: Texture(File("textures/ui/start_final.png", ("IMAGE", ()))),
     children:[
         Image(
             transform: (
@@ -18,7 +18,7 @@ Container(
                 anchor: TopMiddle,
                 mouse_reactive: true,
             ),
-            image: Texture(File("textures/ui/continue_button.png", ("IMAGE", ()))),
+            image: Texture(File("textures/ui/play_button.png", ("IMAGE", ()))),
         ),
         Image(
             transform: (
