@@ -3,7 +3,6 @@ mod camera;
 mod player;
 mod physics;
 mod animation;
-mod parallax;
 mod ui;
 mod utils;
 pub use self::{
@@ -12,7 +11,6 @@ pub use self::{
     physics::PhysicsSystem,
     direction::DirectionSystem,
     animation::SimpleAnimationSystem,
-    parallax::ParallaxSystem,
-    ui::UiEventHandlerSystemDesc
+    ui::UiEventHandlerSystemDesc,
     utils::CurrentState
 };
