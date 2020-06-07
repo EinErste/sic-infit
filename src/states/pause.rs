@@ -9,6 +9,7 @@ use amethyst::{
     ui::{Anchor, TtfFormat, UiText, UiFinder, UiTransform, UiCreator, UiEventType, UiWidget},
     ecs::prelude::{Entity, ResourceId},
 };
+use crate::states::FinishState;
 
 #[derive(Default, Debug)]
 pub struct PauseState {
@@ -39,7 +40,7 @@ impl SimpleState for PauseState {
                 } else if ui.target == self.b2.unwrap() {
                     //TODO add here transition to settings
                 } else if ui.target == self.b3.unwrap() {
-                    return Trans::Quit;
+                    return Trans::Replace(Box::new(FinishState::default()));
                 }
             }
         }
