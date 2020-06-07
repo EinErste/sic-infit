@@ -45,6 +45,7 @@ fn main() -> amethyst::Result<()> {
                 .with_plugin(RenderFlat2D::default())
                 .with_plugin(RenderUi::default()),
         )?
+        .with_system_desc(systems::UiEventHandlerSystemDesc::default(), "ui_event_handler", &[])
         .with_bundle(input_bundle)?
         .with_bundle(UiBundle::<StringBindings>::new())?;
 

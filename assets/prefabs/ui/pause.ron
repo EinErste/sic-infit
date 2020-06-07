@@ -1,0 +1,49 @@
+#![enable(implicit_some)]
+Container(
+    transform: (
+        id: "pause_menu",
+        width: 1920,
+        height: 1080,
+        mouse_reactive: false,
+    ),
+    background: Texture(File("textures/ui/pause.png", ("IMAGE", ()))),
+    children:[
+        Image(
+            transform: (
+                id: "button_1",
+                y: -500,
+                width: 384,
+                height: 96,
+                tab_order: 1,
+                anchor: TopMiddle,
+                mouse_reactive: true,
+            ),
+            image: Texture(File("textures/ui/pause_button1.png", ("IMAGE", ()))),
+        ),
+        Image(
+            transform: (
+                id: "button_2",
+                y: -625,
+                width: 384,
+                height: 96,
+                tab_order: 1,
+                anchor: TopMiddle,
+                mouse_reactive: true,
+            ),
+            image: Texture(File("textures/ui/pause_button2.png", ("IMAGE", ()))),
+        ),
+        Image(
+            transform: (
+                id: "button_3",
+                y: -750,
+                width: 384,
+                height: 96,
+                tab_order: 1,
+                anchor: TopMiddle,
+                mouse_reactive: true,
+            ),
+            image: Texture(File("textures/ui/pause_button3.png", ("IMAGE", ()))),
+        ),
+
+    ]
+)
