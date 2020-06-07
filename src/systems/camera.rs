@@ -19,6 +19,6 @@ impl<'s> System<'s> for CameraSystem {
         let cam = transforms.get_mut(self.camera).unwrap();
         //TODO
         cam.translation_mut().x = char.x;
-        //cam.translation_mut().y = char.y + 80.;
+        cam.translation_mut().y = char.y +70.;
     }
 }

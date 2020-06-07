@@ -24,7 +24,7 @@ pub fn load_player(world: &mut World) -> Entity{
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
     };
     let transform =
-        Transform::default().set_translation_xyz(320., 300., 1.).to_owned();
+        Transform::default().set_translation_xyz(320., 240., 1.).to_owned();
     let sprite = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 0,
@@ -42,8 +42,8 @@ pub fn load_player(world: &mut World) -> Entity{
         rb_desc.lock_rotation_y = true;
         rb_desc.lock_rotation_z = true;
         rb_desc.friction = 0.0;
-        rb_desc.bounciness = 0.0;
-        rb_desc.mass = 10000.;
+        rb_desc.bounciness = 0.00;
+        rb_desc.mass = 10.;
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };
@@ -90,7 +90,8 @@ pub fn load_lion(world: &mut World){
         rb_desc.lock_rotation_z = true;
         rb_desc.friction = 0.0;
         rb_desc.bounciness = 0.0;
-        rb_desc.mass = 1.;
+        rb_desc.mass = 10000000000.;
+        rb_desc.mode = BodyMode::Dynamic;
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };

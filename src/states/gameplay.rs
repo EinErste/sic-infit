@@ -15,7 +15,7 @@ use crate::{
     states::PauseState,
 
 };
-use log::{info};
+use amethyst_physics::PhysicsTime;
 
 pub struct GameplayState<'a, 'b> {
     pub dispatcher: Option<Dispatcher<'a, 'b>>,
@@ -26,6 +26,7 @@ pub struct GameplayState<'a, 'b> {
 impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
+        world.fetch_mut::<PhysicsTime>().set_frames_per_seconds(60);
         let mut dispatcher = DispatcherBuilder::new()
             .with(DirectionSystem{}, "direction_system", &[])
             .with(CameraSystem { character: self.player, camera: self.camera }, "camera_system", &[])
@@ -34,6 +35,20 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
             .build();
         dispatcher.setup(world);
         self.dispatcher = Some(dispatcher);
+    }
+    fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let world = data.world;
+        world.fetch_mut::<PhysicsTime>().set_frames_per_seconds(0);
+    }
+
+    fn on_pause(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let world = data.world;
+        world.fetch_mut::<PhysicsTime>().set_frames_per_seconds(0);
+    }
+
+    fn on_resume(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let world = data.world;
+        world.fetch_mut::<PhysicsTime>().set_frames_per_seconds(60);
     }
 
     fn handle_event(&mut self, mut _data: StateData<'_, GameData<'_, '_>>, event: StateEvent) -> SimpleTrans {
