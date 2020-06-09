@@ -1,3 +1,4 @@
+//! A set of useful functions for loading the spritess
 use amethyst::prelude::{World, WorldExt, Builder};
 use amethyst::core::transform::Transform;
 use amethyst::renderer::{SpriteRender};
@@ -7,7 +8,6 @@ use amethyst_physics::prelude::{ShapeDesc, RigidBodyDesc, BodyMode};
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst::core::math::Vector3;
 use crate::entities::AdjustToDistance;
-
 pub fn load_forest_path(world: &mut World){
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();

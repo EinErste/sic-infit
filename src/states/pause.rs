@@ -18,7 +18,7 @@ pub struct PauseState {
     b2: Option<Entity>,
     b3: Option<Entity>,
 }
-
+///state that has pause UI. from here you can go back to the game, options or end menu
 impl SimpleState for PauseState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         self.init_ui(data.world);
@@ -61,44 +61,10 @@ impl SimpleState for PauseState {
 }
 
 impl PauseState {
+    ///helping function for initialising ui
     fn init_ui(&mut self, world: &mut World) {
         self.ui = world.exec(|mut creator: UiCreator<'_>| {
             Some(creator.create("prefabs/ui/pause.ron", ()))
         });
     }
 }
-// self.b1 = world.exec(|finder: UiFinder<'_>| finder.find("button_1"));
-// self.b2 = world.exec(|finder: UiFinder<'_>| finder.find("button_2"));
-// self.b3 = world.exec(|finder: UiFinder<'_>| finder.find("button_3"));
-//
-// dbg!(self);
-
-
-//
-// let font = world.read_resource::<Loader>().load(
-//     "../font/square.ttf",
-//     TtfFormat,
-//     (),
-//     &world.read_resource(),
-// );
-// let p1_transform = UiTransform::new(
-//     "PAUSE".to_string(),
-//     Anchor::Middle,
-//     Anchor::Middle,
-//     0.,
-//     0.,
-//     3.,
-//     640.,
-//     300.,
-// );
-//
-// world
-//     .create_entity()
-//     .with(p1_transform)
-//     .with(UiText::new(
-//         font.clone(),
-//         "PAUSE".to_string(),
-//         [0.,0.,0.,1.],
-//         100.,
-//     ))
-//     .build()

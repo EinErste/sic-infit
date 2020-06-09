@@ -16,7 +16,7 @@ use crate::{
 
 };
 use amethyst_physics::PhysicsTime;
-
+///Main state where all the actual gameplay takes place
 pub struct GameplayState<'a, 'b> {
     pub dispatcher: Option<Dispatcher<'a, 'b>>,
     pub player: Entity,

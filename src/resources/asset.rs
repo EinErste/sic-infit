@@ -10,14 +10,14 @@ use amethyst::{
     },
 };
 
-
+///One of types of assets we have
 #[derive(Copy, Clone, Eq, Hash, PartialEq)]
 pub enum AssetType {
     BackgroundForest,
     Character,
     Intro
 }
-
+///List of spritesheets to be accesible
 #[derive(Default)]
 pub struct SpriteSheetList {
     sprite_sheets: HashMap<AssetType, SpriteSheetHandle>,
@@ -34,7 +34,7 @@ impl SpriteSheetList {
     }
 }
 
-
+///loading the assets and adding them to spritesheets
 pub fn load_assets(world: &mut World, asset_type_list: Vec<AssetType>) -> ProgressCounter {
     let mut sprite_sheet_list = SpriteSheetList::default();
     let mut progress_counter = ProgressCounter::new();
@@ -51,7 +51,7 @@ pub fn load_assets(world: &mut World, asset_type_list: Vec<AssetType>) -> Progre
     world.insert(sprite_sheet_list);
     progress_counter
 }
-
+///gets a handle for a spritesheet
 pub fn get_sprite_sheet_handle(world: &World, texture_path: &str, ron_path: &str, progress_counter: &mut ProgressCounter, ) -> SpriteSheetHandle {
     let texture_handle = {
         let loader = &world.read_resource::<Loader>();

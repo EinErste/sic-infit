@@ -1,3 +1,4 @@
+//! Mod that contains all of the entity descriptions
 mod background;
 mod npc;
 mod camera;

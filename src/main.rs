@@ -21,7 +21,7 @@ mod systems;
 mod components;
 mod resources;
 mod entities;
-
+///Main function is an entry point for the game
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
 
@@ -33,7 +33,7 @@ fn main() -> amethyst::Result<()> {
 
     let binding_path = app_root.join("config").join("bindings.ron");
     let input_bundle = InputBundle::<StringBindings>::new().with_bindings_from_file(binding_path)?;
-
+    ///main point where we basically construct the game from all the plugins and systems we have
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
         .with_bundle(PhysicsBundle::<f32,NPhysicsBackend>::new()

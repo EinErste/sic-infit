@@ -7,6 +7,7 @@ use amethyst::{
 use crate::components::{Directions, Direction, PhysicsBodyDescription};
 
 #[derive(SystemDesc)]
+///Rotates sptite based on the direction the player is facing
 pub struct DirectionSystem {}
 
 impl<'s> System<'s> for DirectionSystem {

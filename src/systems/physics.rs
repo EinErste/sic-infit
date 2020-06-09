@@ -19,6 +19,7 @@ const IMPULSE_JUMP: f32 =  1000000.;
 
 ///This system controls the character control
 #[derive(SystemDesc,Default)]
+///System responsible for handling all of the physics: collisions, running, falling etc.
 pub struct PhysicsSystem {}
 
 impl<'s> System<'s> for PhysicsSystem {

@@ -11,6 +11,7 @@ use crate::states::GameplayState;
 use amethyst_physics::PhysicsTime;
 
 #[derive(Default)]
+///State used to avoid displaying an empty screen while all of the resources are being loaded
 pub struct LoadingState {
     progress_counter: Option<ProgressCounter>,
 }

@@ -16,7 +16,7 @@ pub struct FinishState {
     ui: Option<Entity>,
     to_menu: Option<Entity>,
 }
-
+///End state from which we can go to the main menu
 impl SimpleState for FinishState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         self.ui = data.world.exec(|mut creator: UiCreator<'_>| {

@@ -1,9 +1,10 @@
 use amethyst::core::transform::Transform;
 use amethyst::core::math::Vector3;
+///Trait which implements a parallax effect
 pub trait AdjustToDistance {
     fn adjust_to_distance(&mut self ,distance: f32, initial_width: f32, initial_height: f32);
 }
-
+///Function used for creating a parallax effect for the background
 impl AdjustToDistance for Transform {
     fn adjust_to_distance(&mut self, distance: f32,initial_width: f32, initial_height: f32,) {
         //Magic angles(seriously)
