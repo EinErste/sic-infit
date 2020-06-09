@@ -46,18 +46,13 @@ impl<'s> System<'s> for PhysicsSystem {
             }
 
             let mut velocity = body_server.linear_velocity(body_tag.get());
-            if !(velocity.x.abs() >= body_desc.velocity_max()) {
+            if velocity.x.abs() <= body_desc.velocity_max() {
                 body_server.apply_impulse(
                     body_tag.get(),
                     &Vector3::new(body_desc.mass() * IMPULSE_JUMP/10. * body_desc.velocity_direction().x,0.,0.));
+                    // &Vector3::new(body_desc.mass() * body_desc.velocity_max()/body_desc.acceleration_time() * body_desc.velocity_direction().x,0.,0.));
             }
 
-            // let mut velocity = body_server.linear_velocity(body_tag.get());
-            // velocity.x = body_desc.velocity_direction().x * body_desc.velocity_max();
-            // //Push
-            // body_server.set_linear_velocity(
-            //     body_tag.get(),
-            //             &velocity);
 
             //dbg!(body_server.linear_velocity(body_tag.get()));
 

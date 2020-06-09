@@ -6,5 +6,5 @@ pub use {
     direction::{Direction, Directions},
     animation::{SimpleAnimation,StateAnimation},
     player::Player,
-    physics::PhysicsBodyDescription
+    physics::{PhysicsBodyDescription,CollisionGroupType}
 };
