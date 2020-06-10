@@ -3,7 +3,7 @@ use amethyst::{
     prelude::{GameData, SimpleState, SimpleTrans, StateData, Trans, WorldExt},
     ui::UiCreator,
 };
-use crate::components::{Direction, SimpleAnimation, Player, PhysicsBodyDescription};
+use crate::components::{Direction, SimpleAnimation, NPC, PhysicsBodyDescription};
 use crate::resources::{load_assets, AssetType};
 use crate::entities::{load_player, init_camera, load_intro, load_forest, load_lion};
 use amethyst::prelude::World;
@@ -22,11 +22,12 @@ impl SimpleState for LoadingState {
         world.register::<PhysicsBodyDescription>();
         world.register::<Direction>();
         world.register::<SimpleAnimation>();
-        world.register::<Player>();
+        world.register::<NPC>();
         self.progress_counter = Some(load_assets(&mut world,vec![
             AssetType::BackgroundForest,
             AssetType::Character,
-            AssetType::Intro
+            AssetType::Intro,
+            AssetType::NPC
         ]));
 
     }

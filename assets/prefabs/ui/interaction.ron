@@ -1,0 +1,12 @@
+Image(
+            transform: (
+                id: "button_1",
+                y: 100,
+                width: 96,
+                height: 96,
+                tab_order: 1,
+                anchor: BottomMiddle,
+                mouse_reactive: true,
+            ),
+            image: Texture(File("textures/ui/interact_button.png", ("IMAGE", ()))),
+        )

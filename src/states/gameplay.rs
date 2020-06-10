@@ -16,6 +16,8 @@ use crate::{
 
 };
 use amethyst_physics::PhysicsTime;
+use crate::systems::DialogSystem;
+
 ///Main state where all the actual gameplay takes place
 pub struct GameplayState<'a, 'b> {
     pub dispatcher: Option<Dispatcher<'a, 'b>>,
@@ -32,6 +34,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
             .with(CameraSystem { character: self.player, camera: self.camera }, "camera_system", &[])
             .with(PlayerSystem::new(self.player),"player_system", &[] )
             .with(SimpleAnimationSystem{},"animation_system", &[] )
+            .with(DialogSystem::new(self.player),"dialog_system", &[] )
             .build();
         dispatcher.setup(world);
         self.dispatcher = Some(dispatcher);

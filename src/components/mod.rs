@@ -6,6 +6,6 @@ mod player;
 pub use {
     direction::{Direction, Directions},
     animation::{SimpleAnimation,StateAnimation},
-    player::Player,
+    player::{NPC, Role},
     physics::{PhysicsBodyDescription,CollisionGroupType}
 };

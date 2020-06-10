@@ -18,6 +18,7 @@ pub struct PauseState {
     b2: Option<Entity>,
     b3: Option<Entity>,
 }
+
 ///state that has pause UI. from here you can go back to the game, options or end menu
 impl SimpleState for PauseState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -48,15 +49,17 @@ impl SimpleState for PauseState {
     }
 
     fn shadow_update(&mut self, _data: StateData<'_, GameData<'_, '_>>) {
-        if self.b1 == None {
-            self.b1 = _data.world.exec(|finder: UiFinder<'_>| finder.find("button_1"));
-        }
-        if self.b2 == None {
-            self.b2 = _data.world.exec(|finder: UiFinder<'_>| finder.find("button_2"));
-        }
-        if self.b3 == None {
-            self.b3 = _data.world.exec(|finder: UiFinder<'_>| finder.find("button_3"));
-        }
+        _data.world.exec(|finder: UiFinder<'_>| {
+            if self.b1 == None {
+                self.b1 = finder.find("button_1")
+            }
+            if self.b2 == None {
+                self.b2 = finder.find("button_2");
+            }
+            if self.b3 == None {
+                self.b3 = finder.find("button_3");
+            }
+        });
     }
 }
 
