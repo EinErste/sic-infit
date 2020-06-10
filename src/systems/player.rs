@@ -42,12 +42,24 @@ impl<'s> System<'s> for PlayerSystem {
             }
         }
 
-        if let Some(jump) = input.action_is_down("Jump"){
-            if jump {
-                player_desc.set_velocity_direction_y(1.);
-            } else {
-                player_desc.set_velocity_direction_y(0.);
+        match input.action_is_down("Jump") {
+            Some(jump) => {
+                if jump {
+                    player_desc.set_velocity_direction_y(1.);
+                } else {
+                    player_desc.set_velocity_direction_y(0.);
+                }
             }
+            None => {}
+        }
+
+        match input.action_is_down("Action") {
+            Some(action) => {
+                if action {
+                    dbg!("e");
+                }
+            }
+            None => {}
         }
 
 

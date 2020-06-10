@@ -110,6 +110,6 @@ pub fn load_lion(world: &mut World){
         .with(shape)
         .with(rb)
         .with(PhysicsBodyDescription::new(10.,120.,1.))
-        .with(NPC{role: Role::NPC})
+        .with(NPC::new_NPC("I am a friggin lion"))
         .build();
 }

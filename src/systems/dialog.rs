@@ -2,7 +2,7 @@ use amethyst::{
     core::Transform,
     derive::SystemDesc,
     ecs::{Join, System, SystemData, WriteStorage, ReadStorage, Read, Entities, Entity},
-    ui::UiCreator,
+    ui::{UiCreator, UiWidget},
 };
 
 use crate::components::{Directions, Direction, PhysicsBodyDescription, NPC, Role};
@@ -26,7 +26,7 @@ impl<'s> System<'s> for DialogSystem {
         Entities<'s>,
         ReadStorage<'s, NPC>,
         ReadStorage<'s, Transform>,
-        UiCreator<'s>
+        UiCreator<'s>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -36,10 +36,11 @@ impl<'s> System<'s> for DialogSystem {
 
 
             let distance = <DialogSystem>::distance(player_transform, char_loc);
-            if character.role == Role::NPC {
+            if let Role::NPC(dialog_line) = character.role {
                 match distance < 100. {
                     true => if self.talk_button == None {
-                        self.talk_button = Some(creator.create("prefabs/ui/interaction.ron", ()));
+                        let entity = creator.create("prefabs/ui/interaction.ron", ());
+                        self.talk_button = Some(entity);
                     }
                     false => if let Some(button) = self.talk_button {
                         entities.delete(button);

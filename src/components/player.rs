@@ -2,19 +2,21 @@ use amethyst::{
     ecs::{Component, DenseVecStorage},
 };
 
-#[derive(Component, Default, Debug)]
+#[derive(Component, Debug)]
 #[storage(DenseVecStorage)]
 ///An empty component that marks a player and ties it in to the control system from keyboard
 pub struct NPC {
     pub(crate) role: Role
 }
+
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Role {
-    ENEMY, NPC
+    ENEMY,
+    NPC(&'static str),
 }
 
-impl Default for Role{
-    fn default() -> Self {
-        Role::NPC
+impl NPC {
+    pub(crate) fn new_NPC(dialog: &'static str) -> NPC {
+        NPC { role: Role::NPC(dialog)}
     }
 }
