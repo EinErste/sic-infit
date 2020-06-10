@@ -8,6 +8,9 @@ use amethyst_physics::prelude::{ShapeDesc, RigidBodyDesc, BodyMode};
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst::core::math::Vector3;
 use crate::entities::AdjustToDistance;
+use amethyst_physics::objects::CollisionGroup;
+use crate::components::CollisionGroupType;
+
 pub fn load_forest_path(world: &mut World){
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
@@ -33,6 +36,10 @@ pub fn load_forest_path(world: &mut World){
         rb_desc.mode = BodyMode::Static;
         rb_desc.friction = 0.5;
         rb_desc.bounciness = 0.00;
+        rb_desc.belong_to = vec![CollisionGroup::new(CollisionGroupType::Ground.into())];
+        rb_desc.collide_with = vec![CollisionGroup::new(CollisionGroupType::Player.into()),
+                                    CollisionGroup::new(CollisionGroupType::NPC.into()),
+                                    CollisionGroup::new(CollisionGroupType::Enemy.into()),];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };
