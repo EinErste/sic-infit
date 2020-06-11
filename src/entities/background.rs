@@ -22,10 +22,10 @@ pub fn load_forest_path(world: &mut World){
     };
 
     let mut transform = Transform::default();
-    transform.set_translation_xyz(960., 60., 0.);
+    transform.set_translation_xyz(960., 40., 0.);
 
     let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(960.,5.,10.)};
+        let desc = ShapeDesc::Cube {half_extents: Vector3::new(960.,20.,10.)};
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.shape_server().create(&desc)
     };
@@ -81,18 +81,6 @@ pub fn load_forest(world: &mut World){
     load_obstacles(world);
 }
 
-#[repr(u32)]
-pub enum Height {
-    Low = 150,
-    Mid = 220,
-    High = 300,
-}
-
-impl Into<f32> for Height{
-    fn into(self) -> f32 {
-        self as u32 as f32
-    }
-}
 
 
 fn load_paddle(init_x: f32, init_y: f32, paddle_width: f32, world: &mut World){
@@ -124,10 +112,10 @@ fn load_paddle(init_x: f32, init_y: f32, paddle_width: f32, world: &mut World){
         .build();
 
     let mut transform = Transform::default();
-    transform.set_translation_xyz(init_x + column_width + paddle_width/2., init_y-paddle_height/2., -1.);
+    transform.set_translation_xyz(init_x + paddle_width/2. + column_width, init_y-paddle_height/2., -1.);
 
     let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(paddle_width/2.,paddle_height/2.,10.)};
+        let desc = ShapeDesc::Cube {half_extents: Vector3::new(paddle_width/2. + column_width,paddle_height/2.,10.)};
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.shape_server().create(&desc)
     };
@@ -177,6 +165,19 @@ fn load_paddle(init_x: f32, init_y: f32, paddle_width: f32, world: &mut World){
         .with(sprite.clone())
         .with(transform)
         .build();
+}
+
+#[repr(u32)]
+pub enum Height {
+    Low = 160,
+    Mid = 250,
+    High = 340,
+}
+
+impl Into<f32> for Height{
+    fn into(self) -> f32 {
+        self as u32 as f32
+    }
 }
 
 fn load_obstacles(world: &mut World){

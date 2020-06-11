@@ -32,7 +32,7 @@ pub fn load_player(world: &mut World) -> Entity{
         sprite_number: 0,
     };
     let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(24.,32.,5.)};
+        let desc = ShapeDesc::Cube {half_extents: Vector3::new(20.,32.,5.)};
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.shape_server().create(&desc)
     };
