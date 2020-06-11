@@ -26,7 +26,7 @@ pub fn load_player(world: &mut World) -> Entity{
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
     };
     let transform =
-        Transform::default().set_translation_xyz(320., 240., 1.).to_owned();
+        Transform::default().set_translation_xyz(360., 240., 1.).to_owned();
     let sprite = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 0,
@@ -43,7 +43,7 @@ pub fn load_player(world: &mut World) -> Entity{
         rb_desc.lock_rotation_x = true;
         rb_desc.lock_rotation_y = true;
         rb_desc.lock_rotation_z = true;
-        rb_desc.friction = 0.0;
+        rb_desc.friction = 0.5;
         rb_desc.bounciness = 0.00;
         rb_desc.mass = 10.;
         rb_desc.belong_to = vec![CollisionGroup::new(CollisionGroupType::Player.into())];
@@ -57,7 +57,7 @@ pub fn load_player(world: &mut World) -> Entity{
         .create_entity()
         .with(sprite)
         .with(transform)
-        .with(PhysicsBodyDescription::new(10.,120.,20.))
+        .with(PhysicsBodyDescription::new(10.,150.,20.))
         .with(Direction{dir: Directions::Right})
         .with(Player{})
         .with(shape)
@@ -111,6 +111,6 @@ pub fn load_lion(world: &mut World){
         .with(transform)
         .with(shape)
         .with(rb)
-        .with(PhysicsBodyDescription::new(10.,120.,1.))
+        .with(PhysicsBodyDescription::new(10.,150.,1.))
         .build();
 }

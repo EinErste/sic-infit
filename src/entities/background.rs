@@ -11,21 +11,48 @@ use amethyst_physics::objects::CollisionGroup;
 use crate::components::CollisionGroupType;
 
 pub fn load_forest_path(world: &mut World){
-    let sprite_sheet_handle = {
-        let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
-        sprite_sheet_list.get(AssetType::BackgroundForest).unwrap().clone()
-    };
 
-    let sprite = SpriteRender {
-        sprite_sheet: sprite_sheet_handle.clone(),
-        sprite_number: 5,
-    };
+    //Main path
+    for i in 1..3{
+        let mut transform = Transform::default();
+        transform.set_translation_xyz(960. * i as f32, 40., 0.);
+
+        let shape = {
+            let desc = ShapeDesc::Cube {half_extents: Vector3::new(960.,20.,10.)};
+            let physics_world = world.fetch::<PhysicsWorld<f32>>();
+            physics_world.shape_server().create(&desc)
+        };
+
+        let rb = {
+            let mut rb_desc = RigidBodyDesc::default();
+            rb_desc.mode = BodyMode::Static;
+            rb_desc.friction = 0.5;
+            rb_desc.bounciness = 0.00;
+            rb_desc.belong_to = vec![CollisionGroup::new(CollisionGroupType::Ground.into())];
+            rb_desc.collide_with = vec![CollisionGroup::new(CollisionGroupType::Player.into()),
+                                        CollisionGroup::new(CollisionGroupType::NPC.into()),
+                                        CollisionGroup::new(CollisionGroupType::Enemy.into()),];
+            let physics_world = world.fetch::<PhysicsWorld<f32>>();
+            physics_world.rigid_body_server().create(&rb_desc)
+        };
+
+        world
+            .create_entity()
+            .with(transform)
+            .with(shape)
+            .with(rb)
+            .build();
+    }
+
+
+    //Left wall
+
 
     let mut transform = Transform::default();
-    transform.set_translation_xyz(960., 40., 0.);
+    transform.set_translation_xyz(160., 0., 0.);
 
     let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(960.,20.,10.)};
+        let desc = ShapeDesc::Cube {half_extents: Vector3::new(160.,1000.,10.)};
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.shape_server().create(&desc)
     };
@@ -45,7 +72,6 @@ pub fn load_forest_path(world: &mut World){
 
     world
         .create_entity()
-        //.with(sprite.clone())
         .with(transform)
         .with(shape)
         .with(rb)
@@ -61,21 +87,23 @@ pub fn load_forest(world: &mut World){
         sprite_sheet_list.get(AssetType::BackgroundForest).unwrap().clone()
     };
 
-    for i in 0..7 {
-        let sprite = SpriteRender {
-            sprite_sheet: sprite_sheet_handle.clone(),
-            sprite_number: i,
-        };
-        let mut transform = Transform::default();
-        transform.adjust_to_distance(-distances[i], 1920.,360.);
-        transform.set_translation_xyz(960., 180., distances[i]);
+    for j in 1..3{
+        for i in 0..7 {
+            let sprite = SpriteRender {
+                sprite_sheet: sprite_sheet_handle.clone(),
+                sprite_number: i,
+            };
+            let mut transform = Transform::default();
+            transform.adjust_to_distance(-distances[i], 1920.,360.);
+            transform.set_translation_xyz(960., 180., distances[i]);
 
-        world
-            .create_entity()
-            .with(sprite.clone())
-            .with(transform)
-            .build();
+            world
+                .create_entity()
+                .with(sprite.clone())
+                .with(transform)
+                .build();
 
+        }
     }
     load_forest_path(world);
     load_obstacles(world);
@@ -83,11 +111,11 @@ pub fn load_forest(world: &mut World){
 
 
 
-fn load_paddle(init_x: f32, init_y: f32, paddle_width: f32, world: &mut World){
+fn load_platform(init_x: f32, init_y: f32, platform_width: f32, world: &mut World){
     let column_width = 26 as f32;
     let column_height = 360 as f32;
-    let paddle_height = 20 as f32;
-    let paddle_inti_width = 26 as f32;
+    let platform_height = 20 as f32;
+    let platform_init_width = 26 as f32;
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::Obstacles).unwrap().clone()
@@ -102,8 +130,8 @@ fn load_paddle(init_x: f32, init_y: f32, paddle_width: f32, world: &mut World){
         sprite_number: 1,
     };
     let mut transform = Transform::default();
-    transform.set_scale(Vector3::new(paddle_width/paddle_inti_width,1.,1.));
-    transform.set_translation_xyz(init_x + column_width + paddle_width/2., init_y-paddle_height/2., -1.);
+    transform.set_scale(Vector3::new(platform_width/platform_init_width,1.,1.));
+    transform.set_translation_xyz(init_x + column_width + platform_width/2., init_y-platform_height/2., -1.);
 
     world
         .create_entity()
@@ -112,10 +140,10 @@ fn load_paddle(init_x: f32, init_y: f32, paddle_width: f32, world: &mut World){
         .build();
 
     let mut transform = Transform::default();
-    transform.set_translation_xyz(init_x + paddle_width/2. + column_width, init_y-paddle_height/2., -1.);
+    transform.set_translation_xyz(init_x + platform_width/2. + column_width, init_y-platform_height/2., -1.);
 
     let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(paddle_width/2. + column_width,paddle_height/2.,10.)};
+        let desc = ShapeDesc::Cube {half_extents: Vector3::new(platform_width/2. + column_width,platform_height/2.,10.)};
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.shape_server().create(&desc)
     };
@@ -158,7 +186,7 @@ fn load_paddle(init_x: f32, init_y: f32, paddle_width: f32, world: &mut World){
         .build();
 
     let mut transform = Transform::default();
-    transform.set_translation_xyz(init_x+paddle_width+column_width, -(column_height-init_y), -1.);
+    transform.set_translation_xyz(init_x+platform_width+column_width, -(column_height-init_y), -1.);
 
     world
         .create_entity()
@@ -181,9 +209,9 @@ impl Into<f32> for Height{
 }
 
 fn load_obstacles(world: &mut World){
-    load_paddle(200.,Height::Low.into(),70.,world);
-    load_paddle(400.,Height::Mid.into(),120.,world);
-    load_paddle(600.,Height::High.into(),100.,world);
+    load_platform(400.,Height::Low.into(),70.,world);
+    load_platform(600.,Height::Mid.into(),120.,world);
+    load_platform(800.,Height::High.into(),100.,world);
 }
 
 pub fn load_intro(world: &mut World) -> Entity{

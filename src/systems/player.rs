@@ -17,9 +17,8 @@ pub struct PlayerSystem {
 
 
 const FORCE_MULTIPLIER: f32 = 1000000.0;
-const ACCELERATION_G: f32 = 10.;
-const FORCE_GRAVITY: f32 = 1000.;
-const IMPULSE_JUMP: f32 =  1000000.;
+const IMPULSE_JUMP: f32 =  10000000. * 1.3;
+const IMPULSE_MOVE: f32 =  500000. ;
 
 #[allow(dead_code)]
 impl<'s> System<'s> for PlayerSystem {
@@ -67,17 +66,17 @@ impl<'s> System<'s> for PlayerSystem {
             if p_description.velocity_direction().y != 0. && !is_in_air{
                 body_server.apply_impulse(
                     p_body_tag.get(),
-                    &Vector3::new(0.,p_description.mass()*IMPULSE_JUMP*1.5,0.));
+                    &Vector3::new(0.,IMPULSE_JUMP,0.));
             }
 
             let mut velocity = body_server.linear_velocity(p_body_tag.get());
-            if velocity.x.abs() <= p_description.velocity_max() {
+            if velocity.x.abs() <= p_description.velocity_max() || velocity.x.signum()!= p_description.velocity_direction().x.signum(){
                 body_server.apply_impulse(
                     p_body_tag.get(),
-                    &Vector3::new(p_description.mass() * IMPULSE_JUMP/10. * p_description.velocity_direction().x,0.,0.));
+                    &Vector3::new(IMPULSE_MOVE * p_description.velocity_direction().x,0.,0.));
                 // &Vector3::new(body_desc.mass() * body_desc.velocity_max()/body_desc.acceleration_time() * body_desc.velocity_direction().x,0.,0.));
             }
-            //dbg!(body_server.linear_velocity(body_tag.get()));
+            //dbg!(body_server.linear_velocity(p_body_tag.get()));
 
 
             //Test contacts
