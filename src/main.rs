@@ -6,7 +6,7 @@ use amethyst::{core::transform::TransformBundle, prelude::*, renderer::types::De
 use crate::states::LoadingState;
 use amethyst_physics::{PhysicsBundle};
 use amethyst_nphysics::NPhysicsBackend;
-use crate::systems::{PhysicsSystem};
+use crate::systems::{PhysicsSystem, PlayerSystem};
 
 mod states;
 mod systems;
@@ -32,6 +32,7 @@ fn main() -> amethyst::Result<()> {
             .with_frames_per_seconds(60)
             .with_max_sub_steps(4)
             .with_pre_physics(PhysicsSystem::default(), String::from("physics_system"),vec![])
+            .with_pre_physics(PlayerSystem::default(),String::from("player_system"), vec![])
         )?
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()

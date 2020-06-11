@@ -94,10 +94,10 @@ pub fn load_lion(world: &mut World){
         rb_desc.lock_rotation_x = true;
         rb_desc.lock_rotation_y = true;
         rb_desc.lock_rotation_z = true;
-        rb_desc.friction = 0.0;
+        rb_desc.friction = 0.9;
         rb_desc.bounciness = 0.0;
         rb_desc.mass = 10.;
-        rb_desc.mode = BodyMode::Dynamic;
+        rb_desc.mode = BodyMode::Disabled;
         rb_desc.belong_to = vec![CollisionGroup::new(CollisionGroupType::Enemy.into())];
         rb_desc.collide_with = vec![CollisionGroup::new(CollisionGroupType::Ground.into()),
                                     CollisionGroup::new(CollisionGroupType::NPC.into()),
