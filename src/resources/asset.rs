@@ -15,7 +15,8 @@ use amethyst::{
 pub enum AssetType {
     BackgroundForest,
     Character,
-    Intro
+    Intro,
+    Obstacles
 }
 
 #[derive(Default)]
@@ -44,6 +45,7 @@ pub fn load_assets(world: &mut World, asset_type_list: Vec<AssetType>) -> Progre
             AssetType::BackgroundForest => ("textures/background_forest.png", "prefabs/background_forest.ron"),
             AssetType::Character => ("textures/character.png", "prefabs/character.ron"),
             AssetType::Intro => ("textures/intro.png", "prefabs/intro.ron"),
+            AssetType::Obstacles => ("textures/obstacles/column.png", "prefabs/obstacles/column.ron"),
         };
         let sprite_sheet_handle = get_sprite_sheet_handle(world, texture_path, ron_path, &mut progress_counter);
         sprite_sheet_list.insert(asset_type, sprite_sheet_handle);

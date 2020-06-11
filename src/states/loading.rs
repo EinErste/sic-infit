@@ -25,7 +25,8 @@ impl SimpleState for LoadingState {
         self.progress_counter = Some(load_assets(&mut world,vec![
             AssetType::BackgroundForest,
             AssetType::Character,
-            AssetType::Intro
+            AssetType::Intro,
+            AssetType::Obstacles
         ]));
 
     }

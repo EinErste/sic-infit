@@ -1,0 +1,19 @@
+List((
+    texture_width: 26,
+    texture_height: 380,
+    sprites: [
+        (
+            x: 0,
+            y: 0,
+            width: 26,
+            height: 360,
+            offsets: Some((-13.0, -180.0)),
+        ),
+        (
+            x: 0,
+            y: 360,
+            width: 26,
+            height: 20,
+        ),
+    ]
+))

@@ -42,7 +42,7 @@ impl<'s> System<'s> for PhysicsSystem {
             if body_desc.velocity_direction().y != 0. && !is_in_air{
                 body_server.apply_impulse(
                         body_tag.get(),
-                        &Vector3::new(0.,body_desc.mass()*IMPULSE_JUMP,0.));
+                        &Vector3::new(0.,body_desc.mass()*IMPULSE_JUMP*1.5,0.));
             }
 
             let mut velocity = body_server.linear_velocity(body_tag.get());
