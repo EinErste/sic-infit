@@ -78,7 +78,7 @@ pub fn load_forest_path(world: &mut World){
 
 
 pub fn load_forest(world: &mut World){
-    let distances:Vec<f32> = vec![-1500.,-1400.,-1300.,-1000.,-900.,0.0,30.];
+    let distances:Vec<f32> = vec![-1500.,-1400.,-1300.,-1000.,-900.,0.0,80.];
     //let distances:Vec<f32> = vec![-15.,-12.,-10.,-8.,-5.,0.0,1.];
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
@@ -92,8 +92,13 @@ pub fn load_forest(world: &mut World){
                 sprite_number: i,
             };
             let mut transform = Transform::default();
-            transform.adjust_to_distance(-distances[i], 1920.,360.);
-            transform.set_translation_xyz(960., 180., distances[i]);
+            if i != 6{
+                transform.adjust_to_distance(-distances[i], 1920.,360.);
+                transform.set_translation_xyz(960., 180., distances[i]);
+            } else{
+                //Hardcoded as fuck due to imprecision of adjust_to_distance()
+                transform.set_translation_xyz(960., 230., distances[i]);
+            }
 
             world
                 .create_entity()

@@ -77,7 +77,7 @@ pub fn load_lion(world: &mut World){
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
     };
     let transform =
-        Transform::default().set_translation_xyz(600., 300., 1.).to_owned();
+        Transform::default().set_translation_xyz(650., 300., 1.).to_owned();
     let sprite = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 0,
