@@ -60,10 +60,45 @@ impl<'s> System<'s> for PlayerSystem {
             // physics
 
 
-            let mut velocity = body_server.linear_velocity(p_body_tag.get());
-            let is_in_air = !almost::zero_with(velocity.y,0.2);
+            body_server.set_contacts_to_report(p_body_tag.get(),5);
+            let mut events = vec![];
+            body_server.contact_events(p_body_tag.get(),&mut events);
 
-            if p_description.velocity_direction().y != 0. && !is_in_air{
+
+            let mut velocity = body_server.linear_velocity(p_body_tag.get());
+            //Check if able to jump
+            let mut is_on_ground = false;
+            for &contact_event in &events{
+
+                //THIS SHIT DOESNT WORK PROPERLY! WHY? HAS I EVER?
+                if almost::zero_with(1. - contact_event.normal.y, 0.01) && almost::zero_with(velocity.y,0.1){
+                    is_on_ground = true;
+                    //dbg!(contact_event.normal);
+                    break;
+                }
+            }
+
+
+            //Contacts
+            for &contact_event in &events {
+                let belongs_to = body_server.belong_to(contact_event.other_body);
+                for collision_group in belongs_to {
+                    let enemy: u8 = CollisionGroupType::Enemy.into();
+                    if collision_group.get() == enemy {
+                        // if almost::zero_with(1. - contact_event.normal.y, 0.01) && !is_on_ground{
+                        //     dbg!(contact_event.normal);
+                        //     body_server.apply_impulse(
+                        //         p_body_tag.get(),
+                        //         &Vector3::new(0.,IMPULSE_JUMP,0.));
+                        // }
+                        dbg!("ENEMY COLLIDED");
+                    }
+                }
+
+            }
+
+
+            if p_description.velocity_direction().y != 0. && is_on_ground{
                 body_server.apply_impulse(
                     p_body_tag.get(),
                     &Vector3::new(0.,IMPULSE_JUMP,0.));
@@ -74,27 +109,7 @@ impl<'s> System<'s> for PlayerSystem {
                 body_server.apply_impulse(
                     p_body_tag.get(),
                     &Vector3::new(IMPULSE_MOVE * p_description.velocity_direction().x,0.,0.));
-                // &Vector3::new(body_desc.mass() * body_desc.velocity_max()/body_desc.acceleration_time() * body_desc.velocity_direction().x,0.,0.));
             }
-            //dbg!(body_server.linear_velocity(p_body_tag.get()));
-
-
-            //Test contacts
-
-            body_server.set_contacts_to_report(p_body_tag.get(),3);
-            let mut events = vec![];
-            body_server.contact_events(p_body_tag.get(),&mut events);
-            for i in events{
-                let belongs_to = body_server.belong_to(i.other_body);
-                for j in belongs_to {
-                    let enemy: u8 = CollisionGroupType::Enemy.into();
-                    if j.get() == enemy{
-                        dbg!("ENEMY COLLIDED");
-                    }
-                }
-            }
-
-
             //just in case (only 1 player entity exists)
             break;
         }

@@ -76,7 +76,7 @@ pub fn load_lion(world: &mut World){
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
     };
     let transform =
-        Transform::default().set_translation_xyz(400., 300., 1.).to_owned();
+        Transform::default().set_translation_xyz(600., 300., 1.).to_owned();
     let sprite = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 0,
@@ -94,14 +94,15 @@ pub fn load_lion(world: &mut World){
         rb_desc.lock_rotation_x = true;
         rb_desc.lock_rotation_y = true;
         rb_desc.lock_rotation_z = true;
-        rb_desc.friction = 0.9;
-        rb_desc.bounciness = 0.0;
+        rb_desc.friction = 0.5;
+        rb_desc.bounciness = 0.05;
         rb_desc.mass = 10.;
-        rb_desc.mode = BodyMode::Disabled;
+        rb_desc.mode = BodyMode::Dynamic;
         rb_desc.belong_to = vec![CollisionGroup::new(CollisionGroupType::Enemy.into())];
         rb_desc.collide_with = vec![CollisionGroup::new(CollisionGroupType::Ground.into()),
                                     CollisionGroup::new(CollisionGroupType::NPC.into()),
-                                    CollisionGroup::new(CollisionGroupType::Player.into())];
+                                    CollisionGroup::new(CollisionGroupType::Player.into()),
+                                    CollisionGroup::new(CollisionGroupType::Wall.into()),];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };
@@ -111,6 +112,7 @@ pub fn load_lion(world: &mut World){
         .with(transform)
         .with(shape)
         .with(rb)
-        .with(PhysicsBodyDescription::new(10.,150.,1.))
+        .with(PhysicsBodyDescription::new(10.,120.,1.))
+        .with(Direction{dir: Directions::Left})
         .build();
 }

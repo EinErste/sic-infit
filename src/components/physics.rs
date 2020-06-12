@@ -2,12 +2,42 @@ use amethyst::{
     core::math::Vector3,
     ecs::{Component, DenseVecStorage},
 };
+use crate::components::physics::CollisionGroupType::{Ground, Player, NPC, Enemy, Undefined, Wall};
+use amethyst_physics::objects::CollisionGroup;
+
+
+#[derive(PartialEq,Debug,Copy,Clone)]
 #[repr(u8)]
 pub enum CollisionGroupType {
+    Undefined = 0,
     Ground = 1,
     Player = 2,
     NPC = 3,
     Enemy = 4,
+    Wall = 5
+}
+
+impl From<u8> for CollisionGroupType{
+    fn from(group : u8) -> Self {
+        match group {
+            1 => Ground,
+            2 => Player,
+            3 => NPC,
+            4 => Enemy,
+            5 => Wall,
+            _ => Undefined,
+        }
+    }
+}
+
+pub fn group_belongs_to(group: CollisionGroupType,vec: &Vec<CollisionGroup>)->bool{
+    let group: u8 = group.into();
+    for &i in vec{
+        if group == i.get() {
+            return true;
+        }
+    }
+    return false
 }
 
 impl Into<u8> for CollisionGroupType{
