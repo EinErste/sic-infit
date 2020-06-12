@@ -39,7 +39,10 @@ fn main() -> amethyst::Result<()> {
             RenderingBundle::<DefaultBackend>::new()
                 .with_plugin(
                     RenderToWindow::from_config_path(display_config)?
-                        .with_clear([0.34, 0.36, 0.52, 1.0]),
+                        //.with_clear([0.34, 0.36, 0.52, 1.0]),
+                        //.with_clear([	0.788,0.914,0.965,1.00]),
+                        //.with_clear([	0.98,0.957,0.875,1.00]),
+                        .with_clear([	0.98,0.965,0.875,1.00]),
                 )
                 .with_plugin(RenderFlat2D::default())
                 .with_plugin(RenderUi::default()),

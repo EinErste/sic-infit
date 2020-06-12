@@ -58,7 +58,7 @@ pub fn load_player(world: &mut World) -> Entity{
         .create_entity()
         .with(sprite)
         .with(transform)
-        .with(PhysicsBodyDescription::new(10.,150.,20.))
+        .with(PhysicsBodyDescription::new(10.,150.))
         .with(Direction{dir: Directions::Right})
         .with(Player{})
         .with(shape)
@@ -99,22 +99,31 @@ pub fn load_lion(world: &mut World){
         rb_desc.bounciness = 1.0;
         rb_desc.mass = 1000.;
         rb_desc.mode = BodyMode::Dynamic;
-        rb_desc.belong_to = vec![CollisionGroup::new(CollisionGroupType::Enemy.into())];
-        rb_desc.collide_with = vec![CollisionGroup::new(CollisionGroupType::Ground.into()),
-                                    CollisionGroup::new(CollisionGroupType::NPC.into()),
-                                    CollisionGroup::new(CollisionGroupType::Player.into()),
-                                    CollisionGroup::new(CollisionGroupType::WorldWall.into()),
-                                    CollisionGroup::new(CollisionGroupType::Wall.into()),];
+        rb_desc.belong_to = vec![
+            CollisionGroup::new(CollisionGroupType::Enemy.into()),
+            CollisionGroup::new(CollisionGroupType::LinearMovable.into()),
+        ];
+        rb_desc.collide_with = vec![
+            CollisionGroup::new(CollisionGroupType::Ground.into()),
+            CollisionGroup::new(CollisionGroupType::NPC.into()),
+            CollisionGroup::new(CollisionGroupType::Player.into()),
+            CollisionGroup::new(CollisionGroupType::WorldWall.into()),
+            CollisionGroup::new(CollisionGroupType::InvisibleWall.into()),
+        ];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };
+
+    let mut desc = PhysicsBodyDescription::new(1000.,120.);
+    desc.set_velocity_direction_x(1.);
     world
         .create_entity()
         .with(sprite)
         .with(transform)
         .with(shape)
         .with(rb)
-        .with(PhysicsBodyDescription::new(1000.,120.,1.))
+        .with(desc)
         .with(Direction{dir: Directions::Left})
         .build();
+
 }

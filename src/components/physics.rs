@@ -2,7 +2,7 @@ use amethyst::{
     core::math::Vector3,
     ecs::{Component, DenseVecStorage},
 };
-use crate::components::physics::CollisionGroupType::{Ground, Player, NPC, Enemy, Undefined, Wall, WorldWall};
+use crate::components::physics::CollisionGroupType::{Ground, Player, NPC, Enemy, Undefined, WorldWall, InvisibleWall, LinearMovable};
 use amethyst_physics::objects::CollisionGroup;
 
 
@@ -14,8 +14,9 @@ pub enum CollisionGroupType {
     Player = 2,
     NPC = 3,
     Enemy = 4,
-    Wall = 5,
-    WorldWall = 6
+    InvisibleWall = 5,
+    WorldWall = 6,
+    LinearMovable = 7,
 }
 
 impl From<u8> for CollisionGroupType{
@@ -25,8 +26,9 @@ impl From<u8> for CollisionGroupType{
             2 => Player,
             3 => NPC,
             4 => Enemy,
-            5 => Wall,
+            5 => InvisibleWall,
             6 => WorldWall,
+            7 => LinearMovable,
             _ => Undefined,
         }
     }
@@ -53,22 +55,20 @@ impl Into<u8> for CollisionGroupType{
 pub struct PhysicsBodyDescription {
     velocity_direction: Vector3<f32>,
     velocity_max: f32,
-    acceleration_time: f32,
     mass: f32,
 }
 
 impl Default for PhysicsBodyDescription {
     fn default() -> Self {
-        PhysicsBodyDescription { velocity_direction: Vector3::new(0., 0., 0.), mass: 1.,acceleration_time: 2., velocity_max: 10.}
+        PhysicsBodyDescription { velocity_direction: Vector3::new(0., 0., 0.), mass: 1., velocity_max: 10.}
     }
 }
 
 impl PhysicsBodyDescription {
-    pub fn new(mass: f32, vel_max: f32, acceleration_time: f32) -> Self {
+    pub fn new(mass: f32, vel_max: f32) -> Self {
         let mut desc = Self::default();
         desc.mass = mass;
         desc.velocity_max = vel_max;
-        desc.acceleration_time = acceleration_time;
         desc
     }
 
@@ -87,14 +87,6 @@ impl PhysicsBodyDescription {
 
     pub fn set_mass(&mut self, mass: f32){
         self.mass = mass;
-    }
-
-    pub fn acceleration_time(&self) ->  f32{
-        self.acceleration_time
-    }
-
-    pub fn set_acceleration_time(&mut self, acceleration_time: f32){
-        self.acceleration_time = acceleration_time;
     }
 
 
