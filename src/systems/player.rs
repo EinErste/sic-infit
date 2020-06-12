@@ -85,17 +85,18 @@ impl<'s> System<'s> for PlayerSystem {
                 for collision_group in belongs_to {
                     let enemy: u8 = CollisionGroupType::Enemy.into();
                     if collision_group.get() == enemy {
-                        // if almost::zero_with(1. - contact_event.normal.y, 0.01) && !is_on_ground{
-                        //     dbg!(contact_event.normal);
-                        //     body_server.apply_impulse(
-                        //         p_body_tag.get(),
-                        //         &Vector3::new(0.,IMPULSE_JUMP,0.));
-                        // }
+                        if almost::zero_with(1. - contact_event.normal.y, 0.01){
+                            // dbg!(contact_event.normal);
+                            body_server.apply_impulse(
+                                p_body_tag.get(),
+                                &Vector3::new(0.,IMPULSE_JUMP,0.));
+                        }
                         dbg!("ENEMY COLLIDED");
                     }
                 }
 
             }
+
 
 
             if p_description.velocity_direction().y != 0. && is_on_ground{

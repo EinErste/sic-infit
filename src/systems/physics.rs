@@ -80,19 +80,26 @@ impl<'s> System<'s> for PhysicsSystem {
 impl PhysicsSystem{
     fn move_body(&mut self,body_server: &dyn RBodyPhysicsServerTrait<f32>, body_tag: &PhysicsHandle<PhysicsRigidBodyTag>, body_desc: &PhysicsBodyDescription, dir: &Direction){
         let vel = body_server.linear_velocity(body_tag.get());
+
+        let IMPULSE_MOVE:f32 = 1000000.;
         match dir.dir {
             Directions::Right =>{
-                body_server.set_linear_velocity(
-                    body_tag.get(),
-                    &Vector3::new(body_desc.velocity_max(),vel.y,0.)
-                );
+                if vel.x.abs() <= body_desc.velocity_max(){
+                    body_server.apply_impulse(
+                        body_tag.get(),
+                        &Vector3::new(IMPULSE_MOVE,0.,0.)
+                    );
+                }
             }
             Directions::Left =>{
-                body_server.set_linear_velocity(
-                    body_tag.get(),
-                    &Vector3::new(-body_desc.velocity_max(),vel.y,0.)
-                );
+                if vel.x.abs() <= body_desc.velocity_max(){
+                    body_server.apply_impulse(
+                        body_tag.get(),
+                        &Vector3::new(-IMPULSE_MOVE,0.,0.)
+                    );
+                }
             }
         }
+
     }
 }

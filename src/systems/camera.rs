@@ -18,7 +18,10 @@ impl<'s> System<'s> for CameraSystem {
         let char = transforms.get(self.character).unwrap().translation().clone();
         let cam = transforms.get_mut(self.camera).unwrap();
         cam.translation_mut().x = char.x;
-        cam.translation_mut().y = char.y + 30.;
-        //cam.translation_mut().y = char.y + 70.;
+        if 180. - char.y > 0.{
+            cam.translation_mut().y = 180.;
+        } else{
+            cam.translation_mut().y = char.y;
+        }
     }
 }

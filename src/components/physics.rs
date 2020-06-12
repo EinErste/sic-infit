@@ -2,7 +2,7 @@ use amethyst::{
     core::math::Vector3,
     ecs::{Component, DenseVecStorage},
 };
-use crate::components::physics::CollisionGroupType::{Ground, Player, NPC, Enemy, Undefined, Wall};
+use crate::components::physics::CollisionGroupType::{Ground, Player, NPC, Enemy, Undefined, Wall, WorldWall};
 use amethyst_physics::objects::CollisionGroup;
 
 
@@ -14,7 +14,8 @@ pub enum CollisionGroupType {
     Player = 2,
     NPC = 3,
     Enemy = 4,
-    Wall = 5
+    Wall = 5,
+    WorldWall = 6
 }
 
 impl From<u8> for CollisionGroupType{
@@ -25,6 +26,7 @@ impl From<u8> for CollisionGroupType{
             3 => NPC,
             4 => Enemy,
             5 => Wall,
+            6 => WorldWall,
             _ => Undefined,
         }
     }
