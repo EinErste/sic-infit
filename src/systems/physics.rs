@@ -41,13 +41,15 @@ impl<'s> System<'s> for PhysicsSystem {
         let body_server = physics_world.rigid_body_server();
         for(body_desc, body_tag) in (&mut body_descs,&rigid_body_tags).join(){
             let belong_groups = body_server.belong_to(body_tag.get());
+            // if group_belongs_to(CollisionGroupType::Ground, &belong_groups) {
+            //     body_server.apply_impulse(
+            //         body_tag.get(),
+            //         &Vector3::new(0.,body_desc.mass()*FORCE_GRAVITY,0.));
+            // }
             if group_belongs_to(CollisionGroupType::LinearMovable, &belong_groups) {
                 body_server.set_contacts_to_report(body_tag.get(),5);
                 let mut collide_events = vec![];
                 body_server.contact_events(body_tag.get(),&mut collide_events);
-                if group_belongs_to(CollisionGroupType::Ground, &belong_groups) {
-                    dbg!(collide_events.clone());
-                }
                 for &event in &collide_events {
                     let contact_belongs_to = body_server.belong_to(event.other_body);
                     for group_collide in contact_belongs_to{
@@ -55,7 +57,9 @@ impl<'s> System<'s> for PhysicsSystem {
 
                         match group_collide{
                             CollisionGroupType::InvisibleWall =>{
-                                body_desc.set_velocity_direction_x(event.normal.x.round());
+                                if event.normal.y.round() !=1.{
+                                    body_desc.set_velocity_direction_x(event.normal.x.round());
+                                }
                             }
                             _ => {}
                         }

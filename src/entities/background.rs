@@ -248,7 +248,7 @@ fn load_invisible_wall(init_x: f32, init_y: f32, wall_width: f32, wall_height: f
         .build();
 }
 
-fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, world: &mut World){
+fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, speed: f32, world: &mut World){
     let platform_width = 150 as f32;
     let platform_height = 14 as f32;
     let sprite_sheet_handle = {
@@ -272,9 +272,13 @@ fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, world: &mut Wor
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
-        rb_desc.mode = BodyMode::Kinematic;
-        rb_desc.friction = 0.5;
+        rb_desc.mode = BodyMode::Dynamic;
+        rb_desc.friction = 1.0;
         rb_desc.bounciness = 0.00;
+        rb_desc.lock_translation_z = true;
+        rb_desc.lock_rotation_x = true;
+        rb_desc.lock_rotation_y = true;
+        rb_desc.lock_rotation_z = true;
         rb_desc.belong_to = vec![
             CollisionGroup::new(CollisionGroupType::Ground.into()),
             CollisionGroup::new(CollisionGroupType::LinearMovable.into()),
@@ -291,7 +295,7 @@ fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, world: &mut Wor
     };
 
 
-    let mut desc = PhysicsBodyDescription::new(0.,150.);
+    let mut desc = PhysicsBodyDescription::new(100.,speed);
     desc.set_velocity_direction_x(-1.);
     world
         .create_entity()
@@ -306,6 +310,8 @@ fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, world: &mut Wor
     load_invisible_wall(init_x - 20.,init_y,20.,platform_height,world);
     //RIGHT
     load_invisible_wall(init_x + distance,init_y,20.,platform_height,world);
+    //BOTTOM
+    load_invisible_wall(init_x ,init_y - platform_height,platform_height+distance,platform_height,world);
 }
 
 #[repr(u32)]
@@ -325,5 +331,5 @@ fn load_obstacles(world: &mut World){
     load_platform(400.,Height::Low.into(),70.,world);
     load_platform(600.,Height::Mid.into(),120.,world);
     load_platform(800.,Height::High.into(),100.,world);
-    load_moving_platform(1000.,Height::Mid.into(),300.,world);
+    load_moving_platform(1000.,Height::Low.into(),500.,200., world);
 }

@@ -47,7 +47,8 @@ impl<'s> System<'s> for PlayerSystem {
                 }
             }
 
-            if let Some(jump) = input.action_is_down("Jump"){
+            //if let Some(jump) = input.action_is("Jump"){
+            if let Some(jump) = input.action_is_down("Jump") {
                 if jump {
                     p_description.set_velocity_direction_y(1.);
                 } else {
@@ -71,64 +72,88 @@ impl<'s> System<'s> for PlayerSystem {
             for &contact_event in &events{
 
                 //THIS SHIT DOESNT WORK PROPERLY! WHY? HAS I EVER?
-                if almost::zero_with(1. - contact_event.normal.y, 0.01) && almost::zero_with(velocity.y,0.1){
+                if almost::zero_with(1. - contact_event.normal.y, 0.01){
                     is_on_ground = true;
-                    //dbg!(contact_event.normal);
                     break;
                 }
             }
-
 
             //Contacts
             for &contact_event in &events {
                 let belongs_to = body_server.belong_to(contact_event.other_body);
                 for collision_group in belongs_to {
-                    let enemy: u8 = CollisionGroupType::Enemy.into();
-                    if collision_group.get() == enemy {
-                        if almost::zero_with(1. - contact_event.normal.y, 0.01){
-                            // dbg!(contact_event.normal);
-                            body_server.apply_impulse(
-                                p_body_tag.get(),
-                                &Vector3::new(0.,IMPULSE_JUMP,0.));
+
+                    let collision_group = CollisionGroupType::from(collision_group.get());
+
+                    match collision_group{
+                        CollisionGroupType::Enemy =>{
+                            if almost::zero_with(1. - contact_event.normal.y, 0.01){
+
+                                //Force jump on enemy head
+                                body_server.apply_impulse(
+                                    p_body_tag.get(),
+                                    &Vector3::new(0.,IMPULSE_JUMP,0.));
+                            }
+                            dbg!("ENEMY COLLIDED");
                         }
-                        dbg!("ENEMY COLLIDED");
+                        CollisionGroupType::Ground =>{
+                            if almost::zero_with(1. - contact_event.normal.y, 0.01){
+                                let velocity_ground = body_server.linear_velocity(contact_event.other_body);
+                                //Check if directions are same
+                                let x_direction_determinant = if velocity.x.signum() == velocity_ground.x.signum() {1.} else {-1.};
+                                //If player is moving
+                                if p_description.velocity_direction().x != 0. {
+                                    if x_direction_determinant == 1.{
+                                        body_server.set_linear_velocity(
+                                            p_body_tag.get(),
+                                            &Vector3::new(
+                                                p_description.velocity_max()*p_description.velocity_direction().x + velocity_ground.x,
+                                                velocity.y + velocity_ground.y,
+                                                0.));
+                                    } else {
+                                        body_server.set_linear_velocity(
+                                            p_body_tag.get(),
+                                            &Vector3::new(
+                                                p_description.velocity_max()*p_description.velocity_direction().x,
+                                                velocity.y + velocity_ground.y,
+                                                0.));
+                                    }
+
+                                } else{
+                                    body_server.set_linear_velocity(
+                                        p_body_tag.get(),
+                                        &Vector3::new(velocity_ground.x,velocity_ground.y,0.));
+                                }
+                            }
+                        }
+                        _ => {}
                     }
                 }
 
             }
 
 
-
+            let mut velocity = body_server.linear_velocity(p_body_tag.get());
             if p_description.velocity_direction().y != 0. && is_on_ground{
+                //Kinda crutch?
+                body_server.set_linear_velocity(
+                    p_body_tag.get(),
+                    &Vector3::new(velocity.x,0.,0.));
+
                 body_server.apply_impulse(
                     p_body_tag.get(),
                     &Vector3::new(0.,IMPULSE_JUMP,0.));
             }
 
-            let mut velocity = body_server.linear_velocity(p_body_tag.get());
-            if velocity.x.abs() <= p_description.velocity_max() || velocity.x.signum()!= p_description.velocity_direction().x.signum(){
+            if velocity.x.abs() <=  p_description.velocity_max() || velocity.x.signum()!= p_description.velocity_direction().x.signum(){
                 body_server.apply_impulse(
                     p_body_tag.get(),
                     &Vector3::new(IMPULSE_MOVE * p_description.velocity_direction().x,0.,0.));
             }
+
+
             //just in case (only 1 player entity exists)
             break;
         }
-
-
-
-
-
-
-        // let player_desc = descs.get_mut(self.player).unwrap();
-        // let player_anim = animations.get_mut(self.player).unwrap();
-
-        //----------when jump anim? never------------
-        // if player_anim.current_state == jump {
-        //     let (i,j,time_step) = player_anim.states[StateAnimation::Jump];
-        //     if player_anim.time_elapsed == time_step*(i-j){
-        //         player_anim.change_state(//Sosat);
-        //     }
-        // }
     }
 }
