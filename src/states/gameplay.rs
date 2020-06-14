@@ -16,7 +16,7 @@ use crate::{
 
 };
 use amethyst_physics::PhysicsTime;
-use crate::systems::CoinPickupSystem;
+use crate::systems::{CoinPickupSystem, InteractButtonSystem};
 
 ///Main state where all the actual gameplay takes place
 pub struct GameplayState<'a, 'b> {
@@ -34,6 +34,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
             .with(CameraSystem { character: self.player, camera: self.camera }, "camera_system", &[])
             .with(SimpleAnimationSystem{},"animation_system", &[] )
             .with(CoinPickupSystem::new(&mut world), "coin_system", &[])
+            .with(InteractButtonSystem::new(&mut world), "interact_button_system", &[])
             .build();
         dispatcher.setup(world);
         self.dispatcher = Some(dispatcher);

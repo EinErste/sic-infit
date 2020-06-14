@@ -10,7 +10,7 @@ use crate::components::{PhysicsBodyDescription, SimpleAnimation, StateAnimation,
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst_physics::objects::PhysicsHandle;
 use amethyst_physics::prelude::PhysicsRigidBodyTag;
-use crate::systems::CoinPicked;
+use crate::systems::{CoinPicked, Interact};
 
 ///This system controls the character control
 #[derive(SystemDesc, Default)]
@@ -32,10 +32,11 @@ impl<'s> System<'s> for PlayerSystem {
         ReadStorage<'s, PhysicsHandle<PhysicsRigidBodyTag>>,
         ReadStorage<'s, Player>,
         Entities<'s>,
-        Write<'s, EventChannel<CoinPicked>>
+        Write<'s, EventChannel<CoinPicked>>,
+        Write<'s, EventChannel<Interact>>
     );
 
-    fn run(&mut self, (mut descs, mut animations, input, physics_world, rigid_body_tags, player, entities, mut coinChannel): Self::SystemData) {
+    fn run(&mut self, (mut descs, mut animations, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut interactChannel): Self::SystemData) {
         let body_server = physics_world.rigid_body_server();
 
         for (p_description, animation, p_body_tag, _player) in (&mut descs, &mut animations, &rigid_body_tags, &player).join() {
@@ -56,6 +57,12 @@ impl<'s> System<'s> for PlayerSystem {
                 } else {
                     p_description.set_velocity_direction_y(0.);
                 }
+            }
+
+            if let Some(action) = input.action_is_down("Action") {
+                if action {
+                    interactChannel.single_write(Interact());
+ d                }
             }
 
 

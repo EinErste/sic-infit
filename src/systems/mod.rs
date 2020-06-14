@@ -7,8 +7,10 @@ mod animation;
 mod ui;
 mod utils;
 mod coin_pickup;
+mod interact_button;
 
 pub use self::{
+    interact_button::{InteractButtonSystem, Interact},
     camera::CameraSystem,
     player::PlayerSystem,
     physics::PhysicsSystem,

@@ -1,12 +1,12 @@
 //! A set of useful functions for loading the player and associated spritess
 use amethyst::{
     prelude::{World, WorldExt, Builder},
-    core::transform::Transform,
+    core::transform::{Transform},
     renderer::{SpriteRender},
     ecs::{Entity},
     core::math::{Vector3},
-    ui::{UiCreator, UiTransform, Anchor, UiText, TtfFormat},
-    assets::Loader,
+    ui::{UiCreator, UiTransform, Anchor, UiText, TtfFormat, FontAsset},
+    assets::{Loader, Handle},
 };
 use crate::{
     resources::{SpriteSheetList, AssetType},
@@ -189,12 +189,8 @@ pub fn load_npc(world: &mut World) {
 pub struct CoinSign(pub Option<Entity>);
 
 pub fn load_coins(world: &mut World) -> CoinSign {
-    let font = world.read_resource::<Loader>().load(
-        "font/square.ttf",
-        TtfFormat,
-        (),
-        &world.read_resource(),
-    );
+    let font = load_font(&world);
+
     let transform = UiTransform::new(
         "coins".to_string(), Anchor::TopLeft, Anchor::TopLeft,
         50., -25., 1., 200., 50.,
@@ -210,4 +206,36 @@ pub fn load_coins(world: &mut World) -> CoinSign {
             50.,
         ))
         .build()))
+}
+
+#[derive(Default)]
+pub struct InteractButton(pub Option<Entity>);
+
+pub fn load_interact_button(world: &mut World) -> InteractButton {
+    let font = load_font(&world);
+
+    let transform = UiTransform::new(
+        "coins".to_string(), Anchor::BottomMiddle, Anchor::BottomMiddle,
+        0., 100., 1., 50., 50.,
+    );
+
+    InteractButton(Some(world
+        .create_entity()
+        .with(transform)
+        .with(UiText::new(
+            font.clone(),
+            "E".to_string(),
+            [0., 0., 0., 1.],
+            50.,
+        ))
+        .build()))
+}
+
+fn load_font(world: &&mut World) -> Handle<FontAsset> {
+    world.read_resource::<Loader>().load(
+        "font/square.ttf",
+        TtfFormat,
+        (),
+        &world.read_resource(),
+    )
 }
