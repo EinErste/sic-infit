@@ -7,7 +7,7 @@ use amethyst::{
 
 use crate::components::{PhysicsBodyDescription, SimpleAnimation, StateAnimation, Player, CollisionGroupType};
 use amethyst_physics::servers::PhysicsWorld;
-use amethyst_physics::objects::PhysicsHandle;
+use amethyst_physics::objects::{PhysicsHandle, CollisionGroup};
 use amethyst_physics::prelude::PhysicsRigidBodyTag;
 
 ///This system controls the character control
@@ -88,22 +88,20 @@ impl<'s> System<'s> for PlayerSystem {
                     let collision_group = CollisionGroupType::from(collision_group.get());
 
                     match collision_group{
+                        //TODO how to delete shape ? -_-
                         CollisionGroupType::Collectable =>{
-                            //TODO how to delete shape ? -_-
                             entities.delete(contact_event.other_entity.unwrap());
                             dbg!("+1 COIN");
                         }
                         CollisionGroupType::Enemy =>{
                             if almost::zero_with(1. - contact_event.normal.y, 0.01){
-
-                                //TODO delete entity
                                 body_server.set_belong_to(
                                     contact_event.other_body,
-                                    vec![]
+                                    vec![CollisionGroup::new(CollisionGroupType::Deletable.into()),]
                                 );
                                 body_server.set_collide_with(
                                     contact_event.other_body,
-                                    vec![]
+                                    vec![CollisionGroup::new(CollisionGroupType::DeleteArea.into()),]
                                 );
                                 body_server.set_linear_velocity(
                                     contact_event.other_body,
@@ -124,6 +122,8 @@ impl<'s> System<'s> for PlayerSystem {
                                 //Check if directions are same
                                 let x_direction_determinant = if velocity.x.signum() == velocity_ground.x.signum() {1.} else {-1.};
                                 //If player is moving
+
+                                //TODO
                                 if p_description.velocity_direction().x != 0. {
                                     if x_direction_determinant == 1.{
                                         body_server.set_linear_velocity(
@@ -132,7 +132,8 @@ impl<'s> System<'s> for PlayerSystem {
                                                 p_description.velocity_max()*p_description.velocity_direction().x + velocity_ground.x,
                                                 velocity.y + velocity_ground.y,
                                                 0.));
-                                    } else {
+                                    }
+                                    else {
                                         body_server.set_linear_velocity(
                                             p_body_tag.get(),
                                             &Vector3::new(
