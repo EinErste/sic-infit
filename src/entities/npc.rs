@@ -4,23 +4,24 @@ use amethyst::{
     core::transform::Transform,
     renderer::{SpriteRender},
     ecs::{Entity},
-    core::math::{Vector3}
+    core::math::{Vector3},
+    ui::UiCreator,
 };
 use crate::{
     resources::{SpriteSheetList, AssetType},
-    components::{Direction, SimpleAnimation, Directions, StateAnimation, Player}
+    components::{Direction, SimpleAnimation, Directions, StateAnimation, Player},
 };
 use enum_map::{enum_map};
 use amethyst_physics::{
     prelude::{ShapeDesc, RigidBodyDesc, BodyMode},
     servers::PhysicsWorld,
-    objects::PhysicsHandle
+    objects::PhysicsHandle,
 };
 use crate::components::{PhysicsBodyDescription, CollisionGroupType, NPC};
 use amethyst_physics::objects::CollisionGroup;
 use amethyst_physics::prelude::PhysicsShapeTag;
 
-pub fn load_player(world: &mut World) -> Entity{
+pub fn load_player(world: &mut World) -> Entity {
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
@@ -32,7 +33,7 @@ pub fn load_player(world: &mut World) -> Entity{
         sprite_number: 0,
     };
     let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(20.,32.,5.)};
+        let desc = ShapeDesc::Cube { half_extents: Vector3::new(20., 32., 5.) };
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.shape_server().create(&desc)
     };
@@ -59,12 +60,12 @@ pub fn load_player(world: &mut World) -> Entity{
         .create_entity()
         .with(sprite)
         .with(transform)
-        .with(PhysicsBodyDescription::new(10.,150.))
-        .with(Direction{dir: Directions::Right})
-        .with(Player{})
+        .with(PhysicsBodyDescription::new(10., 150.))
+        .with(Direction { dir: Directions::Right })
+        .with(Player {})
         .with(shape)
         .with(rb)
-        .with(SimpleAnimation::new(StateAnimation::Idle,enum_map!(
+        .with(SimpleAnimation::new(StateAnimation::Idle, enum_map!(
             StateAnimation::Run => (2,10,0.1),
             StateAnimation::Idle => (0,2,0.8),
             _ => (0,1,0.1)
@@ -72,7 +73,7 @@ pub fn load_player(world: &mut World) -> Entity{
         .build()
 }
 
-pub fn load_lion(world: &mut World){
+pub fn load_lion(world: &mut World) {
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
@@ -84,7 +85,7 @@ pub fn load_lion(world: &mut World){
         sprite_number: 0,
     };
     let shape: PhysicsHandle<PhysicsShapeTag> = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(24.,32.,20.)};
+        let desc = ShapeDesc::Cube { half_extents: Vector3::new(24., 32., 20.) };
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.shape_server().create(&desc)
     };
@@ -115,7 +116,7 @@ pub fn load_lion(world: &mut World){
         physics_world.rigid_body_server().create(&rb_desc)
     };
 
-    let mut desc = PhysicsBodyDescription::new(1000.,120.);
+    let mut desc = PhysicsBodyDescription::new(1000., 120.);
     desc.set_velocity_direction_x(1.);
     world
         .create_entity()
@@ -124,12 +125,11 @@ pub fn load_lion(world: &mut World){
         .with(shape)
         .with(rb)
         .with(desc)
-        .with(Direction{dir: Directions::Left})
+        .with(Direction { dir: Directions::Left })
         .build();
-
 }
 
-pub fn load_npc(world: &mut World){
+pub fn load_npc(world: &mut World) {
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
@@ -141,7 +141,7 @@ pub fn load_npc(world: &mut World){
         sprite_number: 0,
     };
     let shape: PhysicsHandle<PhysicsShapeTag> = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(24.,32.,20.)};
+        let desc = ShapeDesc::Cube { half_extents: Vector3::new(24., 32., 20.) };
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.shape_server().create(&desc)
     };
@@ -170,7 +170,7 @@ pub fn load_npc(world: &mut World){
         physics_world.rigid_body_server().create(&rb_desc)
     };
 
-    let mut desc = PhysicsBodyDescription::new(1000.,120.);
+    let mut desc = PhysicsBodyDescription::new(1000., 120.);
     desc.set_velocity_direction_x(1.);
     world
         .create_entity()
@@ -180,7 +180,14 @@ pub fn load_npc(world: &mut World){
         .with(rb)
         .with(desc)
         .with(NPC::new("I am an iron man!"))
-        .with(Direction{dir: Directions::Right})
+        .with(Direction { dir: Directions::Right })
         .build();
+}
 
+pub struct Coins(Entity);
+
+pub fn load_coins(world: &mut World) -> Coins {
+    Coins(world.exec(|mut creator: UiCreator<'_>| {
+        creator.create("prefabs/ui/coins.ron", ())
+    }))
 }
