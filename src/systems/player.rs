@@ -1,6 +1,6 @@
 use amethyst::{
     derive::SystemDesc,
-    ecs::{Join,Entity, Read, System, SystemData, WriteStorage, ReadStorage, ReadExpect},
+    ecs::{Join,Entity, Read, System, SystemData, WriteStorage, ReadStorage, ReadExpect,Entities},
     input::{InputHandler, StringBindings},
     core::math::Vector3
 };
@@ -18,6 +18,7 @@ pub struct PlayerSystem {
 
 const FORCE_MULTIPLIER: f32 = 1000000.0;
 const IMPULSE_JUMP: f32 =  10000000. * 1.3;
+const IMPULSE_JUMP_DEFEAT_ENEMY: f32 =  100000000. * 0.5;
 const IMPULSE_MOVE: f32 =  500000. ;
 
 #[allow(dead_code)]
@@ -29,10 +30,11 @@ impl<'s> System<'s> for PlayerSystem {
 
         ReadExpect<'s,PhysicsWorld<f32>>,
         ReadStorage<'s, PhysicsHandle<PhysicsRigidBodyTag>>,
-        ReadStorage<'s, Player>
+        ReadStorage<'s, Player>,
+        Entities<'s>,
     );
 
-    fn run(&mut self, (mut descs, mut animations, input, physics_world, rigid_body_tags, player): Self::SystemData) {
+    fn run(&mut self, (mut descs, mut animations, input, physics_world, rigid_body_tags, player,entities): Self::SystemData) {
         let body_server = physics_world.rigid_body_server();
 
         for (p_description, animation, p_body_tag, _player) in  (&mut descs, &mut animations, &rigid_body_tags, &player).join(){
@@ -86,15 +88,35 @@ impl<'s> System<'s> for PlayerSystem {
                     let collision_group = CollisionGroupType::from(collision_group.get());
 
                     match collision_group{
+                        CollisionGroupType::Collectable =>{
+                            //TODO how to delete shape ? -_-
+                            entities.delete(contact_event.other_entity.unwrap());
+                            dbg!("+1 COIN");
+                        }
                         CollisionGroupType::Enemy =>{
                             if almost::zero_with(1. - contact_event.normal.y, 0.01){
 
-                                //Force jump on enemy head
+                                //TODO delete entity
+                                body_server.set_belong_to(
+                                    contact_event.other_body,
+                                    vec![]
+                                );
+                                body_server.set_collide_with(
+                                    contact_event.other_body,
+                                    vec![]
+                                );
+                                body_server.set_linear_velocity(
+                                    contact_event.other_body,
+                                    &Vector3::new(0.,0.,0.)
+                                );
                                 body_server.apply_impulse(
-                                    p_body_tag.get(),
-                                    &Vector3::new(0.,IMPULSE_JUMP,0.));
+                                    contact_event.other_body,
+                                    &Vector3::new(0.,IMPULSE_JUMP_DEFEAT_ENEMY,0.));
+                                dbg!("Enemy dead");
+                                //Not sure
+                            } else{
+                                dbg!("ENEMY COLLIDED");
                             }
-                            dbg!("ENEMY COLLIDED");
                         }
                         CollisionGroupType::Ground =>{
                             if almost::zero_with(1. - contact_event.normal.y, 0.01){

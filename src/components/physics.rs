@@ -2,8 +2,12 @@ use amethyst::{
     core::math::Vector3,
     ecs::{Component, DenseVecStorage},
 };
-use crate::components::physics::CollisionGroupType::{Ground, Player, NPC, Enemy, Undefined, WorldWall, InvisibleWall, LinearMovable};
-use amethyst_physics::objects::CollisionGroup;
+use crate::components::physics::CollisionGroupType::{Ground, Player, NPC, Enemy, Undefined, WorldWall, InvisibleWall, LinearMovable, Collectable};
+use amethyst_physics::objects::{CollisionGroup, PhysicsHandle};
+use amethyst_physics::prelude::{PhysicsShapeTag, ShapeDesc};
+use amethyst_physics::servers::PhysicsWorld;
+use amethyst::prelude::World;
+use amethyst::core::transform::Transform;
 
 
 #[derive(PartialEq,Debug,Copy,Clone)]
@@ -17,6 +21,7 @@ pub enum CollisionGroupType {
     InvisibleWall = 5,
     WorldWall = 6,
     LinearMovable = 7,
+    Collectable = 8,
 }
 
 impl From<u8> for CollisionGroupType{
@@ -29,6 +34,7 @@ impl From<u8> for CollisionGroupType{
             5 => InvisibleWall,
             6 => WorldWall,
             7 => LinearMovable,
+            8 => Collectable,
             _ => Undefined,
         }
     }
@@ -107,4 +113,16 @@ impl PhysicsBodyDescription {
         self.velocity_direction.z = z;
     }
 
+}
+
+pub fn create_cube(init_x:f32, init_y:f32, init_z:f32, width:f32,height:f32,depth:f32,world: &mut World) -> (PhysicsHandle<PhysicsShapeTag>,Transform){
+    let mut transform = Transform::default();
+    transform.set_translation_xyz(init_x + width/2., init_y + height/2., init_z);
+
+    let shape = {
+        let desc = ShapeDesc::Cube {half_extents: Vector3::new(width/2.,height/2.,depth/2.)};
+        let physics_world = world.fetch::<PhysicsWorld<f32>>();
+        physics_world.shape_server().create(&desc)
+    };
+    (shape,transform)
 }

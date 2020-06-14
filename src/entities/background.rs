@@ -8,7 +8,7 @@ use amethyst_physics::servers::PhysicsWorld;
 use amethyst::core::math::Vector3;
 use crate::entities::AdjustToDistance;
 use amethyst_physics::objects::CollisionGroup;
-use crate::components::{CollisionGroupType, PhysicsBodyDescription};
+use crate::components::{CollisionGroupType, PhysicsBodyDescription, create_cube};
 
 
 //All x and y parameters stands for left bottom point
@@ -16,14 +16,7 @@ use crate::components::{CollisionGroupType, PhysicsBodyDescription};
 pub fn load_forest_path(world: &mut World){
 
     //Main path
-    let mut transform = Transform::default();
-    transform.set_translation_xyz(960. as f32, 40., 0.);
-
-    let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(960.,20.,50.)};
-        let physics_world = world.fetch::<PhysicsWorld<f32>>();
-        physics_world.shape_server().create(&desc)
-    };
+    let cube = create_cube(0.,40.,0.,1920.,20.,100.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
@@ -33,6 +26,7 @@ pub fn load_forest_path(world: &mut World){
         rb_desc.belong_to = vec![CollisionGroup::new(CollisionGroupType::Ground.into())];
         rb_desc.collide_with = vec![CollisionGroup::new(CollisionGroupType::Player.into()),
                                     CollisionGroup::new(CollisionGroupType::NPC.into()),
+                                    CollisionGroup::new(CollisionGroupType::Collectable.into()),
                                     CollisionGroup::new(CollisionGroupType::Enemy.into()),];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
@@ -40,23 +34,15 @@ pub fn load_forest_path(world: &mut World){
 
     world
         .create_entity()
-        .with(transform)
-        .with(shape)
+        .with(cube.0)
+        .with(cube.1)
         .with(rb)
         .build();
 
 
     //Left wall
 
-
-    let mut transform = Transform::default();
-    transform.set_translation_xyz(160., 0., 0.);
-
-    let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(160.,1000.,50.)};
-        let physics_world = world.fetch::<PhysicsWorld<f32>>();
-        physics_world.shape_server().create(&desc)
-    };
+    let cube = create_cube(0.,0.,0.,320.,1000.,100.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
@@ -67,6 +53,7 @@ pub fn load_forest_path(world: &mut World){
         rb_desc.collide_with = vec![
             CollisionGroup::new(CollisionGroupType::Player.into()),
             CollisionGroup::new(CollisionGroupType::NPC.into()),
+            CollisionGroup::new(CollisionGroupType::Collectable.into()),
             CollisionGroup::new(CollisionGroupType::Enemy.into()),
             CollisionGroup::new(CollisionGroupType::LinearMovable.into()),
         ];
@@ -76,8 +63,8 @@ pub fn load_forest_path(world: &mut World){
 
     world
         .create_entity()
-        .with(transform)
-        .with(shape)
+        .with(cube.0)
+        .with(cube.1)
         .with(rb)
         .build();
 }
@@ -85,7 +72,6 @@ pub fn load_forest_path(world: &mut World){
 
 pub fn load_forest(world: &mut World){
     let distances:Vec<f32> = vec![-1500.,-1400.,-1300.,-1000.,-900.,0.0,80.];
-    //let distances:Vec<f32> = vec![-15.,-12.,-10.,-8.,-5.,0.0,1.];
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::BackgroundForest).unwrap().clone()
@@ -134,6 +120,7 @@ fn load_platform(init_x: f32, init_y: f32, platform_width: f32, world: &mut Worl
     //---------------------------
     //Platform
 
+    //sprite
     let sprite = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 1,
@@ -148,14 +135,9 @@ fn load_platform(init_x: f32, init_y: f32, platform_width: f32, world: &mut Worl
         .with(transform)
         .build();
 
-    let mut transform = Transform::default();
-    transform.set_translation_xyz(init_x + platform_width/2. + column_width, init_y-platform_height/2., 0.);
 
-    let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(platform_width/2. + column_width,platform_height/2.,50.)};
-        let physics_world = world.fetch::<PhysicsWorld<f32>>();
-        physics_world.shape_server().create(&desc)
-    };
+    //hit box
+    let cube = create_cube(init_x,init_y - platform_height,0.,platform_width + column_width*2.,platform_height,100.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
@@ -165,6 +147,7 @@ fn load_platform(init_x: f32, init_y: f32, platform_width: f32, world: &mut Worl
         rb_desc.belong_to = vec![CollisionGroup::new(CollisionGroupType::Ground.into())];
         rb_desc.collide_with = vec![CollisionGroup::new(CollisionGroupType::Player.into()),
                                     CollisionGroup::new(CollisionGroupType::NPC.into()),
+                                    CollisionGroup::new(CollisionGroupType::Collectable.into()),
                                     CollisionGroup::new(CollisionGroupType::Enemy.into()),];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
@@ -172,9 +155,9 @@ fn load_platform(init_x: f32, init_y: f32, platform_width: f32, world: &mut Worl
 
     world
         .create_entity()
+        .with(cube.0)
+        .with(cube.1)
         .with(rb)
-        .with(shape)
-        .with(transform)
         .build();
 
 
@@ -216,14 +199,7 @@ fn load_platform(init_x: f32, init_y: f32, platform_width: f32, world: &mut Worl
 }
 
 fn load_invisible_wall(init_x: f32, init_y: f32, wall_width: f32, wall_height: f32, world: &mut World){
-    let mut transform = Transform::default();
-    transform.set_translation_xyz(init_x + wall_width/2., init_y + wall_height/2., 0.);
-
-    let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(wall_width/2.,wall_height/2.,50.)};
-        let physics_world = world.fetch::<PhysicsWorld<f32>>();
-        physics_world.shape_server().create(&desc)
-    };
+    let cube = create_cube(init_x,init_y,0.,wall_width,wall_height,100.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
@@ -242,9 +218,9 @@ fn load_invisible_wall(init_x: f32, init_y: f32, wall_width: f32, wall_height: f
 
     world
         .create_entity()
+        .with(cube.0)
+        .with(cube.1)
         .with(rb)
-        .with(shape)
-        .with(transform)
         .build();
 }
 
@@ -261,14 +237,7 @@ fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, speed: f32, wor
         sprite_number: 2,
     };
 
-    let mut transform = Transform::default();
-    transform.set_translation_xyz(init_x + platform_width/2., init_y + platform_height/2., -1.);
-
-    let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(platform_width/2.,platform_height/2.,50.)};
-        let physics_world = world.fetch::<PhysicsWorld<f32>>();
-        physics_world.shape_server().create(&desc)
-    };
+    let cube = create_cube(init_x,init_y,-1.,platform_width, platform_height,100.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
@@ -288,6 +257,7 @@ fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, speed: f32, wor
             CollisionGroup::new(CollisionGroupType::NPC.into()),
             CollisionGroup::new(CollisionGroupType::InvisibleWall.into()),
             CollisionGroup::new(CollisionGroupType::Enemy.into()),
+            CollisionGroup::new(CollisionGroupType::Collectable.into()),
             CollisionGroup::new(CollisionGroupType::WorldWall.into()),
         ];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
@@ -300,18 +270,64 @@ fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, speed: f32, wor
     world
         .create_entity()
         .with(rb)
-        .with(shape)
-        .with(transform)
+        .with(cube.0)
+        .with(cube.1)
         .with(sprite.clone())
         .with(desc)
         .build();
 
     //LEFT
-    load_invisible_wall(init_x - 20.,init_y,20.,platform_height,world);
+    load_invisible_wall(init_x - 20.,init_y,10.,platform_height,world);
     //RIGHT
-    load_invisible_wall(init_x + distance,init_y,20.,platform_height,world);
-    //BOTTOM
+    load_invisible_wall(init_x + distance,init_y,10.,platform_height,world);
+    //BOTTOM (god forgive me)
     load_invisible_wall(init_x ,init_y - platform_height,platform_height+distance,platform_height,world);
+}
+
+fn load_coin(init_x: f32, init_y: f32, world: &mut World){
+    let coin_width = 15 as f32;
+    let coin_height = 15 as f32;
+    let sprite_sheet_handle = {
+        let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
+        sprite_sheet_list.get(AssetType::Collectables).unwrap().clone()
+    };
+
+    let sprite = SpriteRender {
+        sprite_sheet: sprite_sheet_handle.clone(),
+        sprite_number: 0,
+    };
+
+    let cube = create_cube(init_x,init_y,0.,coin_width, coin_height,50.,world);
+
+    let rb = {
+        let mut rb_desc = RigidBodyDesc::default();
+        rb_desc.mode = BodyMode::Dynamic;
+        rb_desc.friction = 1.0;
+        rb_desc.bounciness = 0.00;
+        rb_desc.lock_translation_z = true;
+        rb_desc.lock_rotation_x = true;
+        rb_desc.lock_rotation_y = true;
+        rb_desc.lock_rotation_z = true;
+        rb_desc.belong_to = vec![
+            CollisionGroup::new(CollisionGroupType::Collectable.into()),
+        ];
+        rb_desc.collide_with = vec![
+            CollisionGroup::new(CollisionGroupType::Player.into()),
+            CollisionGroup::new(CollisionGroupType::Ground.into()),
+            //dunno why, just in case
+            CollisionGroup::new(CollisionGroupType::WorldWall.into()),
+        ];
+        let physics_world = world.fetch::<PhysicsWorld<f32>>();
+        physics_world.rigid_body_server().create(&rb_desc)
+    };
+
+    world
+        .create_entity()
+        .with(rb)
+        .with(cube.0)
+        .with(cube.1)
+        .with(sprite.clone())
+        .build();
 }
 
 #[repr(u32)]
@@ -329,6 +345,7 @@ impl Into<f32> for Height{
 
 fn load_obstacles(world: &mut World){
     load_platform(400.,Height::Low.into(),70.,world);
+    load_coin(450.,Height::Low.into(),world);
     load_platform(600.,Height::Mid.into(),120.,world);
     load_platform(800.,Height::High.into(),100.,world);
     load_moving_platform(1000.,Height::Low.into(),500.,200., world);

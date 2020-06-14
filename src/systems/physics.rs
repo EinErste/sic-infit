@@ -67,8 +67,6 @@ impl<'s> System<'s> for PhysicsSystem {
                 }
                 self.move_body(body_server,&body_tag,&body_desc);
             }
-
-
         }
     }
 
@@ -86,3 +84,4 @@ impl PhysicsSystem{
             &Vector3::new(body_desc.velocity_max()*body_desc.velocity_direction().x,vel.y,0.));
     }
 }
+

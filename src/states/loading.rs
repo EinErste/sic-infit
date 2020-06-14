@@ -25,7 +25,8 @@ impl SimpleState for LoadingState {
         self.progress_counter = Some(load_assets(&mut world,vec![
             AssetType::BackgroundForest,
             AssetType::Character,
-            AssetType::Platforms
+            AssetType::Platforms,
+            AssetType::Collectables
         ]));
 
     }
@@ -34,20 +35,18 @@ impl SimpleState for LoadingState {
 
         if let Some(ref progress_counter) = self.progress_counter {
             if progress_counter.is_complete() {
-                println!("end");
+                dbg!("loading done");
                 let mut world: &mut World = data.world;
                 //Pause physics
                 world.fetch_mut::<PhysicsTime>().set_frames_per_seconds(0);
 
                 let camera = init_camera(world);
-                //let intro = load_intro(&mut world);
                 load_forest(&mut world);
                 let player = load_player(&mut world);
                 load_lion(&mut world);
-                //world.delete_entity(intro).unwrap();
                 return Trans::Switch(Box::new(GameplayState{dispatcher: None, player, camera}));
             } else {
-                println!("start");
+                dbg!("loading in progress");
             }
         }
         Trans::None

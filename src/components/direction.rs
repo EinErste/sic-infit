@@ -11,4 +11,3 @@ pub struct Direction{
 pub enum Directions {
     Left, Right
 }
-

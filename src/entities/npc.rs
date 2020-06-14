@@ -50,6 +50,7 @@ pub fn load_player(world: &mut World) -> Entity{
         rb_desc.collide_with = vec![CollisionGroup::new(CollisionGroupType::Ground.into()),
                                     CollisionGroup::new(CollisionGroupType::NPC.into()),
                                     CollisionGroup::new(CollisionGroupType::WorldWall.into()),
+                                    CollisionGroup::new(CollisionGroupType::Collectable.into()),
                                     CollisionGroup::new(CollisionGroupType::Enemy.into())];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
