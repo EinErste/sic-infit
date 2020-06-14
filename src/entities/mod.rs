@@ -5,7 +5,7 @@ mod camera;
 mod utils;
 pub use self::{
     background::{load_forest},
-    npc::{load_player, load_lion, load_npc, load_coins},
+    npc::{load_player, load_lion, load_npc, load_coins, CoinSign},
     camera::init_camera,
     utils::AdjustToDistance
 };

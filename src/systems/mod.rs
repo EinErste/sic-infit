@@ -6,6 +6,8 @@ mod physics;
 mod animation;
 mod ui;
 mod utils;
+mod coin_pickup;
+
 pub use self::{
     camera::CameraSystem,
     player::PlayerSystem,
@@ -13,5 +15,6 @@ pub use self::{
     direction::DirectionSystem,
     animation::SimpleAnimationSystem,
     ui::UiEventHandlerSystemDesc,
-    utils::CurrentState
+    utils::CurrentState,
+    coin_pickup::{CoinPicked, CoinPickupSystem}
 };

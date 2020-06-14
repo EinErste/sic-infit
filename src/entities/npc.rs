@@ -5,7 +5,8 @@ use amethyst::{
     renderer::{SpriteRender},
     ecs::{Entity},
     core::math::{Vector3},
-    ui::UiCreator,
+    ui::{UiCreator, UiTransform, Anchor, UiText, TtfFormat},
+    assets::Loader,
 };
 use crate::{
     resources::{SpriteSheetList, AssetType},
@@ -184,10 +185,29 @@ pub fn load_npc(world: &mut World) {
         .build();
 }
 
-pub struct Coins(Entity);
+#[derive(Default)]
+pub struct CoinSign(pub Option<Entity>);
 
-pub fn load_coins(world: &mut World) -> Coins {
-    Coins(world.exec(|mut creator: UiCreator<'_>| {
-        creator.create("prefabs/ui/coins.ron", ())
-    }))
+pub fn load_coins(world: &mut World) -> CoinSign {
+    let font = world.read_resource::<Loader>().load(
+        "font/square.ttf",
+        TtfFormat,
+        (),
+        &world.read_resource(),
+    );
+    let transform = UiTransform::new(
+        "coins".to_string(), Anchor::TopLeft, Anchor::TopLeft,
+        50., -25., 1., 200., 50.,
+    );
+
+    CoinSign(Some(world
+        .create_entity()
+        .with(transform)
+        .with(UiText::new(
+            font.clone(),
+            "0".to_string(),
+            [0., 0., 0., 1.],
+            50.,
+        ))
+        .build()))
 }
