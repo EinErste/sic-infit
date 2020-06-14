@@ -9,38 +9,38 @@ use amethyst::{
     ui::{Anchor, TtfFormat, UiText, UiFinder, UiTransform, UiCreator, UiEventType, UiWidget},
     ecs::prelude::{Entity, ResourceId},
 };
-use crate::states::FinishState;
+use crate::states::LoadingState;
 
 #[derive(Default, Debug)]
-pub struct PauseState {
+pub struct StartState {
     ui: Option<Entity>,
     b1: Option<Entity>,
     b2: Option<Entity>,
     b3: Option<Entity>,
 }
-///state that has pause UI. from here you can go back to the game, options or end menu
-impl SimpleState for PauseState {
+
+impl SimpleState for StartState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        self.init_ui(data.world);
+        self.ui = data.world.exec(|mut creator: UiCreator<'_>| {
+            Some(creator.create("prefabs/ui/start.ron", ()))
+        });
     }
 
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        // data.world.delete_entity(self.label.unwrap()).expect("Failed to delete entity. Was it already removed?");
-        if let Some(x) = self.ui {
-            data.world.delete_entity(x);
+        if let Some(ui) = self.ui {
+            data.world.delete_entity(ui);
         }
     }
-
 
     fn handle_event(&mut self, _data: StateData<'_, GameData<'_, '_>>, event: StateEvent) -> SimpleTrans {
         if let StateEvent::Ui(ui) = event {
             if ui.event_type == UiEventType::Click {
                 if ui.target == self.b1.unwrap() {
-                    return Trans::Pop;
+                    return Trans::Switch(Box::new(LoadingState::default())); //TODO maybe let it sit on stack
                 } else if ui.target == self.b2.unwrap() {
                     //TODO add here transition to settings
                 } else if ui.target == self.b3.unwrap() {
-                    return Trans::Replace(Box::new(FinishState::default()));
+                    return Trans::Quit;
                 }
             }
         }
@@ -57,14 +57,5 @@ impl SimpleState for PauseState {
         if self.b3 == None {
             self.b3 = _data.world.exec(|finder: UiFinder<'_>| finder.find("button_3"));
         }
-    }
-}
-
-impl PauseState {
-    ///helping function for initialising ui
-    fn init_ui(&mut self, world: &mut World) {
-        self.ui = world.exec(|mut creator: UiCreator<'_>| {
-            Some(creator.create("prefabs/ui/pause.ron", ()))
-        });
     }
 }

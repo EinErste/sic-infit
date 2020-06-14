@@ -16,7 +16,7 @@ use crate::{
 
 };
 use amethyst_physics::PhysicsTime;
-
+///Main state where all the actual gameplay takes place
 pub struct GameplayState<'a, 'b> {
     pub dispatcher: Option<Dispatcher<'a, 'b>>,
     pub player: Entity,
@@ -52,10 +52,9 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
 
     fn handle_event(&mut self, mut _data: StateData<'_, GameData<'_, '_>>, event: StateEvent) -> SimpleTrans {
         if let StateEvent::Window(event) = &event {
-            if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
+            if is_close_requested(&event) {
                 return Trans::Quit;
-            }
-            if is_key_down(&event, VirtualKeyCode::P) {
+            } else if is_key_down(&event, VirtualKeyCode::Escape) || is_key_down(&event, VirtualKeyCode::P) {
                 return Trans::Push(Box::new(PauseState::default()));
             }
             if let Some(_event) = get_key(&event) {

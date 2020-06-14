@@ -6,6 +6,7 @@ use enum_map::Enum;
 
 #[derive(Component)]
 #[storage(DenseVecStorage)]
+///Component responsible for animation. It loops through a set of states through time.
 pub struct SimpleAnimation{
     pub current_state: StateAnimation,
     pub time_elapsed: f32,
@@ -14,6 +15,7 @@ pub struct SimpleAnimation{
 }
 
 #[derive(Enum,Copy, Clone,PartialEq)]
+///Enum for player animation states
 pub enum StateAnimation{
     Static,
     Idle,

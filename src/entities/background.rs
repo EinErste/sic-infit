@@ -1,3 +1,4 @@
+//! A set of useful functions for loading the spritess
 use amethyst::prelude::{World, WorldExt, Builder};
 use amethyst::core::transform::Transform;
 use amethyst::renderer::{SpriteRender};
@@ -12,7 +13,6 @@ use crate::components::{CollisionGroupType, PhysicsBodyDescription, create_cube}
 
 
 //All x and y parameters stands for left bottom point
-
 pub fn load_forest_path(world: &mut World){
 
     //Main path

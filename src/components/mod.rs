@@ -1,3 +1,4 @@
+//! Mod that contains all of the components
 mod physics;
 mod direction;
 mod animation;
