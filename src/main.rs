@@ -1,10 +1,18 @@
-use amethyst::{core::transform::TransformBundle, prelude::*, renderer::types::DefaultBackend,
-               renderer::RenderFlat2D,
-               renderer::RenderToWindow,
-               renderer::RenderingBundle,
-               utils::application_root_dir, input::{InputBundle, StringBindings}, ui::{RenderUi, UiBundle}, ecs::prelude::ReadExpect, StateMachine};
-use crate::states::LoadingState;
-use amethyst_physics::{PhysicsBundle};
+use amethyst::{
+    core::transform::TransformBundle,
+    prelude::*,
+    renderer::{
+        plugins::{RenderFlat2D, RenderToWindow,RenderSkybox},
+        types::DefaultBackend,
+        RenderingBundle,
+    },
+    utils::application_root_dir,
+    input::{InputBundle, StringBindings},
+    ui::{RenderUi, UiBundle},
+    ecs::prelude::ReadExpect
+};
+use crate::states::{LoadingState, StartState};
+use amethyst_physics::{PhysicsBundle,prelude::*};
 use amethyst_nphysics::NPhysicsBackend;
 use crate::systems::{PhysicsSystem, PlayerSystem, DirectionSystem};
 
@@ -13,7 +21,7 @@ mod systems;
 mod components;
 mod resources;
 mod entities;
-
+///Main function is an entry point for the game
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
 
@@ -25,7 +33,7 @@ fn main() -> amethyst::Result<()> {
 
     let binding_path = app_root.join("config").join("bindings.ron");
     let input_bundle = InputBundle::<StringBindings>::new().with_bindings_from_file(binding_path)?;
-
+    ///main point where we basically construct the game from all the plugins and systems we have
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
         .with_bundle(PhysicsBundle::<f32,NPhysicsBackend>::new()
@@ -47,10 +55,11 @@ fn main() -> amethyst::Result<()> {
                 .with_plugin(RenderFlat2D::default())
                 .with_plugin(RenderUi::default()),
         )?
+        .with_system_desc(systems::UiEventHandlerSystemDesc::default(), "ui_event_handler", &[])
         .with_bundle(input_bundle)?
         .with_bundle(UiBundle::<StringBindings>::new())?;
 
-    let mut game = Application::new(resources, LoadingState::default(), game_data)?;
+    let mut game = Application::new(resources, StartState::default(), game_data)?;
     game.run();
     Ok(())
 }

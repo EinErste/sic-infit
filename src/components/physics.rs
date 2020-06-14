@@ -64,6 +64,7 @@ impl Into<u8> for CollisionGroupType{
 
 #[derive(Component)]
 #[storage(DenseVecStorage)]
+///Component that describes a physical body
 pub struct PhysicsBodyDescription {
     velocity_direction: Vector3<f32>,
     velocity_max: f32,

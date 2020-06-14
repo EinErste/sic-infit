@@ -1,3 +1,4 @@
+//! A set of useful functions for loading the player and associated spritess
 use amethyst::{
     prelude::{World, WorldExt, Builder},
     core::transform::Transform,
@@ -18,7 +19,6 @@ use amethyst_physics::{
 use crate::components::{PhysicsBodyDescription, CollisionGroupType, create_cube};
 use amethyst_physics::objects::CollisionGroup;
 use amethyst_physics::prelude::PhysicsShapeTag;
-
 
 pub fn load_player(world: &mut World) -> Entity{
     let sprite_sheet_handle = {
