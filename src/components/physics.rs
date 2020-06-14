@@ -2,6 +2,59 @@ use amethyst::{
     core::math::Vector3,
     ecs::{Component, DenseVecStorage},
 };
+use crate::components::physics::CollisionGroupType::{Ground, Player, NPC, Enemy, Undefined, WorldWall, InvisibleWall, LinearMovable, Collectable};
+use amethyst_physics::objects::{CollisionGroup, PhysicsHandle};
+use amethyst_physics::prelude::{PhysicsShapeTag, ShapeDesc};
+use amethyst_physics::servers::PhysicsWorld;
+use amethyst::prelude::World;
+use amethyst::core::transform::Transform;
+
+
+#[derive(PartialEq,Debug,Copy,Clone)]
+#[repr(u8)]
+pub enum CollisionGroupType {
+    Undefined = 0,
+    Ground = 1,
+    Player = 2,
+    NPC = 3,
+    Enemy = 4,
+    InvisibleWall = 5,
+    WorldWall = 6,
+    LinearMovable = 7,
+    Collectable = 8,
+}
+
+impl From<u8> for CollisionGroupType{
+    fn from(group : u8) -> Self {
+        match group {
+            1 => Ground,
+            2 => Player,
+            3 => NPC,
+            4 => Enemy,
+            5 => InvisibleWall,
+            6 => WorldWall,
+            7 => LinearMovable,
+            8 => Collectable,
+            _ => Undefined,
+        }
+    }
+}
+
+pub fn group_belongs_to(group: CollisionGroupType,vec: &Vec<CollisionGroup>)->bool{
+    let group: u8 = group.into();
+    for &i in vec{
+        if group == i.get() {
+            return true;
+        }
+    }
+    return false
+}
+
+impl Into<u8> for CollisionGroupType{
+    fn into(self) -> u8 {
+        self as u8
+    }
+}
 
 #[derive(Component)]
 #[storage(DenseVecStorage)]
@@ -9,7 +62,7 @@ use amethyst::{
 pub struct PhysicsBodyDescription {
     velocity_direction: Vector3<f32>,
     velocity_max: f32,
-    mass: f32
+    mass: f32,
 }
 
 impl Default for PhysicsBodyDescription {
@@ -61,4 +114,16 @@ impl PhysicsBodyDescription {
         self.velocity_direction.z = z;
     }
 
+}
+
+pub fn create_cube(init_x:f32, init_y:f32, init_z:f32, width:f32,height:f32,depth:f32,world: &mut World) -> (PhysicsHandle<PhysicsShapeTag>,Transform){
+    let mut transform = Transform::default();
+    transform.set_translation_xyz(init_x + width/2., init_y + height/2., init_z);
+
+    let shape = {
+        let desc = ShapeDesc::Cube {half_extents: Vector3::new(width/2.,height/2.,depth/2.)};
+        let physics_world = world.fetch::<PhysicsWorld<f32>>();
+        physics_world.shape_server().create(&desc)
+    };
+    (shape,transform)
 }

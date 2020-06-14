@@ -1,67 +1,87 @@
 use amethyst::{
-    ecs::{Join, ReadStorage, ReadExpect, System, SystemData},
+    ecs::{Join, ReadStorage, WriteStorage, ReadExpect, System, SystemData},
     derive::SystemDesc,
     core::Transform,
     core::math::Vector3
 };
 
-use crate::components::{PhysicsBodyDescription};
+use crate::components::{PhysicsBodyDescription, Player, CollisionGroupType, group_belongs_to, Direction, Directions};
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst_physics::PhysicsTime;
 use amethyst_physics::objects::{PhysicsHandle, CollisionGroup};
-use amethyst_physics::prelude::{PhysicsRigidBodyTag, RigidBodyDesc};
+use amethyst_physics::prelude::{PhysicsRigidBodyTag, RigidBodyDesc, ContactEvent, RBodyPhysicsServerTrait};
+use amethyst::prelude::World;
 
 
-const FORCE_MULTIPLIER: f32 = 1000000.0;
-const ACCELERATION_G: f32 = 10.;
-const FORCE_GRAVITY: f32 = 1000.;
-const IMPULSE_JUMP: f32 =  1000000.;
+pub const FORCE_MULTIPLIER: f32 = 1000000.0;
+pub const ACCELERATION_G: f32 = 10.;
+pub const FORCE_GRAVITY: f32 = 1000.;
+pub const IMPULSE_JUMP: f32 =  1000000.;
 
 ///This system controls the character control
-#[derive(SystemDesc,Default)]
-///System responsible for handling all of the physics: collisions, running, falling etc.
-pub struct PhysicsSystem {}
+pub struct PhysicsSystem {
+    init: bool
+}
+
+impl Default for PhysicsSystem{
+    fn default() -> Self {
+        PhysicsSystem{init: true}
+    }
+}
 
 impl<'s> System<'s> for PhysicsSystem {
     type SystemData = (
         ReadExpect<'s,PhysicsWorld<f32>>,
-        ReadExpect<'s, PhysicsTime>,
         ReadStorage<'s, PhysicsHandle<PhysicsRigidBodyTag>>,
-        ReadStorage<'s, PhysicsBodyDescription>,
+        WriteStorage<'s, PhysicsBodyDescription>,
+        ReadStorage<'s, Direction>,
     );
 
-    fn run(&mut self, (physics_world,physics_time, rigid_body_tags, body_descs): Self::SystemData) {
+    fn run(&mut self, (physics_world, rigid_body_tags, mut body_descs, directions): Self::SystemData) {
         let body_server = physics_world.rigid_body_server();
-        //TODO move this line somewhere out of system
-        physics_world.world_server().set_gravity(&Vector3::new(0.,-FORCE_GRAVITY,0.));
-        //physics_world.world_server().set_gravity(&Vector3::new(0.,0.,0.));
-        for(body_desc, body_tag) in (&body_descs,&rigid_body_tags).join(){
+        for(body_desc, body_tag) in (&mut body_descs,&rigid_body_tags).join(){
+            let belong_groups = body_server.belong_to(body_tag.get());
+            // if group_belongs_to(CollisionGroupType::Ground, &belong_groups) {
+            //     body_server.apply_impulse(
+            //         body_tag.get(),
+            //         &Vector3::new(0.,body_desc.mass()*FORCE_GRAVITY,0.));
+            // }
+            if group_belongs_to(CollisionGroupType::LinearMovable, &belong_groups) {
+                body_server.set_contacts_to_report(body_tag.get(),5);
+                let mut collide_events = vec![];
+                body_server.contact_events(body_tag.get(),&mut collide_events);
+                for &event in &collide_events {
+                    let contact_belongs_to = body_server.belong_to(event.other_body);
+                    for group_collide in contact_belongs_to{
+                        let group_collide = CollisionGroupType::from(group_collide.get());
 
-            let mut velocity = body_server.linear_velocity(body_tag.get());
-            let is_in_air = !almost::zero_with(velocity.y,0.2);
-
-            if body_desc.velocity_direction().y != 0. && !is_in_air{
-                body_server.apply_impulse(
-                        body_tag.get(),
-                        &Vector3::new(0.,body_desc.mass()*IMPULSE_JUMP,0.));
+                        match group_collide{
+                            CollisionGroupType::InvisibleWall =>{
+                                if event.normal.y.round() !=1.{
+                                    body_desc.set_velocity_direction_x(event.normal.x.round());
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                }
+                self.move_body(body_server,&body_tag,&body_desc);
             }
-
-            let mut velocity = body_server.linear_velocity(body_tag.get());
-            if !(velocity.x.abs() >= body_desc.velocity_max()) {
-                body_server.apply_impulse(
-                    body_tag.get(),
-                    &Vector3::new(body_desc.mass() * IMPULSE_JUMP/10. * body_desc.velocity_direction().x,0.,0.));
-            }
-
-            // let mut velocity = body_server.linear_velocity(body_tag.get());
-            // velocity.x = body_desc.velocity_direction().x * body_desc.velocity_max();
-            // //Push
-            // body_server.set_linear_velocity(
-            //     body_tag.get(),
-            //             &velocity);
-
-            //dbg!(body_server.linear_velocity(body_tag.get()));
-
         }
     }
+
+    fn setup(&mut self, world: &mut World) {
+        Self::SystemData::setup(world);
+        world.fetch_mut::<PhysicsWorld<f32>>().world_server().set_gravity(&Vector3::new(0.,-FORCE_GRAVITY,0.));
+    }
 }
+
+impl PhysicsSystem{
+    fn move_body(&mut self,body_server: &dyn RBodyPhysicsServerTrait<f32>, body_tag: &PhysicsHandle<PhysicsRigidBodyTag>, body_desc: &PhysicsBodyDescription){
+        let vel = body_server.linear_velocity(body_tag.get());
+        body_server.set_linear_velocity(
+            body_tag.get(),
+            &Vector3::new(body_desc.velocity_max()*body_desc.velocity_direction().x,vel.y,0.));
+    }
+}
+
