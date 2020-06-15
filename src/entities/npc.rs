@@ -63,7 +63,7 @@ pub fn load_player(world: &mut World) -> Entity {
         .with(transform)
         .with(PhysicsBodyDescription::new(10., 200.))
         .with(Direction { dir: Directions::Right })
-        .with(Player {})
+        .with(Player::new())
         .with(shape)
         .with(rb)
         .with(SimpleAnimation::new(StateAnimation::Idle, enum_map!(
@@ -114,7 +114,7 @@ pub fn load_enemy(init_x: f32, init_y: f32, world: &mut World) {
     };
 
 
-    let mut desc = PhysicsBodyDescription::new(1000.,120.);
+    let mut desc = PhysicsBodyDescription::new(1000., 120.);
     desc.set_velocity_direction_x(1.);
     let entity = world
         .create_entity()
@@ -127,7 +127,7 @@ pub fn load_enemy(init_x: f32, init_y: f32, world: &mut World) {
         .build();
 }
 
-pub fn load_npc(world: &mut World) {
+pub(crate) fn load_npc(world: &mut World) {
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
@@ -162,7 +162,7 @@ pub fn load_npc(world: &mut World) {
             CollisionGroup::new(CollisionGroupType::Ground.into()),
             CollisionGroup::new(CollisionGroupType::NPC.into()),
             CollisionGroup::new(CollisionGroupType::WorldWall.into()),
-            CollisionGroup::new(CollisionGroupType::InvisibleWall.into()),
+            CollisionGroup::new(CollisionGroupType::InvisibleArea.into()),
         ];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
@@ -185,7 +185,7 @@ pub fn load_npc(world: &mut World) {
 #[derive(Default)]
 pub struct CoinSign(pub Option<Entity>);
 
-pub fn load_coins(world: &mut World) {
+fn load_coins(world: &mut World) {
     let font = load_font(&world);
 
     let transform = UiTransform::new(
@@ -205,13 +205,12 @@ pub fn load_coins(world: &mut World) {
         .build()));
 
     world.insert(entity)
-
 }
 
 #[derive(Default)]
 pub struct HeartsSign(pub Option<Entity>);
-}
-pub fn load_hearts(world: &mut World) {
+
+fn load_hearts(world: &mut World) {
     let font = load_font(&world);
 
     let transform = UiTransform::new(
@@ -232,7 +231,7 @@ pub fn load_hearts(world: &mut World) {
     world.insert(entity)
 }
 
-pub fn load_ui_imgs(world: &mut World) {
+fn load_ui_imgs(world: &mut World) {
     world.exec(|mut creator: UiCreator<'_>| {
         Some(creator.create("prefabs/ui/ui_imgs.ron", ()))
     });
@@ -241,7 +240,7 @@ pub fn load_ui_imgs(world: &mut World) {
 #[derive(Default)]
 pub struct InteractButton(pub Option<Entity>);
 
-pub fn load_interact_button(world: &mut World) {
+fn load_interact_button(world: &mut World) {
     let font = load_font(&world);
 
     let transform = UiTransform::new(
@@ -269,3 +268,11 @@ fn load_font(world: &&mut World) -> Handle<FontAsset> {
         (),
         &world.read_resource(),
     )
+}
+
+pub fn load_ui(world: &mut World) {
+    load_coins(world);
+    load_hearts(world);
+    load_ui_imgs(world);
+    load_interact_button(world);
+}
