@@ -4,6 +4,7 @@ Container(
         id: "pause_menu",
         width: 1920,
         height: 1080,
+        z: 100,
         mouse_reactive: false,
     ),
     background: Texture(File("textures/ui/pause.png", ("IMAGE", ()))),

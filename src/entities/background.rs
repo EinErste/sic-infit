@@ -7,7 +7,7 @@ use crate::resources::{SpriteSheetList, AssetType};
 use amethyst_physics::prelude::{ShapeDesc, RigidBodyDesc, BodyMode};
 use amethyst_physics::servers::{PhysicsWorld, AreaDesc};
 use amethyst::core::math::Vector3;
-use crate::entities::{AdjustToDistance, load_enemy};
+use crate::entities::{AdjustToDistance, load_enemy, load_npc};
 use amethyst_physics::objects::CollisionGroup;
 use crate::components::{CollisionGroupType, PhysicsBodyDescription, create_cube};
 
@@ -422,5 +422,6 @@ fn load_obstacles(world: &mut World){
     load_platform(800.,Height::High.into(),400.,world);
     load_moving_platform_x(900.,Height::Low.into(),500.,200., world);
     load_moving_platform_y(1500.,Height::Low.into(),1000.,200., world);
+    load_npc(world); //todo seyoha pls do it properly
 
 }

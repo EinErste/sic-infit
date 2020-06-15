@@ -1,26 +1,28 @@
 //! A set of useful functions for loading the player and associated spritess
 use amethyst::{
     prelude::{World, WorldExt, Builder},
-    core::transform::Transform,
+    core::transform::{Transform},
     renderer::{SpriteRender},
     ecs::{Entity},
-    core::math::{Vector3}
+    core::math::{Vector3},
+    ui::{UiCreator, UiTransform, Anchor, UiText, TtfFormat, FontAsset},
+    assets::{Loader, Handle},
 };
 use crate::{
     resources::{SpriteSheetList, AssetType},
-    components::{Direction, SimpleAnimation, Directions, StateAnimation, Player}
+    components::{Direction, SimpleAnimation, Directions, StateAnimation, Player},
 };
 use enum_map::{enum_map};
 use amethyst_physics::{
     prelude::{ShapeDesc, RigidBodyDesc, BodyMode},
     servers::PhysicsWorld,
-    objects::PhysicsHandle
+    objects::PhysicsHandle,
 };
-use crate::components::{PhysicsBodyDescription, CollisionGroupType, create_cube};
+use crate::components::{PhysicsBodyDescription, CollisionGroupType, NPC, create_cube};
 use amethyst_physics::objects::CollisionGroup;
 use amethyst_physics::prelude::PhysicsShapeTag;
 
-pub fn load_player(world: &mut World) -> Entity{
+pub fn load_player(world: &mut World) -> Entity {
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
@@ -32,7 +34,7 @@ pub fn load_player(world: &mut World) -> Entity{
         sprite_number: 0,
     };
     let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(20.,28.,5.)};
+        let desc = ShapeDesc::Cube { half_extents: Vector3::new(20., 28., 5.) };
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.shape_server().create(&desc)
     };
@@ -59,12 +61,12 @@ pub fn load_player(world: &mut World) -> Entity{
         .create_entity()
         .with(sprite)
         .with(transform)
-        .with(PhysicsBodyDescription::new(10.,200.))
-        .with(Direction{dir: Directions::Right})
-        .with(Player{})
+        .with(PhysicsBodyDescription::new(10., 200.))
+        .with(Direction { dir: Directions::Right })
+        .with(Player::new())
         .with(shape)
         .with(rb)
-        .with(SimpleAnimation::new(StateAnimation::Idle,enum_map!(
+        .with(SimpleAnimation::new(StateAnimation::Idle, enum_map!(
             StateAnimation::Run => (2,10,0.1),
             StateAnimation::Idle => (0,2,0.8),
             _ => (0,1,0.1)
@@ -72,7 +74,7 @@ pub fn load_player(world: &mut World) -> Entity{
         .build()
 }
 
-pub fn load_enemy(init_x:f32,init_y:f32,world: &mut World){
+pub fn load_enemy(init_x: f32, init_y: f32, world: &mut World) {
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
@@ -83,7 +85,7 @@ pub fn load_enemy(init_x:f32,init_y:f32,world: &mut World){
         sprite_number: 0,
     };
 
-    let cube = create_cube(init_x,init_y,1.,48.,64.,40.,world);
+    let cube = create_cube(init_x, init_y, 1., 48., 64., 40., world);
 
 
     let rb = {
@@ -112,7 +114,7 @@ pub fn load_enemy(init_x:f32,init_y:f32,world: &mut World){
     };
 
 
-    let mut desc = PhysicsBodyDescription::new(1000.,120.);
+    let mut desc = PhysicsBodyDescription::new(1000., 120.);
     desc.set_velocity_direction_x(1.);
     let entity = world
         .create_entity()
@@ -121,7 +123,156 @@ pub fn load_enemy(init_x:f32,init_y:f32,world: &mut World){
         .with(cube.1)
         .with(rb)
         .with(desc)
-        .with(Direction{dir: Directions::Left})
+        .with(Direction { dir: Directions::Left })
         .build();
+}
 
+pub  fn load_npc(world: &mut World) {
+    let sprite_sheet_handle = {
+        let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
+        sprite_sheet_list.get(AssetType::Character).unwrap().clone()
+    }; //TODO change asset to real npc
+    let transform =
+        Transform::default().set_translation_xyz(300., 250., 1.).to_owned();
+    let sprite = SpriteRender {
+        sprite_sheet: sprite_sheet_handle.clone(),
+        sprite_number: 0,
+    };
+    let shape: PhysicsHandle<PhysicsShapeTag> = {
+        let desc = ShapeDesc::Cube { half_extents: Vector3::new(24., 32., 20.) };
+        let physics_world = world.fetch::<PhysicsWorld<f32>>();
+        physics_world.shape_server().create(&desc)
+    };
+
+
+    let rb = {
+        let mut rb_desc = RigidBodyDesc::default();
+        rb_desc.lock_translation_z = true;
+        rb_desc.lock_rotation_x = true;
+        rb_desc.lock_rotation_y = true;
+        rb_desc.lock_rotation_z = true;
+        rb_desc.friction = 0.0;
+        rb_desc.bounciness = 1.0;
+        rb_desc.mass = 1000.;
+        rb_desc.mode = BodyMode::Dynamic;
+        rb_desc.belong_to = vec![
+            CollisionGroup::new(CollisionGroupType::NPC.into())
+        ];
+        rb_desc.collide_with = vec![
+            CollisionGroup::new(CollisionGroupType::Ground.into()),
+            CollisionGroup::new(CollisionGroupType::NPC.into()),
+            CollisionGroup::new(CollisionGroupType::WorldWall.into()),
+            CollisionGroup::new(CollisionGroupType::InvisibleArea.into()),
+        ];
+        let physics_world = world.fetch::<PhysicsWorld<f32>>();
+        physics_world.rigid_body_server().create(&rb_desc)
+    };
+
+    let mut desc = PhysicsBodyDescription::new(1000., 120.);
+    desc.set_velocity_direction_x(1.);
+    world
+        .create_entity()
+        .with(sprite)
+        .with(transform)
+        .with(shape)
+        .with(rb)
+        .with(desc)
+        .with(NPC::new("I am an iron man!"))
+        .with(Direction { dir: Directions::Right })
+        .build();
+}
+
+#[derive(Default)]
+pub struct CoinSign(pub Option<Entity>);
+
+fn load_coins(world: &mut World) {
+    let font = load_font(&world);
+
+    let transform = UiTransform::new(
+        "coins".to_string(), Anchor::TopLeft, Anchor::TopLeft,
+        25., 0., 1., 100., 50.,
+    );
+
+    let entity = CoinSign(Some(world
+        .create_entity()
+        .with(transform)
+        .with(UiText::new(
+            font.clone(),
+            "0".to_string(),
+            [0., 0., 0., 1.],
+            50.,
+        ))
+        .build()));
+
+    world.insert(entity)
+}
+
+#[derive(Default)]
+pub struct HeartsSign(pub Option<Entity>);
+
+fn load_hearts(world: &mut World) {
+    let font = load_font(&world);
+
+    let transform = UiTransform::new(
+        "hearts".to_string(), Anchor::TopLeft, Anchor::TopLeft,
+        25., -50., 1., 100., 50.,
+    );
+
+    let entity = HeartsSign(Some(world
+        .create_entity()
+        .with(transform)
+        .with(UiText::new(
+            font.clone(),
+            "3".to_string(),
+            [0., 0., 0., 1.],
+            50.,
+        ))
+        .build()));
+    world.insert(entity)
+}
+
+fn load_ui_imgs(world: &mut World) {
+    world.exec(|mut creator: UiCreator<'_>| {
+        Some(creator.create("prefabs/ui/ui_imgs.ron", ()))
+    });
+}
+
+#[derive(Default)]
+pub struct InteractButton(pub Option<Entity>);
+
+fn load_interact_button(world: &mut World) {
+    let font = load_font(&world);
+
+    let transform = UiTransform::new(
+        "coins".to_string(), Anchor::BottomMiddle, Anchor::BottomMiddle,
+        0., 100., 1., 50., 50.,
+    );
+
+    let entity = InteractButton(Some(world
+        .create_entity()
+        .with(transform)
+        .with(UiText::new(
+            font.clone(),
+            "E".to_string(),
+            [0., 0., 0., 1.],
+            50.,
+        ))
+        .build()));
+    world.insert(entity);
+}
+
+fn load_font(world: &&mut World) -> Handle<FontAsset> {
+    world.read_resource::<Loader>().load(
+        "font/square.ttf",
+        TtfFormat,
+        (),
+        &world.read_resource(),
+    )
+}
+
+pub fn load_ui(world: &mut World) {
+    load_coins(world);
+    load_hearts(world);
+    load_ui_imgs(world);
+    load_interact_button(world);
 }

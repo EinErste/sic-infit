@@ -1,9 +1,10 @@
 #![enable(implicit_some)]
 Container(
     transform: (
-        id: "pause_menu",
+        id: "start_menu",
         width: 1920,
         height: 1080,
+        z: 350,
         mouse_reactive: false,
     ),
     background: Texture(File("textures/ui/start_final.png", ("IMAGE", ()))),

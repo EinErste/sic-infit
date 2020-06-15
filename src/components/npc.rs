@@ -6,13 +6,12 @@ use amethyst::{
 #[derive(Component, Default)]
 #[storage(DenseVecStorage)]
 ///An empty component that marks a player and ties it in to the control system from keyboard
-pub struct Player {
-    pub hp: u8,
-    pub coins: u8,
+pub struct NPC {
+    line: &'static str
 }
 
-impl Player {
-    pub(crate) fn new() -> Player {
-        Player { hp: 3, coins: 0 }
+impl NPC {
+    pub(crate) fn new(line: &'static str) -> NPC {
+        NPC { line }
     }
 }
