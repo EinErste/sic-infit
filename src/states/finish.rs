@@ -33,7 +33,8 @@ impl SimpleState for FinishState {
     fn handle_event(&mut self, _data: StateData<'_, GameData<'_, '_>>, event: StateEvent) -> SimpleTrans {
         if let StateEvent::Ui(ui) = event {
             if ui.event_type == UiEventType::Click&& ui.target == self.to_menu.unwrap() {
-                return Trans::Replace(Box::new(StartState::default()))
+                // return Trans::Replace(Box::new(StartState::default()))
+                return Trans::Quit
             }
         }
         Trans::None

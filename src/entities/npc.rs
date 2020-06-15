@@ -18,7 +18,7 @@ use amethyst_physics::{
     servers::PhysicsWorld,
     objects::PhysicsHandle,
 };
-use crate::components::{PhysicsBodyDescription, CollisionGroupType, NPC};
+use crate::components::{PhysicsBodyDescription, CollisionGroupType, NPC, create_cube};
 use amethyst_physics::objects::CollisionGroup;
 use amethyst_physics::prelude::PhysicsShapeTag;
 
@@ -34,7 +34,7 @@ pub fn load_player(world: &mut World) -> Entity {
         sprite_number: 0,
     };
     let shape = {
-        let desc = ShapeDesc::Cube { half_extents: Vector3::new(20., 32., 5.) };
+        let desc = ShapeDesc::Cube { half_extents: Vector3::new(20., 28., 5.) };
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.shape_server().create(&desc)
     };
@@ -61,9 +61,9 @@ pub fn load_player(world: &mut World) -> Entity {
         .create_entity()
         .with(sprite)
         .with(transform)
-        .with(PhysicsBodyDescription::new(10., 150.))
+        .with(PhysicsBodyDescription::new(10., 200.))
         .with(Direction { dir: Directions::Right })
-        .with(Player::new())
+        .with(Player {})
         .with(shape)
         .with(rb)
         .with(SimpleAnimation::new(StateAnimation::Idle, enum_map!(
@@ -74,22 +74,18 @@ pub fn load_player(world: &mut World) -> Entity {
         .build()
 }
 
-pub fn load_lion(world: &mut World) {
+pub fn load_enemy(init_x: f32, init_y: f32, world: &mut World) {
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
     };
-    let transform =
-        Transform::default().set_translation_xyz(650., 300., 1.).to_owned();
+
     let sprite = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 0,
     };
-    let shape: PhysicsHandle<PhysicsShapeTag> = {
-        let desc = ShapeDesc::Cube { half_extents: Vector3::new(24., 32., 20.) };
-        let physics_world = world.fetch::<PhysicsWorld<f32>>();
-        physics_world.shape_server().create(&desc)
-    };
+
+    let cube = create_cube(init_x, init_y, 1., 48., 64., 40., world);
 
 
     let rb = {
@@ -111,19 +107,20 @@ pub fn load_lion(world: &mut World) {
             CollisionGroup::new(CollisionGroupType::NPC.into()),
             CollisionGroup::new(CollisionGroupType::Player.into()),
             CollisionGroup::new(CollisionGroupType::WorldWall.into()),
-            CollisionGroup::new(CollisionGroupType::InvisibleWall.into()),
+            CollisionGroup::new(CollisionGroupType::InvisibleArea.into()),
         ];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };
 
-    let mut desc = PhysicsBodyDescription::new(1000., 120.);
+
+    let mut desc = PhysicsBodyDescription::new(1000.,120.);
     desc.set_velocity_direction_x(1.);
-    world
+    let entity = world
         .create_entity()
         .with(sprite)
-        .with(transform)
-        .with(shape)
+        .with(cube.0)
+        .with(cube.1)
         .with(rb)
         .with(desc)
         .with(Direction { dir: Directions::Left })
@@ -213,7 +210,7 @@ pub fn load_coins(world: &mut World) {
 
 #[derive(Default)]
 pub struct HeartsSign(pub Option<Entity>);
-
+}
 pub fn load_hearts(world: &mut World) {
     let font = load_font(&world);
 
@@ -272,4 +269,3 @@ fn load_font(world: &&mut World) -> Handle<FontAsset> {
         (),
         &world.read_resource(),
     )
-}
