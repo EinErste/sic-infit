@@ -38,8 +38,8 @@ impl<'s> System<'s> for HealthSystem {
     );
 
     fn run(&mut self, (mut entities, hpEvents, mut players, mut heartsSign, mut uiText): Self::SystemData) {
-        for (player, _) in (&mut players, &entities).join() {
-            for hpEvent in hpEvents.read(&mut self.reader_id) {
+        for hpEvent in hpEvents.read(&mut self.reader_id) {
+            for (player, _) in (&mut players, &entities).join() {
                 match hpEvent {
                     HpEvent::HpGained => {
                         player.hp += 1;

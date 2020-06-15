@@ -10,7 +10,8 @@ use crate::components::{PhysicsBodyDescription, SimpleAnimation, StateAnimation,
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst_physics::objects::{PhysicsHandle, CollisionGroup};
 use amethyst_physics::prelude::PhysicsRigidBodyTag;
-use crate::systems::{CoinPicked, Interact};
+use crate::systems::{CoinPicked, Interact, HpEvent};
+use crate::systems::health::HpEvent::HpGained;
 
 ///This system controls the character control
 #[derive(SystemDesc, Default)]
@@ -21,7 +22,7 @@ const FORCE_MULTIPLIER: f32 = 1000000.0;
 const IMPULSE_JUMP: f32 = 10000000. * 1.3;
 const IMPULSE_JUMP_DEFEAT_ENEMY: f32 = 100000000. * 0.5;
 //const IMPULSE_MOVE: f32 = 500000.;
-const IMPULSE_MOVE: f32 =  800000. ;
+const IMPULSE_MOVE: f32 = 800000.;
 
 #[allow(dead_code)]
 impl<'s> System<'s> for PlayerSystem {
@@ -34,10 +35,11 @@ impl<'s> System<'s> for PlayerSystem {
         ReadStorage<'s, Player>,
         Entities<'s>,
         Write<'s, EventChannel<CoinPicked>>,
+        Write<'s, EventChannel<HpEvent>>,
         Write<'s, EventChannel<Interact>>
     );
 
-    fn run(&mut self, (mut descs, mut animations, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut interactChannel): Self::SystemData) {
+    fn run(&mut self, (mut descs, mut animations, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut hpChannel, mut interactChannel): Self::SystemData) {
         let body_server = physics_world.rigid_body_server();
 
         for (p_description, animation, p_body_tag, _player) in (&mut descs, &mut animations, &rigid_body_tags, &player).join() {
@@ -96,20 +98,19 @@ impl<'s> System<'s> for PlayerSystem {
 
                     match collision_group {
                         //TODO how to delete shape ? -_-
-                        CollisionGroupType::Collectable =>{
+                        CollisionGroupType::Collectable => {
                             entities.delete(contact_event.other_entity.unwrap());
                             coinChannel.single_write(CoinPicked());
-                            dbg!("+1 COIN");
                         }
                         CollisionGroupType::Enemy => {
                             if almost::zero_with(1. - contact_event.normal.y, 0.01) {
                                 body_server.set_belong_to(
                                     contact_event.other_body,
-                                    vec![CollisionGroup::new(CollisionGroupType::Deletable.into()),],
+                                    vec![CollisionGroup::new(CollisionGroupType::Deletable.into()), ],
                                 );
                                 body_server.set_collide_with(
                                     contact_event.other_body,
-                                    vec![CollisionGroup::new(CollisionGroupType::DeleteArea.into()),],
+                                    vec![CollisionGroup::new(CollisionGroupType::DeleteArea.into()), ],
                                 );
                                 body_server.set_linear_velocity(
                                     contact_event.other_body,
@@ -120,17 +121,18 @@ impl<'s> System<'s> for PlayerSystem {
                                     &Vector3::new(0., IMPULSE_JUMP_DEFEAT_ENEMY, 0.));
                                 body_server.apply_impulse(
                                     p_body_tag.get(),
-                                    &Vector3::new(0.,IMPULSE_JUMP,0.));
+                                    &Vector3::new(0., IMPULSE_JUMP, 0.));
                                 //Not sure
                             } else {
                                 body_server.apply_impulse(
                                     p_body_tag.get(),
-                                    &Vector3::new(IMPULSE_JUMP*contact_event.normal.x,0.,0.));
-                                dbg!("HEALTH -1");
+                                    &Vector3::new(IMPULSE_JUMP * contact_event.normal.x, 0., 0.));
+                                hpChannel.single_write(HpEvent::HpLost);
                             }
                         }
                         CollisionGroupType::Ground => {
-                            let velocity_ground = body_server.linear_velocity(contact_event.other_body);if almost::zero_with(1. - contact_event.normal.y, 0.01) && velocity_ground.x != 0.{
+                            let velocity_ground = body_server.linear_velocity(contact_event.other_body);
+                            if almost::zero_with(1. - contact_event.normal.y, 0.01) && velocity_ground.x != 0. {
                                 //Check if directions are same
                                 let x_direction_determinant = if velocity.x.signum() == velocity_ground.x.signum() { 1. } else { -1. };
                                 //If player is moving
@@ -144,8 +146,7 @@ impl<'s> System<'s> for PlayerSystem {
                                                 p_description.velocity_max() * p_description.velocity_direction().x + velocity_ground.x,
                                                 velocity.y + velocity_ground.y,
                                                 0.));
-                                    }
-                                    else {
+                                    } else {
                                         body_server.set_linear_velocity(
                                             p_body_tag.get(),
                                             &Vector3::new(
@@ -183,7 +184,6 @@ impl<'s> System<'s> for PlayerSystem {
                     p_body_tag.get(),
                     &Vector3::new(IMPULSE_MOVE * p_description.velocity_direction().x, 0., 0.));
             }
-
 
 
             //just in case (only 1 player entity exists)
