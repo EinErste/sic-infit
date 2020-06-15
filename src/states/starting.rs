@@ -40,6 +40,7 @@ impl SimpleState for StartState {
                 } else if ui.target == self.b2.unwrap() {
                     //TODO add here transition to settings
                 } else if ui.target == self.b3.unwrap() {
+                    panic!("Successful exit, well done");
                     return Trans::Quit;
                 }
             }
