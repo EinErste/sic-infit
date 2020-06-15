@@ -135,7 +135,6 @@ impl<'s> System<'s> for PlayerSystem {
                                 let x_direction_determinant = if velocity.x.signum() == velocity_ground.x.signum() { 1. } else { -1. };
                                 //If player is moving
 
-                                //TODO
                                 if p_description.velocity_direction().x != 0. {
                                     if x_direction_determinant == 1. {
                                         body_server.set_linear_velocity(

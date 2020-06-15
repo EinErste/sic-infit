@@ -21,6 +21,7 @@ use amethyst_physics::{
 use crate::components::{PhysicsBodyDescription, CollisionGroupType, NPC, create_cube};
 use amethyst_physics::objects::CollisionGroup;
 use amethyst_physics::prelude::PhysicsShapeTag;
+use crate::systems::DirectionSystem;
 
 pub fn load_player(world: &mut World) -> Entity {
     let sprite_sheet_handle = {
@@ -127,58 +128,41 @@ pub fn load_enemy(init_x: f32, init_y: f32, world: &mut World) {
         .build();
 }
 
-pub  fn load_npc(world: &mut World) {
+pub  fn load_npc(init_x: f32, init_y: f32, world: &mut World) {
+    let width = 48.;
+    let height = 64.;
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
     }; //TODO change asset to real npc
-    let transform =
-        Transform::default().set_translation_xyz(300., 250., 1.).to_owned();
     let sprite = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 0,
     };
-    let shape: PhysicsHandle<PhysicsShapeTag> = {
-        let desc = ShapeDesc::Cube { half_extents: Vector3::new(24., 32., 20.) };
-        let physics_world = world.fetch::<PhysicsWorld<f32>>();
-        physics_world.shape_server().create(&desc)
-    };
-
+    let cube = create_cube(init_x,init_y,0.,width,height,20.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
-        rb_desc.lock_translation_z = true;
-        rb_desc.lock_rotation_x = true;
-        rb_desc.lock_rotation_y = true;
-        rb_desc.lock_rotation_z = true;
-        rb_desc.friction = 0.0;
-        rb_desc.bounciness = 1.0;
-        rb_desc.mass = 1000.;
-        rb_desc.mode = BodyMode::Dynamic;
+        rb_desc.mode = BodyMode::Disabled;
         rb_desc.belong_to = vec![
             CollisionGroup::new(CollisionGroupType::NPC.into())
         ];
         rb_desc.collide_with = vec![
             CollisionGroup::new(CollisionGroupType::Ground.into()),
-            CollisionGroup::new(CollisionGroupType::NPC.into()),
             CollisionGroup::new(CollisionGroupType::WorldWall.into()),
-            CollisionGroup::new(CollisionGroupType::InvisibleArea.into()),
         ];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };
 
-    let mut desc = PhysicsBodyDescription::new(1000., 120.);
-    desc.set_velocity_direction_x(1.);
     world
         .create_entity()
         .with(sprite)
-        .with(transform)
-        .with(shape)
+        .with(cube.0)
+        .with(cube.1)
         .with(rb)
-        .with(desc)
         .with(NPC::new("I am an iron man!"))
-        .with(Direction { dir: Directions::Right })
+        .with(Direction{dir:Directions::Left})
         .build();
 }
 
