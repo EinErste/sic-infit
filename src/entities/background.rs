@@ -154,7 +154,7 @@ fn load_platform(init_x: f32, init_y: f32, platform_width: f32, world: &mut Worl
     };
     let mut transform = Transform::default();
     transform.set_scale(Vector3::new(platform_width/platform_init_width,1.,1.));
-    transform.set_translation_xyz(init_x + column_width + platform_width/2., init_y-platform_height/2. - platform_height, -10.);
+    transform.set_translation_xyz(init_x + column_width + platform_width/2., init_y-platform_height/2. - platform_height, -0.1);
 
     world
         .create_entity()
@@ -196,7 +196,7 @@ fn load_platform(init_x: f32, init_y: f32, platform_width: f32, world: &mut Worl
         sprite_number: 0,
     };
     let mut transform = Transform::default();
-    transform.set_translation_xyz(init_x, -(column_height-init_y + platform_height), -9.);
+    transform.set_translation_xyz(init_x, -(column_height-init_y + platform_height), 0.05);
 
     world
         .create_entity()
@@ -205,7 +205,7 @@ fn load_platform(init_x: f32, init_y: f32, platform_width: f32, world: &mut Worl
         .build();
 
     let mut transform = Transform::default();
-    transform.set_translation_xyz(init_x+platform_width+column_width, -(column_height-init_y +platform_height), -9.);
+    transform.set_translation_xyz(init_x+platform_width+column_width, -(column_height-init_y +platform_height), 0.05);
 
     world
         .create_entity()
@@ -289,7 +289,7 @@ fn load_moving_platform(init_x: f32, init_y: f32, speed: f32, init_directions: (
         sprite_number: 2,
     };
 
-    let cube = create_cube(init_x,init_y-platform_height,-1.,platform_width, platform_height,80.,world);
+    let cube = create_cube(init_x,init_y-platform_height,0.08,platform_width, platform_height,80.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
@@ -368,7 +368,7 @@ fn load_coin(init_x: f32, init_y: f32, world: &mut World){
         sprite_number: 0,
     };
 
-    let cube = create_cube(init_x,init_y,0.,coin_width, coin_height,50.,world);
+    let cube = create_cube(init_x,init_y,0.09,coin_width, coin_height,50.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
@@ -395,6 +395,29 @@ fn load_coin(init_x: f32, init_y: f32, world: &mut World){
     world
         .create_entity()
         .with(rb)
+        .with(cube.0)
+        .with(cube.1)
+        .with(sprite.clone())
+        .build();
+}
+
+fn load_cave(init_x: f32, init_y: f32, world: &mut World) {
+    let cave_width = 162 as f32;
+    let cave_height = 468 as f32;
+    let sprite_sheet_handle = {
+        let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
+        sprite_sheet_list.get(AssetType::EndStructure).unwrap().clone()
+    };
+
+    let sprite = SpriteRender {
+        sprite_sheet: sprite_sheet_handle.clone(),
+        sprite_number: 0,
+    };
+
+    let cube = create_cube(init_x,init_y,0.1,cave_width, cave_height,100.,world);
+
+    world
+        .create_entity()
         .with(cube.0)
         .with(cube.1)
         .with(sprite.clone())
@@ -431,4 +454,5 @@ fn load_obstacles(world: &mut World){
     load_moving_platform_y(1700.,Height::Low.into(),1000.,200., world);
     load_npc(400.,Height::Ground.into(),world);
 
+    // load_cave(600.,Height::Ground.into(),world);
 }

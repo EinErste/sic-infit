@@ -29,7 +29,7 @@ pub fn load_player(world: &mut World) -> Entity {
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
     };
     let transform =
-        Transform::default().set_translation_xyz(360., 240., 1.).to_owned();
+        Transform::default().set_translation_xyz(360., 240., 0.1).to_owned();
     let sprite = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 0,
@@ -86,7 +86,7 @@ pub fn load_enemy(init_x: f32, init_y: f32, world: &mut World) {
         sprite_number: 0,
     };
 
-    let cube = create_cube(init_x, init_y, 1., 48., 64., 40., world);
+    let cube = create_cube(init_x, init_y, 0.1, 48., 64., 40., world);
 
 
     let rb = {
@@ -139,7 +139,7 @@ pub  fn load_npc(init_x: f32, init_y: f32, world: &mut World) {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 0,
     };
-    let cube = create_cube(init_x,init_y,0.,width,height,20.,world);
+    let cube = create_cube(init_x,init_y,0.1,width,height,20.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
