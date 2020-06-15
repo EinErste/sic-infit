@@ -1,6 +1,7 @@
 use amethyst::{
     core::transform::TransformBundle,
     prelude::*,
+    audio::AudioBundle,
     renderer::{
         plugins::{RenderFlat2D, RenderToWindow,RenderSkybox},
         types::DefaultBackend,
@@ -16,6 +17,7 @@ use amethyst_physics::{PhysicsBundle,prelude::*};
 use amethyst_nphysics::NPhysicsBackend;
 use crate::systems::{PhysicsSystem, PlayerSystem, DirectionSystem};
 
+mod audio;
 mod states;
 mod systems;
 mod components;
@@ -56,6 +58,7 @@ fn main() -> amethyst::Result<()> {
             )?
             .with_system_desc(systems::UiEventHandlerSystemDesc::default(), "ui_event_handler", &[])
             .with_bundle(input_bundle)?
+            .with_bundle(AudioBundle::default())?
             .with_bundle(UiBundle::<StringBindings>::new())?;
 
         let mut game = Application::new(resources, LoadingState::default(), game_data)?;

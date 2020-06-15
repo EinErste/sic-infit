@@ -9,6 +9,7 @@ use crate::entities::*;
 use amethyst::prelude::World;
 use crate::states::GameplayState;
 use amethyst_physics::PhysicsTime;
+use crate::audio::initialise_audio;
 
 #[derive(Default)]
 ///State used to avoid displaying an empty screen while all of the resources are being loaded
@@ -48,6 +49,7 @@ impl SimpleState for LoadingState {
 
                 load_ui(&mut world);
 
+                initialise_audio(world);
                 return Trans::Switch(Box::new(GameplayState{dispatcher: None, player, camera}));
             } else {
                 dbg!("loading in progress");
