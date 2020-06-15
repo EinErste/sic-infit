@@ -19,7 +19,8 @@ pub struct PlayerSystem {
 const FORCE_MULTIPLIER: f32 = 1000000.0;
 const IMPULSE_JUMP: f32 =  10000000. * 1.3;
 const IMPULSE_JUMP_DEFEAT_ENEMY: f32 =  100000000. * 0.5;
-const IMPULSE_MOVE: f32 =  500000. ;
+//const IMPULSE_MOVE: f32 =  500000. ;
+const IMPULSE_MOVE: f32 =  800000. ;
 
 #[allow(dead_code)]
 impl<'s> System<'s> for PlayerSystem {
@@ -110,15 +111,21 @@ impl<'s> System<'s> for PlayerSystem {
                                 body_server.apply_impulse(
                                     contact_event.other_body,
                                     &Vector3::new(0.,IMPULSE_JUMP_DEFEAT_ENEMY,0.));
-                                dbg!("Enemy dead");
+                                body_server.apply_impulse(
+                                    p_body_tag.get(),
+                                    &Vector3::new(0.,IMPULSE_JUMP,0.));
                                 //Not sure
                             } else{
-                                dbg!("ENEMY COLLIDED");
+                                body_server.apply_impulse(
+                                    p_body_tag.get(),
+                                    &Vector3::new(IMPULSE_JUMP*contact_event.normal.x,0.,0.));
+                                dbg!("HEALTH -1");
                             }
                         }
                         CollisionGroupType::Ground =>{
-                            if almost::zero_with(1. - contact_event.normal.y, 0.01){
-                                let velocity_ground = body_server.linear_velocity(contact_event.other_body);
+                            let velocity_ground = body_server.linear_velocity(contact_event.other_body);
+
+                            if almost::zero_with(1. - contact_event.normal.y, 0.01) && velocity_ground.x != 0.{
                                 //Check if directions are same
                                 let x_direction_determinant = if velocity.x.signum() == velocity_ground.x.signum() {1.} else {-1.};
                                 //If player is moving
@@ -173,6 +180,7 @@ impl<'s> System<'s> for PlayerSystem {
                     p_body_tag.get(),
                     &Vector3::new(IMPULSE_MOVE * p_description.velocity_direction().x,0.,0.));
             }
+
 
 
             //just in case (only 1 player entity exists)

@@ -38,6 +38,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         world.fetch_mut::<PhysicsTime>().set_frames_per_seconds(0);
+        //world.delete_all();
     }
 
     fn on_pause(&mut self, data: StateData<'_, GameData<'_, '_>>) {

@@ -12,6 +12,7 @@ use amethyst_physics::objects::{PhysicsHandle, CollisionGroup};
 use amethyst_physics::prelude::{PhysicsRigidBodyTag, RigidBodyDesc, ContactEvent, RBodyPhysicsServerTrait, PhysicsAreaTag, OverlapEvent};
 use amethyst::prelude::World;
 use std::io::Read;
+use std::convert::TryInto;
 
 
 pub const FORCE_MULTIPLIER: f32 = 1000000.0;
@@ -55,6 +56,7 @@ impl<'s> System<'s> for PhysicsSystem {
                                 OverlapEvent::Enter(tag,entity) => {
                                     let body_desc = body_descs.get_mut(entity.unwrap()).unwrap();
                                     body_desc.set_velocity_direction_x(-body_desc.velocity_direction().x);
+                                    body_desc.set_velocity_direction_y(-body_desc.velocity_direction().y);
                                 }
                                 _=>{}
                             }
@@ -62,7 +64,10 @@ impl<'s> System<'s> for PhysicsSystem {
                         CollisionGroupType::DeleteArea =>{
                             match event {
                                 OverlapEvent::Enter(tag,entity) => {
-                                    entities.delete(entity.unwrap());
+                                    match entity {
+                                        Some(entity) => {entities.delete(entity);},
+                                        None => {dbg!("Error unwrapping overlap entity");}
+                                    }
                                 }
                                 _=>{}
                             }
@@ -99,9 +104,18 @@ impl<'s> System<'s> for PhysicsSystem {
 impl PhysicsSystem{
     fn move_body(&mut self,body_server: &dyn RBodyPhysicsServerTrait<f32>, body_tag: &PhysicsHandle<PhysicsRigidBodyTag>, body_desc: &PhysicsBodyDescription){
         let vel = body_server.linear_velocity(body_tag.get());
-        body_server.set_linear_velocity(
-            body_tag.get(),
-            &Vector3::new(body_desc.velocity_max()*body_desc.velocity_direction().x,vel.y,0.));
+        let belongs_to = body_server.belong_to(body_tag.get());
+        if group_belongs_to(CollisionGroupType::Enemy, &belongs_to) {
+            body_server.set_linear_velocity(
+                body_tag.get(),
+                &Vector3::new(body_desc.velocity_max()*body_desc.velocity_direction().x,vel.y,0.));
+        }
+        if group_belongs_to(CollisionGroupType::Ground, &belongs_to){
+            body_server.set_linear_velocity(
+                body_tag.get(),
+                &Vector3::new(body_desc.velocity_max()*body_desc.velocity_direction().x,body_desc.velocity_max()*body_desc.velocity_direction().y,0.));
+        }
+
     }
 }
 

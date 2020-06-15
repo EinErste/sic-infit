@@ -272,7 +272,8 @@ fn load_support_ground(init_x:f32, init_y:f32, init_z:f32, width:f32,height:f32,
         .build();
 }
 
-fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, speed: f32, world: &mut World){
+
+fn load_moving_platform(init_x: f32, init_y: f32, speed: f32, init_directions: (f32,f32), world: &mut World) -> (f32,f32){
     let platform_width = 153 as f32;
     let platform_height = 28 as f32;
     let sprite_sheet_handle = {
@@ -293,10 +294,10 @@ fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, speed: f32, wor
         rb_desc.friction = 1.0;
         rb_desc.bounciness = 0.00;
         rb_desc.mass = 100.;
-        rb_desc.lock_translation_z;
-        rb_desc.lock_rotation_x;
-        rb_desc.lock_rotation_y;
-        rb_desc.lock_rotation_z;
+        rb_desc.lock_translation_z = true;
+        rb_desc.lock_rotation_x = true;
+        rb_desc.lock_rotation_y = true;
+        rb_desc.lock_rotation_z = true;
         rb_desc.belong_to = vec![
             CollisionGroup::new(CollisionGroupType::Ground.into()),
             CollisionGroup::new(CollisionGroupType::LinearMovable.into()),
@@ -316,7 +317,8 @@ fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, speed: f32, wor
 
 
     let mut desc = PhysicsBodyDescription::new(100.,speed);
-    desc.set_velocity_direction_x(-1.);
+    desc.set_velocity_direction_x(init_directions.0);
+    desc.set_velocity_direction_y(init_directions.1);
     world
         .create_entity()
         .with(rb)
@@ -325,6 +327,11 @@ fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, speed: f32, wor
         .with(sprite.clone())
         .with(desc)
         .build();
+    (platform_width,platform_height)
+}
+
+fn load_moving_platform_x(init_x: f32, init_y: f32, distance: f32, speed: f32, world: &mut World){
+    let (platform_width,platform_height) = load_moving_platform(init_x,init_y,speed,(-1.,0.),world);
 
     //LEFT TURN AREA
     load_invisible_area(init_x - 50.,init_y,50.,platform_height,world);
@@ -332,6 +339,17 @@ fn load_moving_platform(init_x: f32, init_y: f32, distance: f32, speed: f32, wor
     load_invisible_area(init_x + distance,init_y,50.,platform_height,world);
     //BOTTOM SUPPORT
     load_support_ground(init_x,init_y-platform_height,0.,platform_width+distance,10.,100.,world);
+}
+
+fn load_moving_platform_y(init_x: f32, init_y: f32, distance: f32, speed: f32, world: &mut World){
+
+    let (platform_width,platform_height) = load_moving_platform(init_x,init_y,speed,(0.,1.),world);
+
+    //UP TURN AREA
+    load_invisible_area(init_x,init_y + platform_height + distance,platform_width,platform_height,world);
+    //DOWN TURN AREA
+    load_invisible_area(init_x,init_y - platform_height,platform_width,platform_height,world);
+
 }
 
 fn load_coin(init_x: f32, init_y: f32, world: &mut World){
@@ -402,5 +420,7 @@ fn load_obstacles(world: &mut World){
     load_coin(450.,Height::Low.into(),world);
     load_platform(600.,Height::Mid.into(),120.,world);
     load_platform(800.,Height::High.into(),400.,world);
-    load_moving_platform(1000.,Height::Low.into(),500.,200., world);
+    load_moving_platform_x(900.,Height::Low.into(),500.,200., world);
+    load_moving_platform_y(1500.,Height::Low.into(),1000.,200., world);
+
 }

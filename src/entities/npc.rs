@@ -32,7 +32,7 @@ pub fn load_player(world: &mut World) -> Entity{
         sprite_number: 0,
     };
     let shape = {
-        let desc = ShapeDesc::Cube {half_extents: Vector3::new(20.,32.,5.)};
+        let desc = ShapeDesc::Cube {half_extents: Vector3::new(20.,28.,5.)};
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.shape_server().create(&desc)
     };
@@ -59,7 +59,7 @@ pub fn load_player(world: &mut World) -> Entity{
         .create_entity()
         .with(sprite)
         .with(transform)
-        .with(PhysicsBodyDescription::new(10.,150.))
+        .with(PhysicsBodyDescription::new(10.,200.))
         .with(Direction{dir: Directions::Right})
         .with(Player{})
         .with(shape)
@@ -111,7 +111,6 @@ pub fn load_enemy(init_x:f32,init_y:f32,world: &mut World){
         physics_world.rigid_body_server().create(&rb_desc)
     };
 
-    //let tag = rb.get();
 
     let mut desc = PhysicsBodyDescription::new(1000.,120.);
     desc.set_velocity_direction_x(1.);
@@ -124,8 +123,5 @@ pub fn load_enemy(init_x:f32,init_y:f32,world: &mut World){
         .with(desc)
         .with(Direction{dir: Directions::Left})
         .build();
-
-    //let physics_world = world.fetch::<PhysicsWorld<f32>>();
-    //physics_world.rigid_body_server().set_entity(tag,Some(entity));
 
 }
