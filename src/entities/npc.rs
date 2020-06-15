@@ -62,13 +62,13 @@ pub fn load_player(world: &mut World) -> Entity {
         .create_entity()
         .with(sprite)
         .with(transform)
-        .with(PhysicsBodyDescription::new(10., 200.))
+        .with(PhysicsBodyDescription::new(10., 150.))
         .with(Direction { dir: Directions::Right })
         .with(Player::new())
         .with(shape)
         .with(rb)
         .with(SimpleAnimation::new(StateAnimation::Idle, enum_map!(
-            StateAnimation::Run => (2,10,0.1),
+            StateAnimation::Run => (2,10,0.13),
             StateAnimation::Idle => (0,2,0.8),
             _ => (0,1,0.1)
         )))

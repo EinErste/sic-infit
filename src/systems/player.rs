@@ -11,14 +11,19 @@ use amethyst_physics::servers::PhysicsWorld;
 use amethyst_physics::objects::{PhysicsHandle, CollisionGroup};
 use amethyst_physics::prelude::PhysicsRigidBodyTag;
 use crate::systems::{CoinPicked, Interact};
+use amethyst_physics::PhysicsTime;
 
 ///This system controls the character control
 #[derive(SystemDesc, Default)]
-pub struct PlayerSystem {}
+pub struct PlayerSystem {
+    time_last_enemy_collide: f32,
+    time_world_from_start: f32,
+}
 
 
 const FORCE_MULTIPLIER: f32 = 1000000.0;
-const IMPULSE_JUMP: f32 = 10000000. * 1.3;
+//const IMPULSE_JUMP: f32 = 10000000. * 1.3;
+const IMPULSE_JUMP: f32 = 10000000.;
 const IMPULSE_JUMP_DEFEAT_ENEMY: f32 = 100000000. * 0.5;
 //const IMPULSE_MOVE: f32 = 500000.;
 const IMPULSE_MOVE: f32 =  800000. ;
@@ -28,6 +33,7 @@ impl<'s> System<'s> for PlayerSystem {
     type SystemData = (
         WriteStorage<'s, PhysicsBodyDescription>,
         WriteStorage<'s, SimpleAnimation>,
+        ReadExpect<'s, PhysicsTime>,
         Read<'s, InputHandler<StringBindings>>,
         ReadExpect<'s, PhysicsWorld<f32>>,
         ReadStorage<'s, PhysicsHandle<PhysicsRigidBodyTag>>,
@@ -37,7 +43,12 @@ impl<'s> System<'s> for PlayerSystem {
         Write<'s, EventChannel<Interact>>
     );
 
-    fn run(&mut self, (mut descs, mut animations, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut interactChannel): Self::SystemData) {
+    fn run(&mut self, (mut descs, mut animations, physics_time, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut interactChannel): Self::SystemData) {
+        self.time_world_from_start+=physics_time.delta_seconds();
+        if self.time_world_from_start == 1./0. {
+            self.time_world_from_start = 0.;
+            self.time_last_enemy_collide = 0.;
+        }
         let body_server = physics_world.rigid_body_server();
 
         for (p_description, animation, p_body_tag, _player) in (&mut descs, &mut animations, &rigid_body_tags, &player).join() {
@@ -102,32 +113,39 @@ impl<'s> System<'s> for PlayerSystem {
                             dbg!("+1 COIN");
                         }
                         CollisionGroupType::Enemy => {
-                            if almost::zero_with(1. - contact_event.normal.y, 0.01) {
-                                body_server.set_belong_to(
-                                    contact_event.other_body,
-                                    vec![CollisionGroup::new(CollisionGroupType::Deletable.into()),],
-                                );
-                                body_server.set_collide_with(
-                                    contact_event.other_body,
-                                    vec![CollisionGroup::new(CollisionGroupType::DeleteArea.into()),],
-                                );
-                                body_server.set_linear_velocity(
-                                    contact_event.other_body,
-                                    &Vector3::new(0., 0., 0.),
-                                );
-                                body_server.apply_impulse(
-                                    contact_event.other_body,
-                                    &Vector3::new(0., IMPULSE_JUMP_DEFEAT_ENEMY, 0.));
-                                body_server.apply_impulse(
-                                    p_body_tag.get(),
-                                    &Vector3::new(0.,IMPULSE_JUMP,0.));
-                                //Not sure
-                            } else {
-                                body_server.apply_impulse(
-                                    p_body_tag.get(),
-                                    &Vector3::new(IMPULSE_JUMP*contact_event.normal.x,0.,0.));
-                                dbg!("HEALTH -1");
-                            }
+                                if almost::zero_with(1. - contact_event.normal.y, 0.01) {
+                                    body_server.set_belong_to(
+                                        contact_event.other_body,
+                                        vec![CollisionGroup::new(CollisionGroupType::Deletable.into()),],
+                                    );
+                                    body_server.set_collide_with(
+                                        contact_event.other_body,
+                                        vec![CollisionGroup::new(CollisionGroupType::DeleteArea.into()),],
+                                    );
+                                    body_server.set_linear_velocity(
+                                        contact_event.other_body,
+                                        &Vector3::new(0., 0., 0.),
+                                    );
+                                    body_server.apply_impulse(
+                                        contact_event.other_body,
+                                        &Vector3::new(0., IMPULSE_JUMP_DEFEAT_ENEMY, 0.));
+                                    body_server.apply_impulse(
+                                        p_body_tag.get(),
+                                        &Vector3::new(0.,IMPULSE_JUMP,0.));
+                                    //Not sure
+                                } else {
+                                    let time_between_collides = 0.5;
+                                    if self.time_world_from_start - self.time_last_enemy_collide > time_between_collides {
+                                        self.time_last_enemy_collide = self.time_world_from_start;
+                                        body_server.set_linear_velocity(
+                                            p_body_tag.get(),
+                                            &Vector3::new(0.,0.,0.));
+                                        body_server.apply_impulse(
+                                            p_body_tag.get(),
+                                            &Vector3::new(IMPULSE_JUMP*contact_event.normal.x,IMPULSE_JUMP,0.));
+                                        dbg!("HEALTH -1");
+                                    }
+                                }
                         }
                         CollisionGroupType::Ground => {
                             let velocity_ground = body_server.linear_velocity(contact_event.other_body);if almost::zero_with(1. - contact_event.normal.y, 0.01) && velocity_ground.x != 0.{
