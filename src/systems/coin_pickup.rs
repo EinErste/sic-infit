@@ -1,12 +1,14 @@
 use amethyst::{
     core::Transform,
     derive::SystemDesc,
-    ecs::{Entity, System, SystemData, WriteStorage, Read, Write, World, ReaderId},
+    ecs::{Entities, System, SystemData, WriteStorage, Read, Write, World, ReaderId, Join},
     shrev::EventChannel,
     ui::UiText
 };
 
 use crate::entities::CoinSign;
+use crate::components::Player;
+
 ///This system controls the camera and ties it to a character at al
 pub struct CoinPickupSystem {
     reader_id: ReaderId<CoinPicked>,
@@ -27,16 +29,20 @@ impl<'s> System<'s> for CoinPickupSystem {
         Read<'s, EventChannel<CoinPicked>>,
         Write<'s, CoinSign>,
         WriteStorage<'s, UiText>,
+        WriteStorage<'s, Player>,
+        Entities<'s>
     );
 
-    fn run(&mut self, (coinChannel, coinSign, mut uiText): Self::SystemData) {
-        for coinEvent in coinChannel.read(&mut self.reader_id) {
-            let entity = coinSign.0.unwrap();
+    fn run(&mut self, (coinChannel, coinSign, mut uiText, mut players, mut entities): Self::SystemData) {
+        for (player, _) in (&mut players, &entities).join() {
+            for coinEvent in coinChannel.read(&mut self.reader_id) {
+                player.coins +=1;
 
-            if let Some(text) = uiText.get_mut(entity) {
-                text.text = (text.text.parse::<i32>().unwrap() + 1).to_string();//TODO fix doubling
+                let entity = coinSign.0.unwrap();
+                if let Some(text) = uiText.get_mut(entity) {
+                    text.text = player.coins.to_string();//TODO fix doubling
+                }
             }
-
         }
     }
 }

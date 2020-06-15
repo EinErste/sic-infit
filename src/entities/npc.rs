@@ -63,7 +63,7 @@ pub fn load_player(world: &mut World) -> Entity {
         .with(transform)
         .with(PhysicsBodyDescription::new(10., 150.))
         .with(Direction { dir: Directions::Right })
-        .with(Player {})
+        .with(Player::new())
         .with(shape)
         .with(rb)
         .with(SimpleAnimation::new(StateAnimation::Idle, enum_map!(
@@ -227,7 +227,7 @@ pub fn load_hearts(world: &mut World) {
         .with(transform)
         .with(UiText::new(
             font.clone(),
-            "0".to_string(),
+            "3".to_string(),
             [0., 0., 0., 1.],
             50.,
         ))
