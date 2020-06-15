@@ -4,6 +4,7 @@ Container(
         id: "finish_menu",
         width: 1920,
         height: 1080,
+        z: 200,
         mouse_reactive: false,
     ),
     background: Texture(File("textures/ui/start_final.png", ("IMAGE", ()))),

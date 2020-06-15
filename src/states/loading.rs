@@ -5,7 +5,7 @@ use amethyst::{
 };
 use crate::components::{Direction, SimpleAnimation, Player, PhysicsBodyDescription, NPC};
 use crate::resources::{load_assets, AssetType};
-use crate::entities::{load_player, init_camera, load_forest, load_lion, load_npc, load_coins, load_interact_button};
+use crate::entities::{load_player, init_camera, load_forest, load_lion, load_npc, load_coins, load_interact_button, load_ui_imgs, load_hearts};
 use amethyst::prelude::World;
 use crate::states::GameplayState;
 use amethyst_physics::PhysicsTime;
@@ -48,11 +48,10 @@ impl SimpleState for LoadingState {
                 load_lion(&mut world);
                 load_npc(&mut world);
 
-                let coins = load_coins(&mut world);
-                world.insert(coins);
-
-                let interact_button = load_interact_button(&mut world);
-                world.insert( interact_button);
+                load_coins(&mut world);
+                load_hearts(&mut world);
+                load_ui_imgs(&mut world);
+                load_interact_button(&mut world);
 
                 return Trans::Switch(Box::new(GameplayState{dispatcher: None, player, camera}));
             } else {

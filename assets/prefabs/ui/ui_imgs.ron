@@ -1,0 +1,23 @@
+#![enable(implicit_some)]
+Container(
+    transform: (
+        id: "ui_imgs",
+        width: 50,
+        height: 100,
+        mouse_reactive: false,
+        anchor: TopLeft,
+    ),
+    children:[
+        Image(
+            transform: (
+                id: "coins_and_hearts",
+                width: 50,
+                height: 100,
+                tab_order: 1,
+                anchor: BottomRight,
+                mouse_reactive: false,
+            ),
+            image: Texture(File("textures/ui/ui_imgs.png", ("IMAGE", ()))),
+        )
+    ]
+)

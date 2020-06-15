@@ -62,7 +62,7 @@ impl<'s> System<'s> for PlayerSystem {
             if let Some(action) = input.action_is_down("Action") {
                 if action {
                     interactChannel.single_write(Interact());
- d                }
+                }
             }
 
 

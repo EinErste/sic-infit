@@ -188,15 +188,15 @@ pub fn load_npc(world: &mut World) {
 #[derive(Default)]
 pub struct CoinSign(pub Option<Entity>);
 
-pub fn load_coins(world: &mut World) -> CoinSign {
+pub fn load_coins(world: &mut World) {
     let font = load_font(&world);
 
     let transform = UiTransform::new(
         "coins".to_string(), Anchor::TopLeft, Anchor::TopLeft,
-        50., -25., 1., 200., 50.,
+        25., 0., 1., 100., 50.,
     );
 
-    CoinSign(Some(world
+    let entity = CoinSign(Some(world
         .create_entity()
         .with(transform)
         .with(UiText::new(
@@ -205,13 +205,46 @@ pub fn load_coins(world: &mut World) -> CoinSign {
             [0., 0., 0., 1.],
             50.,
         ))
-        .build()))
+        .build()));
+
+    world.insert(entity)
+
+}
+
+#[derive(Default)]
+pub struct HeartsSign(pub Option<Entity>);
+
+pub fn load_hearts(world: &mut World) {
+    let font = load_font(&world);
+
+    let transform = UiTransform::new(
+        "hearts".to_string(), Anchor::TopLeft, Anchor::TopLeft,
+        25., -50., 1., 100., 50.,
+    );
+
+    let entity = HeartsSign(Some(world
+        .create_entity()
+        .with(transform)
+        .with(UiText::new(
+            font.clone(),
+            "0".to_string(),
+            [0., 0., 0., 1.],
+            50.,
+        ))
+        .build()));
+    world.insert(entity)
+}
+
+pub fn load_ui_imgs(world: &mut World) {
+    world.exec(|mut creator: UiCreator<'_>| {
+        Some(creator.create("prefabs/ui/ui_imgs.ron", ()))
+    });
 }
 
 #[derive(Default)]
 pub struct InteractButton(pub Option<Entity>);
 
-pub fn load_interact_button(world: &mut World) -> InteractButton {
+pub fn load_interact_button(world: &mut World) {
     let font = load_font(&world);
 
     let transform = UiTransform::new(
@@ -219,7 +252,7 @@ pub fn load_interact_button(world: &mut World) -> InteractButton {
         0., 100., 1., 50., 50.,
     );
 
-    InteractButton(Some(world
+    let entity = InteractButton(Some(world
         .create_entity()
         .with(transform)
         .with(UiText::new(
@@ -228,7 +261,8 @@ pub fn load_interact_button(world: &mut World) -> InteractButton {
             [0., 0., 0., 1.],
             50.,
         ))
-        .build()))
+        .build()));
+    world.insert(entity);
 }
 
 fn load_font(world: &&mut World) -> Handle<FontAsset> {
