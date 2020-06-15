@@ -127,7 +127,7 @@ pub fn load_enemy(init_x: f32, init_y: f32, world: &mut World) {
         .build();
 }
 
-pub(crate) fn load_npc(world: &mut World) {
+pub  fn load_npc(world: &mut World) {
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
