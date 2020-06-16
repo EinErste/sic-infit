@@ -44,16 +44,22 @@ pub fn initialise_audio(world: &mut World) {
 
 pub fn play_coin_sound(sounds: &Sounds, storage: &AssetStorage<Source>, output: Option<&Output>) {
     if let Some(ref output) = output.as_ref() {
-        if let Some(sound) = storage.get(&(sounds.coin_sfx.clone().unwrap())) {
-            output.play_once(sound, 0.05);
+        return match &sounds.coin_sfx {
+            Some(x) => if let Some(sound) = storage.get(x) {
+                output.play_once(sound, 0.05);
+            }
+            _ => ()
         }
     }
 }
 
 pub fn play_damage_sound(sounds: &Sounds, storage: &AssetStorage<Source>, output: Option<&Output>) {
     if let Some(ref output) = output.as_ref() {
-        if let Some(sound) = storage.get(&(sounds.damage_sfx.clone().unwrap())) {
-            output.play_once(sound, 0.2);
+        return match &sounds.damage_sfx {
+            Some(x) => if let Some(sound) = storage.get(x) {
+                output.play_once(sound, 0.05);
+            }
+            _ => ()
         }
     }
 }

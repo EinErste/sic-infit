@@ -63,6 +63,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
             .with(InteractButtonSystem::new(&mut world), "interact_button_system", &[])
             .build();
         dispatcher.setup(world);
+        initialise_audio(&mut world);
         // start_sound(&mut world);
 
         self.dispatcher = Some(dispatcher);
