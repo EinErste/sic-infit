@@ -30,7 +30,8 @@ impl SimpleState for LoadingState {
             AssetType::Character,
             AssetType::Obstacles,
             AssetType::Collectables,
-            AssetType::EndStructure
+            AssetType::EndStructure,
+            AssetType::FirstNPC,
         ]));
 
     }

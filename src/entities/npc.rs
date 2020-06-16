@@ -135,7 +135,7 @@ pub  fn load_npc(init_x: f32, init_y: f32, world: &mut World) {
     let height = 64.;
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
-        sprite_sheet_list.get(AssetType::Character).unwrap().clone()
+        sprite_sheet_list.get(AssetType::FirstNPC).unwrap().clone()
     }; //TODO change asset to real npc
     let sprite = SpriteRender {
         sprite_sheet: sprite_sheet_handle,
