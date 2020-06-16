@@ -130,7 +130,7 @@ pub fn load_enemy(init_x: f32, init_y: f32, world: &mut World) {
         .build();
 }
 
-pub  fn load_npc(init_x: f32, init_y: f32, asset_type: AssetType, line: &str, world: &mut World) {
+pub  fn load_npc(init_x: f32, init_y: f32, dir: Directions, asset_type: AssetType, line: &str, world: &mut World) {
     let width = 48.;
     let height = 64.;
     let sprite_sheet_handle = {
@@ -164,7 +164,7 @@ pub  fn load_npc(init_x: f32, init_y: f32, asset_type: AssetType, line: &str, wo
         .with(cube.1)
         .with(rb)
         .with(NPC::new(line))
-        .with(Direction{dir:Directions::Left})
+        .with(Direction{dir})
         .build();
 }
 

@@ -45,7 +45,7 @@ impl<'s> System<'s> for InteractButtonSystem {
                 if x < 75. && y < 75. {
 
                     // button_component.color = [0., 0., 0., 1.];
-                    println!("{}", npc.line);
+                    // println!("{}", npc.line);
 
 
                     if button_component.text != npc.line {
