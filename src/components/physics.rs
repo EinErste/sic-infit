@@ -2,7 +2,7 @@ use amethyst::{
     core::math::Vector3,
     ecs::{Component, DenseVecStorage},
 };
-use crate::components::physics::CollisionGroupType::{Ground, Player, NPC, Enemy, Undefined, WorldWall, LinearMovable, Collectable, DeleteArea, Deletable, InvisibleArea, SupportGround};
+use crate::components::physics::CollisionGroupType::{Ground, Player, NPC, Enemy, Undefined, WorldWall, LinearMovable, Collectable, DeleteArea, Deletable, InvisibleArea, SupportGround, Exit};
 use amethyst_physics::objects::{CollisionGroup, PhysicsHandle};
 use amethyst_physics::prelude::{PhysicsShapeTag, ShapeDesc};
 use amethyst_physics::servers::PhysicsWorld;
@@ -24,7 +24,8 @@ pub enum CollisionGroupType {
     Collectable = 8,
     DeleteArea = 9,
     Deletable = 10,
-    SupportGround = 11
+    SupportGround = 11,
+    Exit,
 }
 
 impl From<u8> for CollisionGroupType{
@@ -41,6 +42,7 @@ impl From<u8> for CollisionGroupType{
             9 => DeleteArea,
             10 => Deletable,
             11 => SupportGround,
+            12 => Exit,
             _ => Undefined,
         }
     }
@@ -69,11 +71,13 @@ pub struct PhysicsBodyDescription {
     velocity_direction: Vector3<f32>,
     velocity_max: f32,
     mass: f32,
+    last_collision_time: f32,
+    last_collision_group: CollisionGroupType,
 }
 
 impl Default for PhysicsBodyDescription {
     fn default() -> Self {
-        PhysicsBodyDescription { velocity_direction: Vector3::new(0., 0., 0.), mass: 1., velocity_max: 10.}
+        PhysicsBodyDescription { velocity_direction: Vector3::new(0., 0., 0.), mass: 1., velocity_max: 10., last_collision_time: 0.,last_collision_group: CollisionGroupType::Undefined}
     }
 }
 
@@ -100,6 +104,15 @@ impl PhysicsBodyDescription {
 
     pub fn set_mass(&mut self, mass: f32){
         self.mass = mass;
+    }
+
+    pub fn set_last_collision(&mut self, last_collision_time: f32, last_collision_group: CollisionGroupType,){
+        self.last_collision_time = last_collision_time;
+        self.last_collision_group = last_collision_group;
+    }
+
+    pub fn last_collision(&mut self) -> (f32, CollisionGroupType){
+        (self.last_collision_time,self.last_collision_group)
     }
 
 

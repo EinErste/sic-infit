@@ -6,22 +6,27 @@ use amethyst::{
     shrev::EventChannel,
 };
 
-use crate::components::{PhysicsBodyDescription, SimpleAnimation, StateAnimation, Player, CollisionGroupType};
+use crate::components::{PhysicsBodyDescription, SimpleAnimation, StateAnimation, Player, CollisionGroupType, group_belongs_to};
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst_physics::objects::{PhysicsHandle, CollisionGroup};
 use amethyst_physics::prelude::PhysicsRigidBodyTag;
 use crate::systems::{CoinPicked, Interact, HpEvent};
 use crate::systems::health::HpEvent::HpGained;
+use amethyst_physics::PhysicsTime;
 
 ///This system controls the character control
 #[derive(SystemDesc, Default)]
-pub struct PlayerSystem {}
+pub struct PlayerSystem {
+    time_last_enemy_collide: f32,
+    time_world_from_start: f32,
+}
 
 
-const FORCE_MULTIPLIER: f32 = 1000000.0;
-const IMPULSE_JUMP: f32 = 10000000. * 1.3;
-const IMPULSE_JUMP_DEFEAT_ENEMY: f32 = 100000000. * 0.5;
-//const IMPULSE_MOVE: f32 = 500000.;
+//const IMPULSE_JUMP: f32 = 10000000. * 2.;
+const IMPULSE_JUMP: f32 = 10000000. * 1.2;
+const IMPULSE_JUMP_DEFEAT_ENEMY: f32 = 50000000.;
+const IMPULSE_RESISTANCE_WALL: f32 = 3000000.;
+const IMPULSE_RESISTANCE_ENEMY: f32 = 5000000.;
 const IMPULSE_MOVE: f32 = 800000.;
 
 #[allow(dead_code)]
@@ -29,6 +34,7 @@ impl<'s> System<'s> for PlayerSystem {
     type SystemData = (
         WriteStorage<'s, PhysicsBodyDescription>,
         WriteStorage<'s, SimpleAnimation>,
+        ReadExpect<'s, PhysicsTime>,
         Read<'s, InputHandler<StringBindings>>,
         ReadExpect<'s, PhysicsWorld<f32>>,
         ReadStorage<'s, PhysicsHandle<PhysicsRigidBodyTag>>,
@@ -39,10 +45,14 @@ impl<'s> System<'s> for PlayerSystem {
         Write<'s, EventChannel<Interact>>
     );
 
-    fn run(&mut self, (mut descs, mut animations, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut hpChannel, mut interactChannel): Self::SystemData) {
+    fn run(&mut self, (mut descs, mut animations, physics_time, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut hpChannel, mut interactChannel): Self::SystemData) {
+        self.time_world_from_start += physics_time.delta_seconds();
+        if self.time_world_from_start == 1. / 0. {
+            self.time_world_from_start = 0.;
+            self.time_last_enemy_collide = 0.;
+        }
         let body_server = physics_world.rigid_body_server();
-
-        for (p_description, animation, p_body_tag, _player) in (&mut descs, &mut animations, &rigid_body_tags, &player).join() {
+        for (p_description, animation, p_body_tag, player) in (&mut descs, &mut animations, &rigid_body_tags, &player).join() {
             if let Some(x) = input.axis_value("x-axis") {
                 if x == 0. {
                     p_description.set_velocity_direction_x(0.);
@@ -82,8 +92,6 @@ impl<'s> System<'s> for PlayerSystem {
             //Check if able to jump
             let mut is_on_ground = false;
             for &contact_event in &events {
-
-                //THIS SHIT DOESNT WORK PROPERLY! WHY? HAS I EVER?
                 if almost::zero_with(1. - contact_event.normal.y, 0.01) {
                     is_on_ground = true;
                     break;
@@ -93,7 +101,7 @@ impl<'s> System<'s> for PlayerSystem {
             //Contacts
             for &contact_event in &events {
                 let belongs_to = body_server.belong_to(contact_event.other_body);
-                for collision_group in belongs_to {
+                for &collision_group in &belongs_to {
                     let collision_group = CollisionGroupType::from(collision_group.get());
 
                     match collision_group {
@@ -104,6 +112,7 @@ impl<'s> System<'s> for PlayerSystem {
                         }
                         CollisionGroupType::Enemy => {
                             if almost::zero_with(1. - contact_event.normal.y, 0.01) {
+                                //set entity to delete
                                 body_server.set_belong_to(
                                     contact_event.other_body,
                                     vec![CollisionGroup::new(CollisionGroupType::Deletable.into()), ],
@@ -112,32 +121,48 @@ impl<'s> System<'s> for PlayerSystem {
                                     contact_event.other_body,
                                     vec![CollisionGroup::new(CollisionGroupType::DeleteArea.into()), ],
                                 );
+
+                                //stop entity
                                 body_server.set_linear_velocity(
                                     contact_event.other_body,
                                     &Vector3::new(0., 0., 0.),
                                 );
+                                //Entity last jump mericCat
                                 body_server.apply_impulse(
                                     contact_event.other_body,
                                     &Vector3::new(0., IMPULSE_JUMP_DEFEAT_ENEMY, 0.));
+
+                                //Player resistance jump
                                 body_server.apply_impulse(
                                     p_body_tag.get(),
-                                    &Vector3::new(0., IMPULSE_JUMP, 0.));
-                                //Not sure
+                                    &Vector3::new(0., IMPULSE_RESISTANCE_ENEMY * 2., 0.));
                             } else {
-                                body_server.apply_impulse(
-                                    p_body_tag.get(),
-                                    &Vector3::new(IMPULSE_JUMP * contact_event.normal.x, 0., 0.));
-                                hpChannel.single_write(HpEvent::HpLost);
+                                let time_between_collides = 0.5;
+                                if self.time_world_from_start - self.time_last_enemy_collide > time_between_collides {
+                                    self.time_last_enemy_collide = self.time_world_from_start;
+                                    //Player resistance impulse
+                                    body_server.set_linear_velocity(
+                                        p_body_tag.get(),
+                                        &Vector3::new(0., 0., 0.));
+                                    body_server.apply_impulse(
+                                        p_body_tag.get(),
+                                        &Vector3::new(IMPULSE_RESISTANCE_ENEMY * contact_event.normal.x, IMPULSE_RESISTANCE_ENEMY * 2., 0.));
+                                    dbg!("HEALTH -1");
+                                }
                             }
                         }
                         CollisionGroupType::Ground => {
+                            if contact_event.normal.x != 0. {
+                                body_server.apply_impulse(
+                                    p_body_tag.get(),
+                                    &Vector3::new(IMPULSE_RESISTANCE_WALL * contact_event.normal.x, 0., 0.));
+                            }
                             let velocity_ground = body_server.linear_velocity(contact_event.other_body);
                             if almost::zero_with(1. - contact_event.normal.y, 0.01) && velocity_ground.x != 0. {
                                 //Check if directions are same
                                 let x_direction_determinant = if velocity.x.signum() == velocity_ground.x.signum() { 1. } else { -1. };
                                 //If player is moving
 
-                                //TODO
                                 if p_description.velocity_direction().x != 0. {
                                     if x_direction_determinant == 1. {
                                         body_server.set_linear_velocity(
@@ -160,6 +185,36 @@ impl<'s> System<'s> for PlayerSystem {
                                         &Vector3::new(velocity_ground.x, velocity_ground.y, 0.));
                                 }
                             }
+                            //Prevent stuck by moving platform
+                            if group_belongs_to(CollisionGroupType::LinearMovable, &belongs_to) {
+                                if contact_event.normal.y == -1. && is_on_ground {
+                                    body_server.apply_impulse(
+                                        contact_event.other_body,
+                                        &Vector3::new(
+                                            0.,
+                                            IMPULSE_JUMP * 10.,
+                                            0.));
+                                }
+
+                                //todo
+                                // if contact_event.normal.x != 0. && !is_on_ground{
+                                //     body_server.apply_impulse(
+                                //         contact_event.other_body,
+                                //         &Vector3::new(
+                                //             0.,
+                                //             0.,
+                                //             0.));
+                                // }
+                            }
+                        }
+                        CollisionGroupType::Exit => {
+                            if player.coins == 0 {
+                                dbg!("WIN");
+                            } else {
+                                body_server.apply_impulse(
+                                    p_body_tag.get(),
+                                    &Vector3::new(-IMPULSE_JUMP, 0., 0.));
+                            }
                         }
                         _ => {}
                     }
@@ -168,8 +223,9 @@ impl<'s> System<'s> for PlayerSystem {
 
 
             let mut velocity = body_server.linear_velocity(p_body_tag.get());
+            //Jump
             if p_description.velocity_direction().y != 0. && is_on_ground {
-                //Kinda crutch?
+                //Set y velocity to zero
                 body_server.set_linear_velocity(
                     p_body_tag.get(),
                     &Vector3::new(velocity.x, 0., 0.));
@@ -179,6 +235,7 @@ impl<'s> System<'s> for PlayerSystem {
                     &Vector3::new(0., IMPULSE_JUMP, 0.));
             }
 
+            //Move
             if velocity.x.abs() <= p_description.velocity_max() || velocity.x.signum() != p_description.velocity_direction().x.signum() {
                 body_server.apply_impulse(
                     p_body_tag.get(),
