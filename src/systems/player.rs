@@ -49,7 +49,6 @@ impl<'s> System<'s> for PlayerSystem {
         Entities<'s>,
         Write<'s, EventChannel<CoinPicked>>,
         Write<'s, EventChannel<HpEvent>>,
-        Write<'s, EventChannel<Interact>>,
         Read<'s, AssetStorage<Source>>,
         ReadExpect<'s, Sounds>,
         Option<Read<'s, Output>>,
@@ -57,7 +56,7 @@ impl<'s> System<'s> for PlayerSystem {
         Write<'s, GameplayStateType>
     );
 
-    fn run(&mut self, (mut descs, mut animations, physics_time, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut hpChannel, mut interactChannel, sources, sounds, output, mut interactChannel, mut gameplay_current_state): Self::SystemData) {
+    fn run(&mut self, (mut descs, mut animations, physics_time, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut hpChannel, sources, sounds, output, mut interactChannel, mut gameplay_current_state): Self::SystemData) {
         self.time_world_from_start += physics_time.delta_seconds();
         if self.time_world_from_start == 1. / 0. {
             self.time_world_from_start = 0.;
