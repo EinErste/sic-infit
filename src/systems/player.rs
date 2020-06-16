@@ -4,6 +4,8 @@ use amethyst::{
     input::{InputHandler, StringBindings},
     core::math::Vector3,
     shrev::EventChannel,
+    assets::AssetStorage,
+    audio::{output::Output, Source},
 };
 
 use crate::components::{PhysicsBodyDescription, SimpleAnimation, StateAnimation, Player, CollisionGroupType, group_belongs_to};
@@ -14,6 +16,8 @@ use crate::systems::{CoinPicked, Interact, HpEvent};
 use crate::systems::health::HpEvent::{HpGained, HpLost};
 use amethyst_physics::PhysicsTime;
 use crate::entities::MAX_COINS;
+use crate::audio::{play_damage_sound, Sounds};
+use std::ops::Deref;
 
 ///This system controls the character control
 #[derive(SystemDesc, Default)]
@@ -44,10 +48,13 @@ impl<'s> System<'s> for PlayerSystem {
         Entities<'s>,
         Write<'s, EventChannel<CoinPicked>>,
         Write<'s, EventChannel<HpEvent>>,
-        Write<'s, EventChannel<Interact>>
+        Write<'s, EventChannel<Interact>>,
+        Read<'s, AssetStorage<Source>>,
+        ReadExpect<'s, Sounds>,
+        Option<Read<'s, Output>>,
     );
 
-    fn run(&mut self, (mut descs, mut animations, physics_time, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut hpChannel, mut interactChannel): Self::SystemData) {
+    fn run(&mut self, (mut descs, mut animations, physics_time, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut hpChannel, mut interactChannel, sources, sounds, output): Self::SystemData) {
         self.time_world_from_start += physics_time.delta_seconds();
         if self.time_world_from_start == 1. / 0. {
             self.time_world_from_start = 0.;
@@ -111,7 +118,7 @@ impl<'s> System<'s> for PlayerSystem {
                         //TODO how to delete shape ? -_-
                         CollisionGroupType::Collectable => {
                             ///add coin
-                            let time_between_collides = physics_time.delta_seconds()*2.;
+                            let time_between_collides = physics_time.delta_seconds() * 2.;
                             if self.time_world_from_start - self.time_last_collectable_collide > time_between_collides {
                                 self.time_last_collectable_collide = self.time_world_from_start;
                                 entities.delete(contact_event.other_entity.unwrap());
@@ -129,6 +136,8 @@ impl<'s> System<'s> for PlayerSystem {
                                     contact_event.other_body,
                                     vec![CollisionGroup::new(CollisionGroupType::DeleteArea.into()), ],
                                 );
+                                play_damage_sound(&*sounds, &sources, output.as_ref().map(|o| o.deref()));
+
 
                                 //stop entity
                                 body_server.set_linear_velocity(
