@@ -206,7 +206,7 @@ fn load_platform(init_x: f32, init_y: f32, init_z: f32, platform_width: f32, wor
         .build();
 
     let mut transform = Transform::default();
-    transform.set_translation_xyz(init_x+platform_width+column_width, -(column_height-init_y +platform_height), -0.3 + init_z);
+    transform.set_translation_xyz(init_x+platform_width+column_width, -(column_height-init_y +platform_height), -0.1 + init_z);
 
     world
         .create_entity()
@@ -473,7 +473,7 @@ impl Into<f32> for Latitude{
 
 
 fn load_obstacles(world: &mut World){
-    let (d1,d2,d3,d4,d5,d6) = (-0.2,-0.4,-0.8,-1.0,-1.2,-1.4);
+    let (d1,d2,d3,d4,d5,d6) = (-0.3,-0.6,-0.9,-1.2,-1.5,-1.8);
     let ground: f32 = Altitude::Ground.into();
     let low: f32 = Altitude::Low.into();
     let mid: f32 = Altitude::Mid.into();
