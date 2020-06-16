@@ -143,9 +143,9 @@ impl<'s> System<'s> for PlayerSystem {
                                 //Player resistance jump
                                 body_server.apply_impulse(
                                     p_body_tag.get(),
-                                    &Vector3::new(0., IMPULSE_JUMP * 2., 0.));
+                                    &Vector3::new(0., IMPULSE_JUMP, 0.));
                             } else {
-                                let time_between_collides = physics_time.delta_seconds()*2.;
+                                let time_between_collides = physics_time.delta_seconds()*30.;
                                 if self.time_world_from_start - self.time_last_enemy_collide > time_between_collides {
                                     self.time_last_enemy_collide = self.time_world_from_start;
                                     //Player resistance impulse

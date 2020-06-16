@@ -80,7 +80,7 @@ pub fn load_player(world: &mut World) -> Entity {
 pub fn load_enemy(init_x: f32, init_y: f32,speed: f32, dir: Directions,world: &mut World) {
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
-        sprite_sheet_list.get(AssetType::Character).unwrap().clone()
+        sprite_sheet_list.get(AssetType::Enemy).unwrap().clone()
     };
 
     let sprite = SpriteRender {
@@ -88,7 +88,7 @@ pub fn load_enemy(init_x: f32, init_y: f32,speed: f32, dir: Directions,world: &m
         sprite_number: 0,
     };
 
-    let cube = create_cube(init_x, init_y, 0.1, 48., 64., 40., world);
+    let cube = create_cube(init_x, init_y, 0.1, 40., 60., 40., world);
 
 
     let rb = {

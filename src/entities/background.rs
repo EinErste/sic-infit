@@ -14,7 +14,7 @@ use crate::entities::background::Latitude::WorldStart;
 use rand::Rng;
 use rand::distributions::{Distribution};
 use rand_distr::{Normal};
-pub const MAX_COINS: u8 = 30;
+pub const MAX_COINS: u8 = 60;
 
 //All x and y parameters stands for left bottom point
 pub fn load_forest_path(init_x: f32, init_y: f32, ground_width: f32,ground_height: f32, ground_depth: f32,world: &mut World){
@@ -522,16 +522,18 @@ fn load_obstacles(world: &mut World){
 
     let mut rng = rand::thread_rng();
     let mut coins = 0u8;
-    let world_max = 3340.;
-    let mut distribution = Normal::new(1920.,700.).unwrap();
+    let world_max = 3300.;
+    let mut distribution = Normal::new(1920.,800.).unwrap();
     let mut u_distribution = Normal::new(2.,1.).unwrap();
     while coins!=MAX_COINS{
 
         let height = rng.gen_range(1, 4);
-        let mult = rng.gen_range(1, 4);
-        // let x =  rng.gen_range(450., world_max);
+        let mut mult = rng.gen_range(1, 4);
         let x =  distribution.sample(&mut rng);
-        let height = match height as u8 {
+        //Check world bounds
+        if x < 400. || x > world_max {continue;}
+
+        let mut height = match height as u8 {
             1 => {
                 low
             }
@@ -543,6 +545,11 @@ fn load_obstacles(world: &mut World){
             }
             _=> {low}
         };
+        //middle y platform
+        if x > 1700. && x < 1950. {
+            mult = 1;
+            height = high + ground;
+        }
         coins+=1;
         load_coin(x,height*mult as f32,world);
     }
@@ -553,7 +560,7 @@ fn load_obstacles(world: &mut World){
         let height = rng.gen_range(1, 4);
         let mult = rng.gen_range(1, 4);
         let x =  distribution.sample(&mut rng);
-        // let x =  rng.gen_range(600., world_max-400.);
+        if x < 400. || x > world_max {continue;}
         let speed:f32 = rng.gen_range(50., 150.);
         let height = match height {
             1 => {
@@ -570,9 +577,8 @@ fn load_obstacles(world: &mut World){
         enemies+=1;
         load_enemy(x,height*mult as f32, speed,Directions::Right,world);
     }
-  
-    //load_enemy(620.,Altitude::Low.into(),world);
-    //load_coin(650.,Altitude::Low.into(),world);
+
+
     load_npc(400., Altitude::Ground.into(), Directions::Left, AssetType::HoboNPC,"You need to go out and collect all the coins!", world);
     load_npc(1050., mid + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am a guard.", world);
     load_npc(3400., Altitude::Ground.into(),Directions::Left, AssetType::GuardianNPC,"You need to prove you're worthy. Collect all coins first!", world);
