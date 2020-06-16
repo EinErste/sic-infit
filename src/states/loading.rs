@@ -10,12 +10,15 @@ use amethyst::prelude::World;
 use crate::states::GameplayState;
 use amethyst_physics::PhysicsTime;
 use crate::audio::initialise_audio;
+use crate::states::gameplay::{GameplayStateType, GameplayStateTypes};
 
 #[derive(Default)]
 ///State used to avoid displaying an empty screen while all of the resources are being loaded
 pub struct LoadingState {
     progress_counter: Option<ProgressCounter>,
 }
+
+
 
 impl SimpleState for LoadingState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -25,6 +28,7 @@ impl SimpleState for LoadingState {
         world.register::<SimpleAnimation>();
         world.register::<Player>();
         world.register::<NPC>();
+        world.entry::<GameplayStateType>().or_insert_with(|| GameplayStateType{state: GameplayStateTypes::Active});
         self.progress_counter = Some(load_assets(&mut world,vec![
             AssetType::BackgroundForest,
             AssetType::Character,

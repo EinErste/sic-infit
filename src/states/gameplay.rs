@@ -19,6 +19,23 @@ use crate::{
 use amethyst_physics::PhysicsTime;
 use crate::systems::{CoinPickupSystem, InteractButtonSystem, HealthSystem};
 use crate::audio::{initialise_audio, Sounds};
+use crate::states::FinishState;
+
+#[derive(PartialEq)]
+pub enum GameplayStateTypes{
+    Active,
+    Inactice
+}
+
+pub struct GameplayStateType{
+    pub state: GameplayStateTypes
+}
+
+impl Default for GameplayStateType{
+    fn default() -> Self {
+        GameplayStateType{state: GameplayStateTypes::Active}
+    }
+}
 
 ///Main state where all the actual gameplay takes place
 pub struct GameplayState<'a, 'b> {
@@ -30,6 +47,12 @@ pub struct GameplayState<'a, 'b> {
 impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
     fn on_start(&mut self, mut data: StateData<'_, GameData<'_, '_>>) {
         let mut world = data.world;
+        // let mut fetched =
+            world.fetch_mut::<GameplayStateType>().state = GameplayStateTypes::Active;
+        // fetched.state = GameplayStateTypes::Active;
+        // if let Some(mut state) = fetched {
+        //     state.state = GameplayStateTypes::Active;
+        // }
         world.fetch_mut::<PhysicsTime>().set_frames_per_seconds(60);
         let mut dispatcher = DispatcherBuilder::new()
             .with(DirectionSystem {}, "direction_system", &[])
@@ -76,6 +99,14 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
     fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
         if let Some(dispatcher) = self.dispatcher.as_mut() {
             dispatcher.dispatch(&data.world);
+        }
+        let fetched = data.world.try_fetch_mut::<GameplayStateType>();
+        if let Some(mut state) = fetched {
+            if state.state == GameplayStateTypes::Inactice {
+                //?
+                state.state == GameplayStateTypes::Active;
+                return Trans::Switch(Box::new(FinishState::default()));
+            }
         }
         Trans::None
     }
