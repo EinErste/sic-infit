@@ -19,7 +19,6 @@ pub const FORCE_MULTIPLIER: f32 = 1000000.0;
 pub const ACCELERATION_G: f32 = 10.;
 pub const FORCE_GRAVITY: f32 = 1000.;
 pub const IMPULSE_JUMP: f32 =  1000000.;
-
 ///This system controls the character control
 pub struct PhysicsSystem {
     init: bool,
@@ -64,7 +63,7 @@ impl<'s> System<'s> for PhysicsSystem {
                                     let (time,_) = body_desc.last_collision();
                                     //Prevent stuck
                                     if (self.time_world_from_start-time).abs() > 0.3{
-                                        body_desc.set_last_collision(self.time_world_from_start,CollisionGroupType::InvisibleArea);
+                                        body_desc.set_last_collision(self.time_world_from_start,area_group_type_body);
                                         body_desc.set_velocity_direction_x(-body_desc.velocity_direction().x);
                                         body_desc.set_velocity_direction_y(-body_desc.velocity_direction().y);
                                     }
