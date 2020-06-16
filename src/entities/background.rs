@@ -14,7 +14,7 @@ use crate::entities::background::Latitude::WorldStart;
 use rand::Rng;
 use rand::distributions::{Distribution};
 use rand_distr::{Normal};
-pub const MAX_COINS: u8 = 60;
+pub const MAX_COINS: u8 = 30;
 
 //All x and y parameters stands for left bottom point
 pub fn load_forest_path(init_x: f32, init_y: f32, ground_width: f32,ground_height: f32, ground_depth: f32,world: &mut World){
@@ -485,7 +485,7 @@ fn load_obstacles(world: &mut World){
     //1
     load_platform(380.,mid*3.,d6,100.,world);
     //15
-    load_moving_platform_y(650.,low,mid * 3. - low,150., world);
+    load_moving_platform_y(650.,low + 15.,mid * 3. - low - 15.,150., world);
     //4
     load_platform(850.,high,d3,150.,world);
     //2
@@ -504,7 +504,7 @@ fn load_obstacles(world: &mut World){
     //7
     load_platform(1300.,mid*2.,d4,700.,world);
     //14
-    load_moving_platform_y(2500.,low,mid * 3. - low,100., world);
+    load_moving_platform_y(2500.,low + 15.,mid * 3. - low - 15.,100., world);
     //9
     load_platform(2800.,mid*2.,d4,200.,world);
     //10
@@ -516,7 +516,7 @@ fn load_obstacles(world: &mut World){
     //22
     load_moving_platform_x(900.,high*2.,300.,100., world);
     //25
-    load_moving_platform_y(1750.,mid*2. + ground,high*2. - mid*2.,100., world);
+    load_moving_platform_y(1750.,mid*2. + ground + 15.,high*2. - mid*2. - 15.,100., world);
     //12
     load_moving_platform_x(1950.,high*2.,450.,100., world);
 
