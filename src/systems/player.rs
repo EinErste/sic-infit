@@ -11,7 +11,7 @@ use amethyst_physics::servers::PhysicsWorld;
 use amethyst_physics::objects::{PhysicsHandle, CollisionGroup};
 use amethyst_physics::prelude::PhysicsRigidBodyTag;
 use crate::systems::{CoinPicked, Interact, HpEvent};
-use crate::systems::health::HpEvent::HpGained;
+use crate::systems::health::HpEvent::{HpGained, HpLost};
 use amethyst_physics::PhysicsTime;
 use crate::entities::MAX_COINS;
 
@@ -155,7 +155,7 @@ impl<'s> System<'s> for PlayerSystem {
                                     body_server.apply_impulse(
                                         p_body_tag.get(),
                                         &Vector3::new(IMPULSE_RESISTANCE_ENEMY * contact_event.normal.x, IMPULSE_RESISTANCE_ENEMY * 2., 0.));
-                                    dbg!("HEALTH -1");
+                                    hpChannel.single_write(HpLost);
                                 }
                             }
                         }

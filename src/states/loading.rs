@@ -31,7 +31,8 @@ impl SimpleState for LoadingState {
             AssetType::Obstacles,
             AssetType::Collectables,
             AssetType::EndStructure,
-            AssetType::FirstNPC,
+            AssetType::HoboNPC,
+            AssetType::GuardianNPC
         ]));
 
     }

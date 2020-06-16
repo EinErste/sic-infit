@@ -134,12 +134,12 @@ pub fn load_enemy(init_x: f32, init_y: f32,speed: f32, dir: Directions,world: &m
         .build();
 }
 
-pub  fn load_npc(init_x: f32, init_y: f32, world: &mut World) {
+pub  fn load_npc(init_x: f32, init_y: f32, dir: Directions, asset_type: AssetType, line: &str, world: &mut World) {
     let width = 48.;
     let height = 64.;
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
-        sprite_sheet_list.get(AssetType::FirstNPC).unwrap().clone()
+        sprite_sheet_list.get(asset_type).unwrap().clone()
     }; //TODO change asset to real npc
     let sprite = SpriteRender {
         sprite_sheet: sprite_sheet_handle,
@@ -166,8 +166,8 @@ pub  fn load_npc(init_x: f32, init_y: f32, world: &mut World) {
         .with(cube.0)
         .with(cube.1)
         .with(rb)
-        .with(NPC::new("You need to go out and collect all the coins!"))
-        .with(Direction{dir:Directions::Left})
+        .with(NPC::new(line))
+        .with(Direction{dir})
         .build();
 }
 

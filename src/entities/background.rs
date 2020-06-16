@@ -9,7 +9,7 @@ use amethyst_physics::servers::{PhysicsWorld, AreaDesc};
 use amethyst::core::math::Vector3;
 use crate::entities::{AdjustToDistance, load_enemy, load_npc};
 use amethyst_physics::objects::CollisionGroup;
-use crate::components::{CollisionGroupType, PhysicsBodyDescription, create_cube, Directions};
+use crate::components::{CollisionGroupType, PhysicsBodyDescription, create_cube, Direction, Directions};
 use crate::entities::background::Latitude::WorldStart;
 use rand::Rng;
 use rand::distributions::{Distribution};
@@ -546,7 +546,6 @@ fn load_obstacles(world: &mut World){
         coins+=1;
         load_coin(x,height*mult as f32,world);
     }
-
     let mut enemies = 0u8;
     let max_enemies = 10u8;
     let mut distribution = Normal::new(1920.,800.).unwrap();
@@ -571,7 +570,13 @@ fn load_obstacles(world: &mut World){
         enemies+=1;
         load_enemy(x,height*mult as f32, speed,Directions::Right,world);
     }
-    load_npc(400.,Altitude::Ground.into(),world);
+  
+    //load_enemy(620.,Altitude::Low.into(),world);
+    //load_coin(650.,Altitude::Low.into(),world);
+    load_npc(400., Altitude::Ground.into(), Directions::Left, AssetType::HoboNPC,"You need to go out and collect all the coins!", world);
+    let x: f32 = Altitude::Mid.into();
+    load_npc(1050., x + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am a guard.", world);
+    load_npc(3400., Altitude::Ground.into(),Directions::Left, AssetType::GuardianNPC,"You need to prove you're worthy. Collect all coins first!", world);
 
 
     load_exit(world);
