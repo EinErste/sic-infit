@@ -9,11 +9,11 @@ const COIN_SOUND: &str = "audio/coin.ogg";
 const DAMAGE_SOUND: &str = "audio/damage.ogg";
 const SCORE_SOUND: &str = "audio/score.ogg";
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Sounds {
-    pub score_sfx: SourceHandle,
-    pub coin_sfx: SourceHandle,
-    pub damage_sfx: SourceHandle,
+    pub score_sfx: Option<SourceHandle>,
+    pub coin_sfx: Option<SourceHandle>,
+    pub damage_sfx: Option<SourceHandle>,
 }
 
 /// Loads an ogg audio track.
@@ -29,9 +29,9 @@ pub fn initialise_audio(world: &mut World) {
         let loader = world.read_resource::<Loader>();
 
         let sound = Sounds {
-            coin_sfx: load_audio_track(&loader, &world, COIN_SOUND),
-            damage_sfx: load_audio_track(&loader, &world, DAMAGE_SOUND),
-            score_sfx: load_audio_track(&loader, &world, SCORE_SOUND),
+            coin_sfx: Some(load_audio_track(&loader, &world, COIN_SOUND)),
+            damage_sfx: Some(load_audio_track(&loader, &world, DAMAGE_SOUND)),
+            score_sfx: Some(load_audio_track(&loader, &world, SCORE_SOUND)),
         };
 
         sound
@@ -44,7 +44,7 @@ pub fn initialise_audio(world: &mut World) {
 
 pub fn play_coin_sound(sounds: &Sounds, storage: &AssetStorage<Source>, output: Option<&Output>) {
     if let Some(ref output) = output.as_ref() {
-        if let Some(sound) = storage.get(&sounds.coin_sfx) {
+        if let Some(sound) = storage.get(&(sounds.coin_sfx.clone().unwrap())) {
             output.play_once(sound, 0.05);
         }
     }
@@ -52,7 +52,7 @@ pub fn play_coin_sound(sounds: &Sounds, storage: &AssetStorage<Source>, output: 
 
 pub fn play_damage_sound(sounds: &Sounds, storage: &AssetStorage<Source>, output: Option<&Output>) {
     if let Some(ref output) = output.as_ref() {
-        if let Some(sound) = storage.get(&sounds.damage_sfx) {
+        if let Some(sound) = storage.get(&(sounds.damage_sfx.clone().unwrap())) {
             output.play_once(sound, 0.2);
         }
     }

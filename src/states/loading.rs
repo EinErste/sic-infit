@@ -58,7 +58,6 @@ impl SimpleState for LoadingState {
 
                 load_ui(&mut world);
 
-                initialise_audio(world);
                 return Trans::Switch(Box::new(GameplayState{dispatcher: None, player, camera}));
             } else {
                 dbg!("loading in progress");

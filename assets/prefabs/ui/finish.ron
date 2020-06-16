@@ -19,7 +19,7 @@ Container(
                 anchor: TopMiddle,
                 mouse_reactive: true,
             ),
-            image: Texture(File("textures/ui/continue_button.png", ("IMAGE", ()))),
+            image: Texture(File("textures/ui/quit_button.png", ("IMAGE", ()))),
         ),
         Image(
             transform: (

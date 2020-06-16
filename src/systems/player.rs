@@ -50,7 +50,7 @@ impl<'s> System<'s> for PlayerSystem {
         Write<'s, EventChannel<CoinPicked>>,
         Write<'s, EventChannel<HpEvent>>,
         Read<'s, AssetStorage<Source>>,
-        ReadExpect<'s, Sounds>,
+        Read<'s, Sounds>,
         Option<Read<'s, Output>>,
         Write<'s, EventChannel<Interact>>,
         Write<'s, GameplayStateType>

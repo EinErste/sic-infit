@@ -63,7 +63,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
             .with(InteractButtonSystem::new(&mut world), "interact_button_system", &[])
             .build();
         dispatcher.setup(world);
-        start_sound(&mut world);
+        // start_sound(&mut world);
 
         self.dispatcher = Some(dispatcher);
     }
@@ -111,14 +111,14 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
         Trans::None
     }
 }
-
-fn start_sound(world: &mut &mut World) {
-    let storage = world.read_resource::<AssetStorage<Source>>();
-    let sounds = world.read_resource::<Sounds>();
-    let output = world.read_resource::<Output>();
-
-    if let Some(sound) = storage.get(&sounds.score_sfx) {
-        dbg!("play");
-        output.play_n_times(sound, 0.2, 1);
-    }
-}
+//
+// fn start_sound(world: &mut &mut World) {
+//     let storage = world.read_resource::<AssetStorage<Source>>();
+//     let sounds = world.read_resource::<Sounds>();
+//     let output = world.read_resource::<Output>();
+//
+//     if let Some(sound) = storage.get(&sounds.score_sfx) {
+//         dbg!("play");
+//         output.play_n_times(sound, 0.2, 1);
+//     }
+// }
