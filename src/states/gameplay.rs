@@ -88,6 +88,6 @@ fn start_sound(world: &mut &mut World) {
 
     if let Some(sound) = storage.get(&sounds.score_sfx) {
         dbg!("play");
-        output.play_n_times(sound, 1.0, 1);
+        output.play_n_times(sound, 0.2, 1);
     }
 }

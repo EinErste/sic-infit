@@ -163,7 +163,7 @@ pub  fn load_npc(init_x: f32, init_y: f32, world: &mut World) {
         .with(cube.0)
         .with(cube.1)
         .with(rb)
-        .with(NPC::new("I am an iron man!"))
+        .with(NPC::new("You need to go out and collect all the coins!"))
         .with(Direction{dir:Directions::Left})
         .build();
 }
