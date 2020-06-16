@@ -15,7 +15,9 @@ use amethyst::{
 use crate::states::{LoadingState, StartState};
 use amethyst_physics::{PhysicsBundle,prelude::*};
 use amethyst_nphysics::NPhysicsBackend;
+use rand::prelude::*;
 use crate::systems::{PhysicsSystem, PlayerSystem, DirectionSystem};
+use std::panic;
 
 mod audio;
 mod states;

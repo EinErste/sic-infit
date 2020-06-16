@@ -77,7 +77,7 @@ pub fn load_player(world: &mut World) -> Entity {
         .build()
 }
 
-pub fn load_enemy(init_x: f32, init_y: f32, world: &mut World) {
+pub fn load_enemy(init_x: f32, init_y: f32,speed: f32, dir: Directions,world: &mut World) {
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
@@ -118,7 +118,11 @@ pub fn load_enemy(init_x: f32, init_y: f32, world: &mut World) {
 
 
     let mut desc = PhysicsBodyDescription::new(1000., 120.);
-    desc.set_velocity_direction_x(1.);
+    let vel_dir = match dir {
+        Directions::Left => {-1.}
+        Directions::Right => {1.}
+    };
+    desc.set_velocity_direction_x(vel_dir);
     let entity = world
         .create_entity()
         .with(sprite)
@@ -126,7 +130,7 @@ pub fn load_enemy(init_x: f32, init_y: f32, world: &mut World) {
         .with(cube.1)
         .with(rb)
         .with(desc)
-        .with(Direction { dir: Directions::Left })
+        .with(Direction {dir })
         .build();
 }
 
@@ -156,7 +160,6 @@ pub  fn load_npc(init_x: f32, init_y: f32, dir: Directions, asset_type: AssetTyp
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };
-
     world
         .create_entity()
         .with(sprite)

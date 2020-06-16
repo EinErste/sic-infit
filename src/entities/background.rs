@@ -11,7 +11,10 @@ use crate::entities::{AdjustToDistance, load_enemy, load_npc};
 use amethyst_physics::objects::CollisionGroup;
 use crate::components::{CollisionGroupType, PhysicsBodyDescription, create_cube, Direction, Directions};
 use crate::entities::background::Latitude::WorldStart;
-
+use rand::Rng;
+use rand::distributions::{Distribution};
+use rand_distr::{Normal};
+pub const MAX_COINS: u8 = 30;
 
 //All x and y parameters stands for left bottom point
 pub fn load_forest_path(init_x: f32, init_y: f32, ground_width: f32,ground_height: f32, ground_depth: f32,world: &mut World){
@@ -359,7 +362,7 @@ fn load_moving_platform_y(init_x: f32, init_y: f32, distance: f32, speed: f32, w
 
 fn load_coin(init_x: f32, init_y: f32, world: &mut World){
     let coin_width = 15 as f32;
-    let coin_height = 15 as f32;
+    let coin_height = 30 as f32;
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::Collectables).unwrap().clone()
@@ -370,7 +373,7 @@ fn load_coin(init_x: f32, init_y: f32, world: &mut World){
         sprite_number: 0,
     };
 
-    let cube = create_cube(init_x,init_y,0.09,coin_width, coin_height,50.,world);
+    let cube = create_cube(init_x,init_y,2.0,coin_width, coin_height,50.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
@@ -387,7 +390,6 @@ fn load_coin(init_x: f32, init_y: f32, world: &mut World){
         rb_desc.collide_with = vec![
             CollisionGroup::new(CollisionGroupType::Player.into()),
             CollisionGroup::new(CollisionGroupType::Ground.into()),
-            //dunno why, just in case
             CollisionGroup::new(CollisionGroupType::WorldWall.into()),
         ];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
@@ -479,6 +481,7 @@ fn load_obstacles(world: &mut World){
     let mid: f32 = Altitude::Mid.into();
     let high: f32 = Altitude::High.into();
 
+    load_enemy(800.,low, 150.,Directions::Right,world);
     //1
     load_platform(380.,mid*3.,d6,100.,world);
     //15
@@ -487,6 +490,7 @@ fn load_obstacles(world: &mut World){
     load_platform(850.,high,d3,150.,world);
     //2
     load_platform(1000.,low,d1,100.,world);
+    load_enemy(1050.,low, 50.,Directions::Left,world);
     //6
     load_platform(1250.,high*2.,d6,350.,world);
     //3
@@ -512,17 +516,68 @@ fn load_obstacles(world: &mut World){
     //22
     load_moving_platform_x(900.,high*2.,300.,100., world);
     //25
-    load_moving_platform_y(1700.,mid*2. + ground,high*2. - mid*2.,100., world);
+    load_moving_platform_y(1750.,mid*2. + ground,high*2. - mid*2.,100., world);
     //12
-    load_moving_platform_x(1950.,high*2.,500.,100., world);
+    load_moving_platform_x(1950.,high*2.,450.,100., world);
 
+    let mut rng = rand::thread_rng();
+    let mut coins = 0u8;
+    let world_max = 3340.;
+    let mut distribution = Normal::new(1920.,700.).unwrap();
+    let mut u_distribution = Normal::new(2.,1.).unwrap();
+    while coins!=MAX_COINS{
+
+        let height = rng.gen_range(1, 4);
+        let mult = rng.gen_range(1, 4);
+        // let x =  rng.gen_range(450., world_max);
+        let x =  distribution.sample(&mut rng);
+        let height = match height as u8 {
+            1 => {
+                low
+            }
+            2 => {
+                mid
+            }
+            3 => {
+                high
+            }
+            _=> {low}
+        };
+        coins+=1;
+        load_coin(x,height*mult as f32,world);
+    }
+    let mut enemies = 0u8;
+    let max_enemies = 10u8;
+    let mut distribution = Normal::new(1920.,800.).unwrap();
+    while enemies!=max_enemies{
+        let height = rng.gen_range(1, 4);
+        let mult = rng.gen_range(1, 4);
+        let x =  distribution.sample(&mut rng);
+        // let x =  rng.gen_range(600., world_max-400.);
+        let speed:f32 = rng.gen_range(50., 150.);
+        let height = match height {
+            1 => {
+                low
+            }
+            2 => {
+                mid
+            }
+            3 => {
+                high
+            }
+            _=> {low}
+        };
+        enemies+=1;
+        load_enemy(x,height*mult as f32, speed,Directions::Right,world);
+    }
+  
     //load_enemy(620.,Altitude::Low.into(),world);
     //load_coin(650.,Altitude::Low.into(),world);
     load_npc(400., Altitude::Ground.into(), Directions::Left, AssetType::HoboNPC,"You need to go out and collect all the coins!", world);
     let x: f32 = Altitude::Mid.into();
     load_npc(1050., x + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am a guard.", world);
-
     load_npc(3400., Altitude::Ground.into(),Directions::Left, AssetType::GuardianNPC,"You need to prove you're worthy. Collect all coins first!", world);
+
 
     load_exit(world);
 }

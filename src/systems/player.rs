@@ -13,11 +13,13 @@ use amethyst_physics::prelude::PhysicsRigidBodyTag;
 use crate::systems::{CoinPicked, Interact, HpEvent};
 use crate::systems::health::HpEvent::{HpGained, HpLost};
 use amethyst_physics::PhysicsTime;
+use crate::entities::MAX_COINS;
 
 ///This system controls the character control
 #[derive(SystemDesc, Default)]
 pub struct PlayerSystem {
     time_last_enemy_collide: f32,
+    time_last_collectable_collide: f32,
     time_world_from_start: f32,
 }
 
@@ -50,6 +52,7 @@ impl<'s> System<'s> for PlayerSystem {
         if self.time_world_from_start == 1. / 0. {
             self.time_world_from_start = 0.;
             self.time_last_enemy_collide = 0.;
+            self.time_last_collectable_collide = 0.;
         }
         let body_server = physics_world.rigid_body_server();
         for (p_description, animation, p_body_tag, player) in (&mut descs, &mut animations, &rigid_body_tags, &player).join() {
@@ -83,7 +86,7 @@ impl<'s> System<'s> for PlayerSystem {
             // physics
 
 
-            body_server.set_contacts_to_report(p_body_tag.get(), 5);
+            body_server.set_contacts_to_report(p_body_tag.get(), 8);
             let mut events = vec![];
             body_server.contact_events(p_body_tag.get(), &mut events);
 
@@ -107,8 +110,13 @@ impl<'s> System<'s> for PlayerSystem {
                     match collision_group {
                         //TODO how to delete shape ? -_-
                         CollisionGroupType::Collectable => {
-                            entities.delete(contact_event.other_entity.unwrap());
-                            coinChannel.single_write(CoinPicked());
+                            ///add coin
+                            let time_between_collides = physics_time.delta_seconds()*2.;
+                            if self.time_world_from_start - self.time_last_collectable_collide > time_between_collides {
+                                self.time_last_collectable_collide = self.time_world_from_start;
+                                entities.delete(contact_event.other_entity.unwrap());
+                                coinChannel.single_write(CoinPicked());
+                            }
                         }
                         CollisionGroupType::Enemy => {
                             if almost::zero_with(1. - contact_event.normal.y, 0.01) {
@@ -135,9 +143,9 @@ impl<'s> System<'s> for PlayerSystem {
                                 //Player resistance jump
                                 body_server.apply_impulse(
                                     p_body_tag.get(),
-                                    &Vector3::new(0., IMPULSE_RESISTANCE_ENEMY * 2., 0.));
+                                    &Vector3::new(0., IMPULSE_JUMP * 2., 0.));
                             } else {
-                                let time_between_collides = 0.5;
+                                let time_between_collides = physics_time.delta_seconds()*2.;
                                 if self.time_world_from_start - self.time_last_enemy_collide > time_between_collides {
                                     self.time_last_enemy_collide = self.time_world_from_start;
                                     //Player resistance impulse
@@ -208,7 +216,7 @@ impl<'s> System<'s> for PlayerSystem {
                             }
                         }
                         CollisionGroupType::Exit => {
-                            if player.coins == 0 {
+                            if player.coins == MAX_COINS {
                                 dbg!("WIN");
                             } else {
                                 body_server.apply_impulse(
