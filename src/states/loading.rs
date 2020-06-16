@@ -33,6 +33,7 @@ impl SimpleState for LoadingState {
             AssetType::EndStructure,
             AssetType::HoboNPC,
             AssetType::GuardianNPC,
+            AssetType::WizardNPC,
             AssetType::Enemy
         ]));
 
