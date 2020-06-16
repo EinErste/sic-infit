@@ -50,7 +50,7 @@ impl<'s> System<'s> for PlayerSystem {
         }
         let body_server = physics_world.rigid_body_server();
 
-        for (p_description, animation, p_body_tag, _player) in (&mut descs, &mut animations, &rigid_body_tags, &player).join() {
+        for (p_description, animation, p_body_tag, player) in (&mut descs, &mut animations, &rigid_body_tags, &player).join() {
             if let Some(x) = input.axis_value("x-axis") {
                 if x == 0. {
                     p_description.set_velocity_direction_x(0.);
@@ -183,6 +183,15 @@ impl<'s> System<'s> for PlayerSystem {
                                         p_body_tag.get(),
                                         &Vector3::new(velocity_ground.x, velocity_ground.y, 0.));
                                 }
+                            }
+                        }
+                        CollisionGroupType::Exit => {
+                            if player.coins == 0 {
+                                dbg!("WIN");
+                            } else {
+                                body_server.apply_impulse(
+                                    p_body_tag.get(),
+                                    &Vector3::new(-IMPULSE_JUMP,0.,0.));
                             }
                         }
                         _ => {}

@@ -2,7 +2,7 @@ use amethyst::{
     core::math::Vector3,
     ecs::{Component, DenseVecStorage},
 };
-use crate::components::physics::CollisionGroupType::{Ground, Player, NPC, Enemy, Undefined, WorldWall, LinearMovable, Collectable, DeleteArea, Deletable, InvisibleArea, SupportGround};
+use crate::components::physics::CollisionGroupType::{Ground, Player, NPC, Enemy, Undefined, WorldWall, LinearMovable, Collectable, DeleteArea, Deletable, InvisibleArea, SupportGround, Exit};
 use amethyst_physics::objects::{CollisionGroup, PhysicsHandle};
 use amethyst_physics::prelude::{PhysicsShapeTag, ShapeDesc};
 use amethyst_physics::servers::PhysicsWorld;
@@ -24,7 +24,8 @@ pub enum CollisionGroupType {
     Collectable = 8,
     DeleteArea = 9,
     Deletable = 10,
-    SupportGround = 11
+    SupportGround = 11,
+    Exit,
 }
 
 impl From<u8> for CollisionGroupType{
@@ -41,6 +42,7 @@ impl From<u8> for CollisionGroupType{
             9 => DeleteArea,
             10 => Deletable,
             11 => SupportGround,
+            12 => Exit,
             _ => Undefined,
         }
     }

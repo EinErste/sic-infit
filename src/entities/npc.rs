@@ -29,7 +29,7 @@ pub fn load_player(world: &mut World) -> Entity {
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
     };
     let transform =
-        Transform::default().set_translation_xyz(360., 240., 0.1).to_owned();
+        Transform::default().set_translation_xyz(360., 240., 0.15).to_owned();
     let sprite = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 0,
@@ -54,7 +54,9 @@ pub fn load_player(world: &mut World) -> Entity {
                                     CollisionGroup::new(CollisionGroupType::NPC.into()),
                                     CollisionGroup::new(CollisionGroupType::WorldWall.into()),
                                     CollisionGroup::new(CollisionGroupType::Collectable.into()),
-                                    CollisionGroup::new(CollisionGroupType::Enemy.into())];
+                                    CollisionGroup::new(CollisionGroupType::Enemy.into()),
+                                    CollisionGroup::new(CollisionGroupType::Exit.into()),
+        ];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
     };
@@ -62,7 +64,7 @@ pub fn load_player(world: &mut World) -> Entity {
         .create_entity()
         .with(sprite)
         .with(transform)
-        .with(PhysicsBodyDescription::new(10., 150.))
+        .with(PhysicsBodyDescription::new(10., 300.))
         .with(Direction { dir: Directions::Right })
         .with(Player::new())
         .with(shape)

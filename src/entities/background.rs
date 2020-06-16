@@ -10,6 +10,7 @@ use amethyst::core::math::Vector3;
 use crate::entities::{AdjustToDistance, load_enemy, load_npc};
 use amethyst_physics::objects::CollisionGroup;
 use crate::components::{CollisionGroupType, PhysicsBodyDescription, create_cube};
+use crate::entities::background::Latitude::WorldStart;
 
 
 //All x and y parameters stands for left bottom point
@@ -60,12 +61,11 @@ pub fn load_forest_path(init_x: f32, init_y: f32, ground_width: f32,ground_heigh
         .with(rb)
         .build();
 
+}
 
+fn load_world_wall(init_x: f32, init_y: f32,world: &mut World) {
 
-
-    //Left wall
-
-    let cube = create_cube(init_x,init_x,0.,320.,1000.,100.,world);
+    let cube = create_cube(init_x,init_y,0.,320.,2000.,100.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
@@ -92,7 +92,6 @@ pub fn load_forest_path(init_x: f32, init_y: f32, ground_width: f32,ground_heigh
         .with(rb)
         .build();
 }
-
 
 pub fn load_world_forest(world: &mut World){
     //Main sprites
@@ -127,7 +126,9 @@ pub fn load_world_forest(world: &mut World){
 
         }
     }
-    load_forest_path(0.,Height::Ground.into(),width,100.,100.,world);
+    load_forest_path(Latitude::WorldStart.into(),Altitude::Ground.into(),width,100.,100.,world);
+    load_world_wall(Latitude::WorldStart.into(),Altitude::Zero.into(),world);
+    load_world_wall(Latitude::WorldEnd as u32 as f32 - 320.,Altitude::Zero.into(),world);
     load_obstacles(world);
 }
 
@@ -401,9 +402,9 @@ fn load_coin(init_x: f32, init_y: f32, world: &mut World){
         .build();
 }
 
-fn load_cave(init_x: f32, init_y: f32, world: &mut World) {
-    let cave_width = 162 as f32;
-    let cave_height = 468 as f32;
+fn  load_exit(world: &mut World) {
+    let cave_width = 500 as f32;
+    let cave_height = 360 as f32;
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::EndStructure).unwrap().clone()
@@ -414,45 +415,75 @@ fn load_cave(init_x: f32, init_y: f32, world: &mut World) {
         sprite_number: 0,
     };
 
-    let cube = create_cube(init_x,init_y,0.1,cave_width, cave_height,100.,world);
+    let cube = create_cube(Latitude::WorldEnd as u32 as f32 - cave_width,Altitude::Ground as u32 as f32 - 60.,0.13,cave_width,cave_height,100.,world);
+
+    let rb = {
+        let mut rb_desc = RigidBodyDesc::default();
+        rb_desc.mode = BodyMode::Static;
+        rb_desc.friction = 0.0;
+        rb_desc.bounciness = 0.00;
+        rb_desc.belong_to = vec![
+            CollisionGroup::new(CollisionGroupType::Exit.into()),
+        ];
+        rb_desc.collide_with = vec![
+            CollisionGroup::new(CollisionGroupType::Player.into()),
+        ];
+        let physics_world = world.fetch::<PhysicsWorld<f32>>();
+        physics_world.rigid_body_server().create(&rb_desc)
+    };
 
     world
         .create_entity()
         .with(cube.0)
         .with(cube.1)
         .with(sprite.clone())
+        .with(rb)
         .build();
 }
 
 //For ground entities - top point
 //For other entities - bottom point
 #[repr(u32)]
-pub enum Height {
+pub enum Altitude {
+    Zero = 0,
     Ground = 65,
     Low = 160,
     Mid = 250,
     High = 340,
 }
 
-impl Into<f32> for Height{
+#[repr(u32)]
+pub enum Latitude {
+    WorldStart = 0,
+    WorldEnd = 3840
+}
+
+impl Into<f32> for Altitude{
     fn into(self) -> f32 {
         self as u32 as f32
     }
 }
 
+impl Into<f32> for Latitude{
+    fn into(self) -> f32 {
+        self as u32 as f32
+    }
+}
+
+
 fn load_obstacles(world: &mut World){
 
-    load_enemy(620.,Height::Low.into(),world);
-    // load_enemy(450.,Height::Low.into(),world);
-    // load_enemy(500.,Height::Low.into(),world);
-    // load_enemy(600.,Height::Low.into(),world);
-    load_platform(600.,Height::Low.into(),70.,world);
-    load_coin(650.,Height::Low.into(),world);
-    load_platform(800.,Height::Mid.into(),120.,world);
-    load_platform(1000.,Height::High.into(),400.,world);
-    load_moving_platform_x(1100.,Height::Low.into(),500.,200., world);
-    load_moving_platform_y(1700.,Height::Low.into(),1000.,200., world);
-    load_npc(400.,Height::Ground.into(),world);
+    load_enemy(620.,Altitude::Low.into(),world);
+    // load_enemy(450.,Altitude::Low.into(),world);
+    // load_enemy(500.,Altitude::Low.into(),world);
+    // load_enemy(600.,Altitude::Low.into(),world);
+    load_platform(600.,Altitude::Low.into(),70.,world);
+    load_coin(650.,Altitude::Low.into(),world);
+    load_platform(800.,Altitude::Mid.into(),120.,world);
+    load_platform(1000.,Altitude::High.into(),400.,world);
+    load_moving_platform_x(1100.,Altitude::Low.into(),500.,200., world);
+    load_moving_platform_y(1700.,Altitude::Low.into(),300.,200., world);
+    load_npc(400.,Altitude::Ground.into(),world);
 
-    // load_cave(600.,Height::Ground.into(),world);
+    load_exit(world);
 }
