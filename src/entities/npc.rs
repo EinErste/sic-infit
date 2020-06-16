@@ -212,7 +212,7 @@ fn load_hearts(world: &mut World) {
         .with(transform)
         .with(UiText::new(
             font.clone(),
-            "3".to_string(),
+            "10".to_string(),
             [0., 0., 0., 1.],
             50.,
         ))

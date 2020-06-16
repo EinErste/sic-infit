@@ -30,7 +30,7 @@ fn main() -> amethyst::Result<()> {
 
 
     //TODO (u know)
-    amethyst::start_logger(Default::default());
+    //amethyst::start_logger(Default::default());
 
     let app_root = application_root_dir()?;
 

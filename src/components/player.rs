@@ -13,7 +13,7 @@ pub struct Player {
 
 impl Player {
     pub(crate) fn new() -> Player {
-        Player { hp: 100, coins: 0 }
+        Player { hp: 10, coins: 0 }
     }
 
 }
