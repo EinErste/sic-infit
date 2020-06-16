@@ -34,18 +34,21 @@ impl<'s> System<'s> for InteractButtonSystem {
     );
 
     fn run(&mut self, (transforms, npcs, player, button, mut text, interactions): Self::SystemData) {
-        for (_, npc_transform) in (&npcs, &transforms).join() {
+        for (npc, npc_transform) in (&npcs, &transforms).join() {
             for (_, player_transform) in (&player, &transforms).join() {
-                let npc = npc_transform.translation();
+                let npc_translation = npc_transform.translation();
                 let plyr = player_transform.translation();
                 let button_component = text.get_mut(button.0.unwrap()).unwrap();
-                let x = (npc.x - plyr.x).abs();
-                let y = (npc.y - plyr.y).abs();
+                let x = (npc_translation.x - plyr.x).abs();
+                let y = (npc_translation.y - plyr.y).abs();
 
                 if x < 75. && y < 75. {
                     button_component.color = [0., 0., 0., 1.];
                     for interaction in interactions.read(&mut self.reader_id) {
-                        println!("Talking");
+                        println!("{}", npc.line);
+                    }
+                    if button_component.text != npc.line {
+                        button_component.text = npc.line.clone();
                     }
                 } else {
                     button_component.color = [0., 0., 0., 0.];

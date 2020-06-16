@@ -231,7 +231,7 @@ fn load_interact_button(world: &mut World) {
 
     let transform = UiTransform::new(
         "coins".to_string(), Anchor::BottomMiddle, Anchor::BottomMiddle,
-        0., 100., 1., 50., 50.,
+        0., 100., 1., 1600., 50.,
     );
 
     let entity = InteractButton(Some(world
@@ -241,7 +241,7 @@ fn load_interact_button(world: &mut World) {
             font.clone(),
             "E".to_string(),
             [0., 0., 0., 1.],
-            50.,
+            75.,
         ))
         .build()));
     world.insert(entity);
@@ -249,7 +249,7 @@ fn load_interact_button(world: &mut World) {
 
 fn load_font(world: &&mut World) -> Handle<FontAsset> {
     world.read_resource::<Loader>().load(
-        "font/square.ttf",
+        "font/dalek.ttf",
         TtfFormat,
         (),
         &world.read_resource(),
