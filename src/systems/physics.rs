@@ -22,12 +22,13 @@ pub const IMPULSE_JUMP: f32 =  1000000.;
 
 ///This system controls the character control
 pub struct PhysicsSystem {
-    init: bool
+    init: bool,
+    time_world_from_start: f32,
 }
 
 impl Default for PhysicsSystem{
     fn default() -> Self {
-        PhysicsSystem{init: true}
+        PhysicsSystem{init: true, time_world_from_start:0.}
     }
 }
 
@@ -38,9 +39,14 @@ impl<'s> System<'s> for PhysicsSystem {
         ReadStorage<'s, PhysicsHandle<PhysicsAreaTag>>,
         WriteStorage<'s, PhysicsBodyDescription>,
         Entities<'s>,
+        ReadExpect<'s, PhysicsTime>,
     );
 
-    fn run(&mut self, (physics_world, rigid_body_tags, area_body_tags, mut body_descs, entities): Self::SystemData) {
+    fn run(&mut self, (physics_world, rigid_body_tags, area_body_tags, mut body_descs, entities,physics_time): Self::SystemData) {
+        self.time_world_from_start+=physics_time.delta_seconds();
+        if self.time_world_from_start == 1./0. {
+            self.time_world_from_start = 0.;
+        }
         let body_server = physics_world.rigid_body_server();
         let area_server = physics_world.area_server();
         for (area_body_tag) in (&area_body_tags).join() {
@@ -55,10 +61,15 @@ impl<'s> System<'s> for PhysicsSystem {
                             match event {
                                 OverlapEvent::Enter(tag,entity) => {
                                     let body_desc = body_descs.get_mut(entity.unwrap()).unwrap();
-                                    body_desc.set_velocity_direction_x(-body_desc.velocity_direction().x);
-                                    body_desc.set_velocity_direction_y(-body_desc.velocity_direction().y);
+                                    let (time,_) = body_desc.last_collision();
+                                    //Prevent stuck
+                                    if (self.time_world_from_start-time).abs() > 0.3{
+                                        body_desc.set_last_collision(self.time_world_from_start,CollisionGroupType::InvisibleArea);
+                                        body_desc.set_velocity_direction_x(-body_desc.velocity_direction().x);
+                                        body_desc.set_velocity_direction_y(-body_desc.velocity_direction().y);
+                                    }
                                 }
-                                _=>{}
+                                _ =>{}
                             }
                         }
                         CollisionGroupType::DeleteArea =>{

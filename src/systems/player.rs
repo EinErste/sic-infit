@@ -6,7 +6,7 @@ use amethyst::{
     shrev::EventChannel,
 };
 
-use crate::components::{PhysicsBodyDescription, SimpleAnimation, StateAnimation, Player, CollisionGroupType};
+use crate::components::{PhysicsBodyDescription, SimpleAnimation, StateAnimation, Player, CollisionGroupType, group_belongs_to};
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst_physics::objects::{PhysicsHandle, CollisionGroup};
 use amethyst_physics::prelude::PhysicsRigidBodyTag;
@@ -21,7 +21,8 @@ pub struct PlayerSystem {
 }
 
 
-const IMPULSE_JUMP: f32 = 10000000.;
+//const IMPULSE_JUMP: f32 = 10000000. * 2.;
+const IMPULSE_JUMP: f32 = 10000000. *1.2;
 const IMPULSE_JUMP_DEFEAT_ENEMY: f32 = 50000000.;
 const IMPULSE_RESISTANCE_WALL: f32 = 3000000.;
 const IMPULSE_RESISTANCE_ENEMY: f32 = 5000000.;
@@ -49,7 +50,6 @@ impl<'s> System<'s> for PlayerSystem {
             self.time_last_enemy_collide = 0.;
         }
         let body_server = physics_world.rigid_body_server();
-
         for (p_description, animation, p_body_tag, player) in (&mut descs, &mut animations, &rigid_body_tags, &player).join() {
             if let Some(x) = input.axis_value("x-axis") {
                 if x == 0. {
@@ -99,7 +99,7 @@ impl<'s> System<'s> for PlayerSystem {
             //Contacts
             for &contact_event in &events {
                 let belongs_to = body_server.belong_to(contact_event.other_body);
-                for collision_group in belongs_to {
+                for &collision_group in &belongs_to {
                     let collision_group = CollisionGroupType::from(collision_group.get());
 
                     match collision_group {
@@ -156,7 +156,8 @@ impl<'s> System<'s> for PlayerSystem {
                                     p_body_tag.get(),
                                     &Vector3::new(IMPULSE_RESISTANCE_WALL* contact_event.normal.x,0.,0.));
                             }
-                            let velocity_ground = body_server.linear_velocity(contact_event.other_body);if almost::zero_with(1. - contact_event.normal.y, 0.01) && velocity_ground.x != 0.{
+                            let velocity_ground = body_server.linear_velocity(contact_event.other_body);
+                            if almost::zero_with(1. - contact_event.normal.y, 0.01) && velocity_ground.x != 0.{
                                 //Check if directions are same
                                 let x_direction_determinant = if velocity.x.signum() == velocity_ground.x.signum() { 1. } else { -1. };
                                 //If player is moving
@@ -184,6 +185,29 @@ impl<'s> System<'s> for PlayerSystem {
                                         &Vector3::new(velocity_ground.x, velocity_ground.y, 0.));
                                 }
                             }
+                            //Prevent stuck by moving platform
+                            if group_belongs_to(CollisionGroupType::LinearMovable,&belongs_to){
+                                if contact_event.normal.y == -1. && is_on_ground{
+                                    body_server.apply_impulse(
+                                        contact_event.other_body,
+                                        &Vector3::new(
+                                            0.,
+                                            IMPULSE_JUMP*10.,
+                                            0.));
+                                }
+
+                                //todo
+                                // if contact_event.normal.x != 0. && !is_on_ground{
+                                //     body_server.apply_impulse(
+                                //         contact_event.other_body,
+                                //         &Vector3::new(
+                                //             0.,
+                                //             0.,
+                                //             0.));
+                                // }
+                            }
+
+
                         }
                         CollisionGroupType::Exit => {
                             if player.coins == 0 {
