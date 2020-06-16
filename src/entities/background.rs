@@ -574,9 +574,10 @@ fn load_obstacles(world: &mut World){
     //load_enemy(620.,Altitude::Low.into(),world);
     //load_coin(650.,Altitude::Low.into(),world);
     load_npc(400., Altitude::Ground.into(), Directions::Left, AssetType::HoboNPC,"You need to go out and collect all the coins!", world);
-    let x: f32 = Altitude::Mid.into();
-    load_npc(1050., x + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am a guard.", world);
+    load_npc(1050., mid + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am a guard.", world);
     load_npc(3400., Altitude::Ground.into(),Directions::Left, AssetType::GuardianNPC,"You need to prove you're worthy. Collect all coins first!", world);
+
+    load_npc(3200., high + 64.0f32,Directions::Left, AssetType::WizardNPC,"Ah... Stars show that you are a hero...", world);
 
 
     load_exit(world);
