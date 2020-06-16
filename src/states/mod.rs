@@ -7,7 +7,7 @@ mod finish;
 pub use self::{
     finish::FinishState,
     starting::StartState,
-    gameplay::GameplayState,
+    gameplay::{GameplayState,GameplayStateType,GameplayStateTypes},
     pause::PauseState,
     loading::LoadingState
 };

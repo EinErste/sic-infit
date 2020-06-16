@@ -418,7 +418,7 @@ fn  load_exit(world: &mut World) {
         sprite_number: 0,
     };
 
-    let cube = create_cube(Latitude::WorldEnd as u32 as f32 - cave_width,Altitude::Ground as u32 as f32 - 60.,0.13,cave_width,cave_height,100.,world);
+    let cube = create_cube(Latitude::WorldEnd as u32 as f32 - cave_width,Altitude::Ground as u32 as f32 - 40.,0.13,cave_width,cave_height,100.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
@@ -524,7 +524,6 @@ fn load_obstacles(world: &mut World){
     let mut coins = 0u8;
     let world_max = 3300.;
     let mut distribution = Normal::new(1920.,800.).unwrap();
-    let mut u_distribution = Normal::new(2.,1.).unwrap();
     while coins!=MAX_COINS{
 
         let height = rng.gen_range(1, 4);
@@ -582,8 +581,7 @@ fn load_obstacles(world: &mut World){
     load_npc(400., Altitude::Ground.into(), Directions::Left, AssetType::HoboNPC,"You need to go out and collect all the coins!", world);
     load_npc(1050., mid + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am a guard.", world);
     load_npc(3400., Altitude::Ground.into(),Directions::Left, AssetType::GuardianNPC,"You need to prove you're worthy. Collect all coins first!", world);
-
-    load_npc(3200., high + 64.0f32,Directions::Left, AssetType::WizardNPC,"Ah... Stars show that you are a hero...", world);
+    load_npc(3000., mid*3. -20.,Directions::Right, AssetType::WizardNPC,"Ah... Stars show that you are a hero...", world);
 
 
     load_exit(world);

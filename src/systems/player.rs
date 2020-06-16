@@ -18,6 +18,7 @@ use amethyst_physics::PhysicsTime;
 use crate::entities::MAX_COINS;
 use crate::audio::{play_damage_sound, Sounds};
 use std::ops::Deref;
+use crate::states::{GameplayStateType,GameplayStateTypes};
 
 ///This system controls the character control
 #[derive(SystemDesc, Default)]
@@ -52,9 +53,11 @@ impl<'s> System<'s> for PlayerSystem {
         Read<'s, AssetStorage<Source>>,
         ReadExpect<'s, Sounds>,
         Option<Read<'s, Output>>,
+        Write<'s, EventChannel<Interact>>,
+        Write<'s, GameplayStateType>
     );
 
-    fn run(&mut self, (mut descs, mut animations, physics_time, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut hpChannel, mut interactChannel, sources, sounds, output): Self::SystemData) {
+    fn run(&mut self, (mut descs, mut animations, physics_time, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut hpChannel, mut interactChannel, sources, sounds, output, mut interactChannel, mut gameplay_current_state): Self::SystemData) {
         self.time_world_from_start += physics_time.delta_seconds();
         if self.time_world_from_start == 1. / 0. {
             self.time_world_from_start = 0.;
@@ -165,6 +168,9 @@ impl<'s> System<'s> for PlayerSystem {
                                         p_body_tag.get(),
                                         &Vector3::new(IMPULSE_RESISTANCE_ENEMY * contact_event.normal.x, IMPULSE_RESISTANCE_ENEMY * 2., 0.));
                                     hpChannel.single_write(HpLost);
+                                    if player.hp == 0 {
+                                        gameplay_current_state.state = GameplayStateTypes::Inactice;
+                                    }
                                 }
                             }
                         }
@@ -225,8 +231,9 @@ impl<'s> System<'s> for PlayerSystem {
                             }
                         }
                         CollisionGroupType::Exit => {
-                            if player.coins == MAX_COINS {
-                                dbg!("WIN");
+                            // if player.coins == MAX_COINS {
+                            if player.coins >= 0 {
+                                gameplay_current_state.state = GameplayStateTypes::Inactice;
                             } else {
                                 body_server.apply_impulse(
                                     p_body_tag.get(),
