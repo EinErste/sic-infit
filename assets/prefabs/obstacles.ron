@@ -1,13 +1,13 @@
 List((
     texture_width: 203,
-    texture_height: 370,
+    texture_height: 1080,
     sprites: [
         (
             x: 0,
             y: 0,
             width: 50,
-            height: 360,
-            offsets: Some((-25.0, -180.0)),
+            height: 1080,
+            offsets: Some((-25.0, -540.0)),
         ),
         (
             x: 50,

@@ -28,7 +28,8 @@ impl SimpleState for LoadingState {
             AssetType::BackgroundForest,
             AssetType::Character,
             AssetType::Obstacles,
-            AssetType::Collectables
+            AssetType::Collectables,
+            AssetType::EndStructure
         ]));
 
     }
