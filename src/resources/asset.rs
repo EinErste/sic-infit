@@ -18,7 +18,8 @@ pub enum AssetType {
     Character,
     Obstacles,
     Collectables,
-    EndStructure
+    EndStructure,
+    FirstNPC
 }
 ///List of spritesheets to be accesible
 #[derive(Default)]
@@ -49,6 +50,7 @@ pub fn load_assets(world: &mut World, asset_type_list: Vec<AssetType>) -> Progre
             AssetType::Obstacles => ("textures/obstacles.png", "prefabs/obstacles.ron"),
             AssetType::Collectables => ("textures/collectables.png", "prefabs/collectables.ron"),
             AssetType::EndStructure => ("textures/end_structure.png", "prefabs/end_structure.ron"),
+            AssetType::FirstNPC => ("textures/hobo.png", "prefabs/FUCK IS THIS.ron"),
         };
         let sprite_sheet_handle = get_sprite_sheet_handle(world, texture_path, ron_path, &mut progress_counter);
         sprite_sheet_list.insert(asset_type, sprite_sheet_handle);

@@ -138,7 +138,7 @@ pub  fn load_npc(init_x: f32, init_y: f32, world: &mut World) {
         sprite_sheet_list.get(AssetType::Character).unwrap().clone()
     }; //TODO change asset to real npc
     let sprite = SpriteRender {
-        sprite_sheet: sprite_sheet_handle.clone(),
+        sprite_sheet: sprite_sheet_handle,
         sprite_number: 0,
     };
     let cube = create_cube(init_x,init_y,0.1,width,height,20.,world);
