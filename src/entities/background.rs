@@ -128,7 +128,7 @@ pub fn load_world_forest(world: &mut World){
     }
     load_forest_path(Latitude::WorldStart.into(),Altitude::Ground.into(),width,65.,100.,world);
     load_world_wall(Latitude::WorldStart.into(),Altitude::Zero.into(),world);
-    load_world_wall(Latitude::WorldEnd as u32 as f32 - 320.,Altitude::Zero.into(),world);
+    load_world_wall(Latitude::WorldEnd as u32 as f32 - 48.,Altitude::Zero.into(),world);
     load_obstacles(world);
 }
 
@@ -404,8 +404,8 @@ fn load_coin(init_x: f32, init_y: f32, world: &mut World){
 }
 
 fn  load_exit(world: &mut World) {
-    let cave_width = 500 as f32;
-    let cave_height = 360 as f32;
+    let cave_width = 320.;
+    let cave_height = 540.;
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::EndStructure).unwrap().clone()
