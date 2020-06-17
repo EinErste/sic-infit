@@ -1,7 +1,7 @@
 [package]
 name = "sic_infit"
 version = "0.1.0"
-authors = ["'chddr' <spaceshroom175@gmail.com>"]
+authors = ["'chddr' <spaceshroom175@gmail.com> 'Reinhard' <magicfuture97@gmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -9,7 +9,13 @@ edition = "2018"
 [dependencies]
 log = { version = "0.4.8", features = ["serde"] }
 amethyst = "0.15.0"
-
+amethyst_physics = "0.2.0"
+amethyst_nphysics = "0.2.0"
+enum-map = "0.6.2"
+almost = "0.2.0"
+rand = "0.7.3"
+rand_distr = "0.2.2"
+amethyst_audio = "0.10.0"
 
 [features]
 default = ["vulkan"]

@@ -4,6 +4,7 @@ use amethyst::{
 
 #[derive(Component)]
 #[storage(DenseVecStorage)]
+///Component responsible for direction. Rotates sprite depending on where the entity is headed
 pub struct Direction{
     pub(crate) dir: Directions
 }
@@ -11,4 +12,3 @@ pub struct Direction{
 pub enum Directions {
     Left, Right
 }
-

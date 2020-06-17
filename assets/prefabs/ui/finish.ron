@@ -1,0 +1,37 @@
+#![enable(implicit_some)]
+Container(
+    transform: (
+        id: "finish_menu",
+        width: 1920,
+        height: 1080,
+        z: 200,
+        mouse_reactive: false,
+    ),
+    background: Texture(File("textures/ui/start_final.png", ("IMAGE", ()))),
+    children:[
+        Image(
+            transform: (
+                id: "to_menu",
+                y: -750,
+                width: 384,
+                height: 96,
+                tab_order: 1,
+                anchor: TopMiddle,
+                mouse_reactive: true,
+            ),
+            image: Texture(File("textures/ui/quit_button.png", ("IMAGE", ()))),
+        ),
+        Image(
+            transform: (
+                id: "label",
+                y: -550,
+                width: 654,
+                height: 129,
+                tab_order: 1,
+                anchor: TopMiddle,
+                mouse_reactive: false,
+            ),
+            image: Texture(File("textures/ui/end.png", ("IMAGE", ()))),
+        )
+    ]
+)

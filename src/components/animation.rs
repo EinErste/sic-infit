@@ -1,27 +1,46 @@
 use amethyst::{
     ecs::{Component, DenseVecStorage}
 };
+use enum_map::EnumMap;
+use enum_map::Enum;
 
 #[derive(Component)]
 #[storage(DenseVecStorage)]
+///Component responsible for animation. It loops through a set of states through time.
 pub struct SimpleAnimation{
-    pub start_sprite_index: usize,
-    pub frames: usize,
-    pub current_frame: usize,
-    pub time_per_frame: f32,
-    pub elapsed_time: f32
+    pub current_state: StateAnimation,
+    pub time_elapsed: f32,
+    pub state_changed: bool,
+    pub states: EnumMap<StateAnimation,(usize,usize,f32)>
+}
+
+#[derive(Enum,Copy, Clone,PartialEq)]
+///Enum for player animation states
+pub enum StateAnimation{
+    Static,
+    Idle,
+    Run,
 }
 
 
 impl SimpleAnimation {
-    pub fn new(start_sprite_index: usize, frames: usize, time_per_frame: f32) -> SimpleAnimation
+    pub fn new(current_state: StateAnimation, states: EnumMap<StateAnimation,(usize,usize,f32)>) -> SimpleAnimation
     {
         SimpleAnimation {
-            start_sprite_index,
-            frames,
-            current_frame: 0,
-            time_per_frame,
-            elapsed_time: 0.0,
+            current_state,
+            time_elapsed: 0.0,
+            state_changed: false,
+            states
         }
     }
+
+    pub fn change_state(&mut self, new_state: StateAnimation){
+
+        if new_state!=self.current_state {
+            self.time_elapsed = 0.0;
+            self.current_state = new_state;
+        }
+
+    }
 }
+

@@ -1,12 +1,26 @@
+//! Mod for storing all of the systems in one place
 mod direction;
 mod camera;
-mod character;
-mod motion;
+mod player;
+mod physics;
 mod animation;
+mod ui;
+mod utils;
+mod coin_pickup;
+mod interact_button;
+mod health;
+mod player_sound_effects;
+
 pub use self::{
+    health::{HealthSystem, HpEvent},
+    interact_button::{InteractButtonSystem, Interact},
     camera::CameraSystem,
-    character::CharacterSystem,
-    motion::MotionSystem,
+    player::PlayerSystem,
+    physics::PhysicsSystem,
     direction::DirectionSystem,
     animation::SimpleAnimationSystem,
+    ui::UiEventHandlerSystemDesc,
+    utils::CurrentState,
+    coin_pickup::{CoinPicked, CoinPickupSystem},
+    player_sound_effects::{SoundEffect, PlayerSoundSystem},
 };
