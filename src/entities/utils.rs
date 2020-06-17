@@ -20,17 +20,5 @@ impl AdjustToDistance for Transform {
         self.set_scale(Vector3::new(scale_x,scale_y,1.));
         (scale_x*initial_width,scale_y*initial_height)
 
-        // let distance = distance.abs() + 1920.;
-        //
-        // let rad_x = 20_f32.to_radians();
-        // let rad_y = 15_f32.to_radians();
-        //
-        //
-        // let scale_x = (initial_width + rad_x.sin() * distance * 2.)/initial_width;
-        // let scale_y = (initial_height + rad_y.sin() * distance * 2.)/initial_height;
-        // self.set_scale(Vector3::new(scale_x,scale_y,1.));
-        //
-        // dbg!((scale_x*initial_width,scale_y*initial_height));
-        // (scale_x*initial_width,scale_y*initial_height)
     }
 }
