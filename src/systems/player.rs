@@ -16,7 +16,7 @@ use crate::systems::{CoinPicked, Interact, HpEvent, SoundEffect};
 use crate::systems::health::HpEvent::{HpGained, HpLost};
 use amethyst_physics::PhysicsTime;
 use crate::entities::MAX_COINS;
-use crate::audio::{play_damage_sound, Sounds};
+use crate::audio::{play_damage_sound, Sounds, play_death_sound};
 use std::ops::Deref;
 use crate::states::{GameplayStateType,GameplayStateTypes};
 
@@ -31,7 +31,7 @@ pub struct PlayerSystem {
 
 // const IMPULSE_JUMP: f32 = 10000000. * 2.;
 const IMPULSE_JUMP: f32 = 10000000. * 1.2;
-const IMPULSE_JUMP_DEFEAT_ENEMY: f32 = 50000000.;
+const IMPULSE_JUMP_DEFEAT_ENEMY: f32 = 40000000.;
 const IMPULSE_RESISTANCE_WALL: f32 = 3000000.;
 const IMPULSE_RESISTANCE_ENEMY: f32 = 5000000.;
 const IMPULSE_MOVE: f32 = 800000.;
@@ -143,7 +143,7 @@ impl<'s> System<'s> for PlayerSystem {
                                     contact_event.other_body,
                                     vec![CollisionGroup::new(CollisionGroupType::DeleteArea.into()), ],
                                 );
-                                play_damage_sound(&*sounds, &sources, output.as_ref().map(|o| o.deref()));
+                                play_death_sound(&*sounds, &sources, output.as_ref().map(|o| o.deref()));
 
 
                                 //stop entity
@@ -173,6 +173,7 @@ impl<'s> System<'s> for PlayerSystem {
                                         &Vector3::new(IMPULSE_RESISTANCE_ENEMY * contact_event.normal.x, IMPULSE_RESISTANCE_ENEMY * 2., 0.));
                                     hpChannel.single_write(HpLost);
                                     if player.hp == 0 {
+                                        play_death_sound(&*sounds, &sources, output.as_ref().map(|o| o.deref()));
                                         gameplay_current_state.state = GameplayStateTypes::Inactice;
                                     }
                                 }

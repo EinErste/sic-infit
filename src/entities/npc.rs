@@ -64,7 +64,7 @@ pub fn load_player(world: &mut World) -> Entity {
         .create_entity()
         .with(sprite)
         .with(transform)
-        .with(PhysicsBodyDescription::new(10., 120.))
+        .with(PhysicsBodyDescription::new(10., 130.))
         .with(Direction { dir: Directions::Right })
         .with(Player::new())
         .with(shape)

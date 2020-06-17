@@ -588,8 +588,8 @@ fn load_obstacles(world: &mut World){
     }
 
 
-    load_npc(400., Altitude::Ground.into(), Directions::Left, AssetType::HoboNPC,"You need to go out and collect all the coins!", world);
-    load_npc(1050., mid + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am a guard. My advice - watch your back, it's not safe here.", world);
+    load_npc(400., Altitude::Ground.into(), Directions::Left, AssetType::HoboNPC,"You need to collect 30 coins. May the gods be in your favour", world);
+    load_npc(950., mid + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am local guard. Watch your back, it's not safe here.", world);
     load_npc(3400., Altitude::Ground.into(),Directions::Left, AssetType::GuardianNPC,"You need to prove you're worthy. Collect all coins first!", world);
     load_npc(3000., mid*3. -20.,Directions::Right, AssetType::WizardNPC,"Ah... Stars show that you are a hero...", world);
 

@@ -10,6 +10,7 @@ const DAMAGE_SOUND: &str = "audio/damage.ogg";
 const AMBIENT_SOUND: &str = "audio/ambient.ogg";
 const STEPS_SOUND: &str = "audio/steps.ogg";
 const MENU_SOUND: &str = "audio/ambient.ogg";
+const DEATH_SOUND: &str = "audio/death.ogg";
 
 #[derive(Clone, Default)]
 pub struct Sounds {
@@ -17,6 +18,7 @@ pub struct Sounds {
     pub coin_sfx: Option<SourceHandle>,
     pub damage_sfx: Option<SourceHandle>,
     pub steps_sfx: Option<SourceHandle>,
+    pub death_sfx: Option<SourceHandle>,
 }
 
 /// Loads an ogg audio track.
@@ -36,6 +38,7 @@ pub fn initialise_audio(world: &mut World) {
             damage_sfx: Some(load_audio_track(&loader, &world, DAMAGE_SOUND)),
             ambient_sfx: Some(load_audio_track(&loader, &world, AMBIENT_SOUND)),
             steps_sfx: Some(load_audio_track(&loader, &world, STEPS_SOUND)),
+            death_sfx: Some(load_audio_track(&loader, &world, DEATH_SOUND)),
         };
 
         sound
@@ -57,6 +60,14 @@ pub fn play_coin_sound(sounds: &Sounds, storage: &AssetStorage<Source>, output: 
 pub fn play_damage_sound(sounds: &Sounds, storage: &AssetStorage<Source>, output: Option<&Output>) {
     if let Some(ref output) = output.as_ref() {
         if let Some(sound) = storage.get(&(sounds.damage_sfx.clone().unwrap())) {
+            output.play_once(sound, 0.15);
+        }
+    }
+}
+
+pub fn play_death_sound(sounds: &Sounds, storage: &AssetStorage<Source>, output: Option<&Output>) {
+    if let Some(ref output) = output.as_ref() {
+        if let Some(sound) = storage.get(&(sounds.death_sfx.clone().unwrap())) {
             output.play_once(sound, 0.15);
         }
     }
