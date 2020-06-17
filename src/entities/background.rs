@@ -516,14 +516,14 @@ fn load_obstacles(world: &mut World){
     //22
     load_moving_platform_x(900.,high*2.,300.,100., world);
     //25
-    load_moving_platform_y(1750.,mid*2. + ground + 35.,high*2. - ground - 25.,100., world);
+    load_moving_platform_y(1750.,mid*2.  + ground + 35.,high*2. - mid*2. - ground - 70.,100., world);
     //12
-    load_moving_platform_x(1950.,high*2.,450.,100., world);
+    load_moving_platform_x(1970.,high*2.,500.,100., world);
 
     let mut rng = rand::thread_rng();
     let mut coins = 0u8;
     let world_max = 3300.;
-    let mut distribution = Normal::new(1920.,800.).unwrap();
+    let mut distribution = Normal::new(1920.,1000.).unwrap();
     while coins!=MAX_COINS{
 
         let height = rng.gen_range(1, 4);
@@ -553,13 +553,13 @@ fn load_obstacles(world: &mut World){
         load_coin(x,height*mult as f32,world);
     }
     let mut enemies = 0u8;
-    let max_enemies = 10u8;
+    let max_enemies = 8u8;
     let mut distribution = Normal::new(1920.,800.).unwrap();
     while enemies!=max_enemies{
         let height = rng.gen_range(1, 4);
         let mult = rng.gen_range(1, 4);
         let x =  distribution.sample(&mut rng);
-        if x < 400. || x > world_max {continue;}
+        if x < 700. || x > world_max {continue;}
         let speed:f32 = rng.gen_range(50., 150.);
         let height = match height {
             1 => {
@@ -589,7 +589,7 @@ fn load_obstacles(world: &mut World){
 
 
     load_npc(400., Altitude::Ground.into(), Directions::Left, AssetType::HoboNPC,"You need to go out and collect all the coins!", world);
-    load_npc(1050., mid + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am a guard.", world);
+    load_npc(1050., mid + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am a guard. My advice - watch your back, it's not safe here.", world);
     load_npc(3400., Altitude::Ground.into(),Directions::Left, AssetType::GuardianNPC,"You need to prove you're worthy. Collect all coins first!", world);
     load_npc(3000., mid*3. -20.,Directions::Right, AssetType::WizardNPC,"Ah... Stars show that you are a hero...", world);
 

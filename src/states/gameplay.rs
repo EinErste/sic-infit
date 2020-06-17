@@ -113,7 +113,7 @@ impl<'a, 'b> SimpleState for GameplayState<'a, 'b> {
             if let Some(handle) = &sounds.ambient_sfx {
                 if let Some(music) = storage.get(handle) {
                     self.DJ.append(music);
-                    self.DJ.set_volume(0.2);
+                    self.DJ.set_volume(0.1);
                 }
             }
         }

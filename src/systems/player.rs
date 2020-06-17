@@ -114,6 +114,7 @@ impl<'s> System<'s> for PlayerSystem {
                 }
             }
 
+            let mut sound_run_sent = false;
             //Contacts
             for &contact_event in &events {
                 let belongs_to = body_server.belong_to(contact_event.other_body);
@@ -158,7 +159,7 @@ impl<'s> System<'s> for PlayerSystem {
                                 //Player resistance jump
                                 body_server.apply_impulse(
                                     p_body_tag.get(),
-                                    &Vector3::new(0., IMPULSE_JUMP*1.5, 0.));
+                                    &Vector3::new(0., IMPULSE_JUMP*1.3, 0.));
                             } else {
                                 let time_between_collides = physics_time.delta_seconds()*30.;
                                 if self.time_world_from_start - self.time_last_enemy_collide > time_between_collides {
@@ -188,6 +189,7 @@ impl<'s> System<'s> for PlayerSystem {
                             } else {
                                 player_sound_effect_channel.single_write(SoundEffect::Idle);
                             }
+                            sound_run_sent = true;
                             let velocity_ground = body_server.linear_velocity(contact_event.other_body);
                             if almost::zero_with(1. - contact_event.normal.y, 0.01) && velocity_ground.x != 0. {
                                 //Check if directions are same
@@ -252,6 +254,9 @@ impl<'s> System<'s> for PlayerSystem {
                 }
             }
 
+            if !sound_run_sent {
+                player_sound_effect_channel.single_write(SoundEffect::Idle);
+            }
 
             let mut velocity = body_server.linear_velocity(p_body_tag.get());
             //Jump

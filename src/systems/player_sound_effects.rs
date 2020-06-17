@@ -45,18 +45,19 @@ impl<'s> System<'s> for PlayerSoundSystem {
         for event in soundChannel.read(&mut self.reader_id) {
             match event {
                 SoundEffect::Running => {
-                    self.DJ.play();
+                    self.DJ.set_volume(1.);
+                    // self.DJ.play();
                     if self.DJ.empty(){
                         if let Some(handle) = &sounds.steps_sfx {
                             if let Some(sound) = storage.get(handle) {
                                 self.DJ.append(sound);
-                                self.DJ.set_volume(1.);
                             }
                         }
                     }
                 }
                 SoundEffect::Idle => {
-                    self.DJ.pause();
+                    self.DJ.set_volume(0.);
+                    //self.DJ.pause();
                 }
             }
         }

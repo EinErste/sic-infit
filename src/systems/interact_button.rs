@@ -3,7 +3,7 @@ use amethyst::{
     derive::SystemDesc,
     ecs::{Entity, System, SystemData, WriteStorage, ReadStorage, Write, Read, World, ReaderId, Join},
     shrev::EventChannel,
-    ui::UiText,
+    ui::{UiText,LineMode},
 };
 use crate::components::{NPC, Player};
 use crate::entities::InteractButton;
@@ -46,7 +46,6 @@ impl<'s> System<'s> for InteractButtonSystem {
 
                     // button_component.color = [0., 0., 0., 1.];
                     // println!("{}", npc.line);
-
 
                     if button_component.text != npc.line {
                         button_component.text = npc.line.clone();
