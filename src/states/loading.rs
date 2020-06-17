@@ -11,6 +11,8 @@ use crate::states::GameplayState;
 use amethyst_physics::PhysicsTime;
 use crate::audio::initialise_audio;
 use crate::states::gameplay::{GameplayStateType, GameplayStateTypes};
+use amethyst_audio::AudioSink;
+use amethyst_audio::output::Output;
 
 #[derive(Default)]
 ///State used to avoid displaying an empty screen while all of the resources are being loaded
@@ -55,10 +57,10 @@ impl SimpleState for LoadingState {
                 let camera = init_camera(world);
                 load_world_forest(&mut world);
                 let player = load_player(&mut world);
-
+                //initialise_audio(&mut world);
                 load_ui(&mut world);
 
-                return Trans::Switch(Box::new(GameplayState{dispatcher: None, player, camera}));
+                return Trans::Switch(Box::new(GameplayState{dispatcher: None, player, camera, DJ: AudioSink::new(&world.read_resource::<Output>())}));
             } else {
                 dbg!("loading in progress");
             }

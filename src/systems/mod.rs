@@ -9,6 +9,7 @@ mod utils;
 mod coin_pickup;
 mod interact_button;
 mod health;
+mod player_sound_effects;
 
 pub use self::{
     health::{HealthSystem, HpEvent},
@@ -20,5 +21,6 @@ pub use self::{
     animation::SimpleAnimationSystem,
     ui::UiEventHandlerSystemDesc,
     utils::CurrentState,
-    coin_pickup::{CoinPicked, CoinPickupSystem}
+    coin_pickup::{CoinPicked, CoinPickupSystem},
+    player_sound_effects::{SoundEffect, PlayerSoundSystem},
 };

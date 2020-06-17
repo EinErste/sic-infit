@@ -516,7 +516,7 @@ fn load_obstacles(world: &mut World){
     //22
     load_moving_platform_x(900.,high*2.,300.,100., world);
     //25
-    load_moving_platform_y(1750.,mid*2. + ground + 15.,high*2. - mid*2. - 15.,100., world);
+    load_moving_platform_y(1750.,mid*2. + ground + 35.,high*2. - ground - 25.,100., world);
     //12
     load_moving_platform_x(1950.,high*2.,450.,100., world);
 
@@ -573,8 +573,18 @@ fn load_obstacles(world: &mut World){
             }
             _=> {low}
         };
+
+        let dir = match rng.gen_range(0, 2) {
+            0 => {
+                Directions::Left
+            }
+            1 =>{
+                Directions::Right
+            }
+            _=>{Directions::Left}
+        };
         enemies+=1;
-        load_enemy(x,height*mult as f32, speed,Directions::Right,world);
+        load_enemy(x,height*mult as f32, speed,dir,world);
     }
 
 

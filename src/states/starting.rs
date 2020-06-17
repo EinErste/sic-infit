@@ -10,6 +10,13 @@ use amethyst::{
     ecs::prelude::{Entity, ResourceId},
 };
 use crate::states::LoadingState;
+use amethyst_audio::AudioSink;
+use amethyst_audio::output::Output;
+use crate::audio::initialise_audio;
+
+pub struct DJWrapper {
+    dj: AudioSink
+}
 
 #[derive(Default, Debug)]
 pub struct StartState {
@@ -24,6 +31,10 @@ impl SimpleState for StartState {
         self.ui = data.world.exec(|mut creator: UiCreator<'_>| {
             Some(creator.create("prefabs/ui/start.ron", ()))
         });
+        let mut world = data.world;
+        // let dj = DJWrapper{dj: AudioSink::new(&world.read_resource::<Output>())};
+        // world.insert(dj);
+        initialise_audio(world);
     }
 
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -36,7 +47,7 @@ impl SimpleState for StartState {
         if let StateEvent::Ui(ui) = event {
             if ui.event_type == UiEventType::Click {
                 if ui.target == self.b1.unwrap() {
-                    return Trans::Switch(Box::new(LoadingState::default())); //TODO maybe let it sit on stack
+                    return Trans::Switch(Box::new(LoadingState::default()));
                 } else if ui.target == self.b2.unwrap() {
                     //TODO add here transition to settings
                 } else if ui.target == self.b3.unwrap() {

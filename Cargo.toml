@@ -15,6 +15,7 @@ enum-map = "0.6.2"
 almost = "0.2.0"
 rand = "0.7.3"
 rand_distr = "0.2.2"
+amethyst_audio = "0.10.0"
 
 [features]
 default = ["vulkan"]

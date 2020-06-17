@@ -117,7 +117,7 @@ pub fn load_enemy(init_x: f32, init_y: f32,speed: f32, dir: Directions,world: &m
     };
 
 
-    let mut desc = PhysicsBodyDescription::new(1000., 120.);
+    let mut desc = PhysicsBodyDescription::new(1000., speed);
     let vel_dir = match dir {
         Directions::Left => {-1.}
         Directions::Right => {1.}

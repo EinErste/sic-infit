@@ -48,7 +48,7 @@ impl<'s> System<'s> for CoinPickupSystem {
 
                 let entity = coinSign.0.unwrap();
                 if let Some(text) = uiText.get_mut(entity) {
-                    text.text = player.coins.to_string();//TODO fix doubling
+                    text.text = player.coins.to_string();
                 }
             }
         }

@@ -12,7 +12,7 @@ use crate::components::{PhysicsBodyDescription, SimpleAnimation, StateAnimation,
 use amethyst_physics::servers::PhysicsWorld;
 use amethyst_physics::objects::{PhysicsHandle, CollisionGroup};
 use amethyst_physics::prelude::PhysicsRigidBodyTag;
-use crate::systems::{CoinPicked, Interact, HpEvent};
+use crate::systems::{CoinPicked, Interact, HpEvent, SoundEffect};
 use crate::systems::health::HpEvent::{HpGained, HpLost};
 use amethyst_physics::PhysicsTime;
 use crate::entities::MAX_COINS;
@@ -29,7 +29,7 @@ pub struct PlayerSystem {
 }
 
 
-//const IMPULSE_JUMP: f32 = 10000000. * 2.;
+// const IMPULSE_JUMP: f32 = 10000000. * 2.;
 const IMPULSE_JUMP: f32 = 10000000. * 1.2;
 const IMPULSE_JUMP_DEFEAT_ENEMY: f32 = 50000000.;
 const IMPULSE_RESISTANCE_WALL: f32 = 3000000.;
@@ -53,10 +53,14 @@ impl<'s> System<'s> for PlayerSystem {
         Read<'s, Sounds>,
         Option<Read<'s, Output>>,
         Write<'s, EventChannel<Interact>>,
+        Write<'s, EventChannel<SoundEffect>>,
         Write<'s, GameplayStateType>
     );
 
-    fn run(&mut self, (mut descs, mut animations, physics_time, input, physics_world, rigid_body_tags, player, entities, mut coinChannel, mut hpChannel, sources, sounds, output, mut interactChannel, mut gameplay_current_state): Self::SystemData) {
+    fn run(&mut self, (mut descs, mut animations, physics_time, input, physics_world, rigid_body_tags, player, entities,
+        mut coinChannel, mut hpChannel, sources, sounds, output,
+        mut interactChannel,  mut player_sound_effect_channel,
+        mut gameplay_current_state,): Self::SystemData) {
         self.time_world_from_start += physics_time.delta_seconds();
         if self.time_world_from_start == 1. / 0. {
             self.time_world_from_start = 0.;
@@ -154,7 +158,7 @@ impl<'s> System<'s> for PlayerSystem {
                                 //Player resistance jump
                                 body_server.apply_impulse(
                                     p_body_tag.get(),
-                                    &Vector3::new(0., IMPULSE_JUMP, 0.));
+                                    &Vector3::new(0., IMPULSE_JUMP*1.5, 0.));
                             } else {
                                 let time_between_collides = physics_time.delta_seconds()*30.;
                                 if self.time_world_from_start - self.time_last_enemy_collide > time_between_collides {
@@ -179,13 +183,18 @@ impl<'s> System<'s> for PlayerSystem {
                                     p_body_tag.get(),
                                     &Vector3::new(IMPULSE_RESISTANCE_WALL * contact_event.normal.x, 0., 0.));
                             }
+                            if almost::zero_with(1. - contact_event.normal.y, 0.01) && p_description.velocity_direction().x != 0. {
+                                player_sound_effect_channel.single_write(SoundEffect::Running);
+                            } else {
+                                player_sound_effect_channel.single_write(SoundEffect::Idle);
+                            }
                             let velocity_ground = body_server.linear_velocity(contact_event.other_body);
                             if almost::zero_with(1. - contact_event.normal.y, 0.01) && velocity_ground.x != 0. {
                                 //Check if directions are same
-                                let x_direction_determinant = if velocity.x.signum() == velocity_ground.x.signum() { 1. } else { -1. };
                                 //If player is moving
-
+                                let x_direction_determinant = if velocity.x.signum() == velocity_ground.x.signum() { 1. } else { -1. };
                                 if p_description.velocity_direction().x != 0. {
+                                    player_sound_effect_channel.single_write(SoundEffect::Running);
                                     if x_direction_determinant == 1. {
                                         body_server.set_linear_velocity(
                                             p_body_tag.get(),
@@ -230,8 +239,7 @@ impl<'s> System<'s> for PlayerSystem {
                             }
                         }
                         CollisionGroupType::Exit => {
-                            // if player.coins == MAX_COINS {
-                            if player.coins >= 0 {
+                            if player.coins == MAX_COINS {
                                 gameplay_current_state.state = GameplayStateTypes::Inactice;
                             } else {
                                 body_server.apply_impulse(
@@ -264,7 +272,6 @@ impl<'s> System<'s> for PlayerSystem {
                     p_body_tag.get(),
                     &Vector3::new(IMPULSE_MOVE * p_description.velocity_direction().x, 0., 0.));
             }
-
 
             //just in case (only 1 player entity exists)
             break;

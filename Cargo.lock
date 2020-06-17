@@ -3368,6 +3368,7 @@ version = "0.1.0"
 dependencies = [
  "almost",
  "amethyst",
+ "amethyst_audio",
  "amethyst_nphysics",
  "amethyst_physics",
  "enum-map",

@@ -7,13 +7,16 @@ use amethyst::{
 
 const COIN_SOUND: &str = "audio/coin.ogg";
 const DAMAGE_SOUND: &str = "audio/damage.ogg";
-const SCORE_SOUND: &str = "audio/score.ogg";
+const AMBIENT_SOUND: &str = "audio/ambient.ogg";
+const STEPS_SOUND: &str = "audio/steps.ogg";
+const MENU_SOUND: &str = "audio/ambient.ogg";
 
 #[derive(Clone, Default)]
 pub struct Sounds {
-    pub score_sfx: Option<SourceHandle>,
+    pub ambient_sfx: Option<SourceHandle>,
     pub coin_sfx: Option<SourceHandle>,
     pub damage_sfx: Option<SourceHandle>,
+    pub steps_sfx: Option<SourceHandle>,
 }
 
 /// Loads an ogg audio track.
@@ -31,7 +34,8 @@ pub fn initialise_audio(world: &mut World) {
         let sound = Sounds {
             coin_sfx: Some(load_audio_track(&loader, &world, COIN_SOUND)),
             damage_sfx: Some(load_audio_track(&loader, &world, DAMAGE_SOUND)),
-            score_sfx: Some(load_audio_track(&loader, &world, SCORE_SOUND)),
+            ambient_sfx: Some(load_audio_track(&loader, &world, AMBIENT_SOUND)),
+            steps_sfx: Some(load_audio_track(&loader, &world, STEPS_SOUND)),
         };
 
         sound
@@ -45,7 +49,7 @@ pub fn initialise_audio(world: &mut World) {
 pub fn play_coin_sound(sounds: &Sounds, storage: &AssetStorage<Source>, output: Option<&Output>) {
     if let Some(ref output) = output.as_ref() {
         if let Some(sound) = storage.get(&(sounds.coin_sfx.clone().unwrap())) {
-            output.play_once(sound, 0.05);
+            output.play_once(sound, 0.03);
         }
     }
 }
@@ -53,7 +57,7 @@ pub fn play_coin_sound(sounds: &Sounds, storage: &AssetStorage<Source>, output: 
 pub fn play_damage_sound(sounds: &Sounds, storage: &AssetStorage<Source>, output: Option<&Output>) {
     if let Some(ref output) = output.as_ref() {
         if let Some(sound) = storage.get(&(sounds.damage_sfx.clone().unwrap())) {
-            output.play_once(sound, 0.2);
+            output.play_once(sound, 0.15);
         }
     }
 }

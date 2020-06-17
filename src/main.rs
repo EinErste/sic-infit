@@ -17,7 +17,6 @@ use amethyst_physics::{PhysicsBundle, prelude::*};
 use amethyst_nphysics::NPhysicsBackend;
 use crate::systems::{PhysicsSystem, PlayerSystem, DirectionSystem};
 use std::panic;
-
 mod audio;
 mod states;
 mod systems;
@@ -28,9 +27,7 @@ mod entities;
 ///Main function is an entry point for the game
 fn main() -> amethyst::Result<()> {
 
-
-    //TODO (u know)
-    //amethyst::start_logger(Default::default());
+    amethyst::start_logger(Default::default());
 
     let app_root = application_root_dir()?;
 
