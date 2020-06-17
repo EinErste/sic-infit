@@ -510,7 +510,7 @@ fn load_obstacles(world: &mut World){
     //10
     load_platform(2700.,mid*3.,d6,400.,world);
     //13
-    load_moving_platform_x(1200.,high,300.,100., world);
+    load_moving_platform_x(1200.,high - 50.,300.,100., world);
     //21
     load_moving_platform_x(900.,mid*2.,325.,100., world);
     //22
@@ -589,7 +589,7 @@ fn load_obstacles(world: &mut World){
 
 
     load_npc(400., Altitude::Ground.into(), Directions::Left, AssetType::HoboNPC,"You need to collect 30 coins. May the gods be in your favour", world);
-    load_npc(950., mid + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am local guard. Watch your back, it's not safe here.", world);
+    load_npc(950., mid + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am local guard. Watch your back, thugs are common in this area.", world);
     load_npc(3400., Altitude::Ground.into(),Directions::Left, AssetType::GuardianNPC,"You need to prove you're worthy. Collect all coins first!", world);
     load_npc(3000., mid*3. -20.,Directions::Right, AssetType::WizardNPC,"Ah... Stars show that you are a hero...", world);
 
