@@ -22,7 +22,8 @@ pub enum AssetType {
     HoboNPC,
     GuardianNPC,
     WizardNPC,
-    Enemy
+    Enemy,
+    Prop
 }
 ///List of spritesheets to be accesible
 #[derive(Default)]
@@ -57,6 +58,7 @@ pub fn load_assets(world: &mut World, asset_type_list: Vec<AssetType>) -> Progre
             AssetType::GuardianNPC => ("textures/guardian.png", "prefabs/npc.ron"),
             AssetType::WizardNPC => ("textures/wizard.png", "prefabs/npc.ron"),
             AssetType::Enemy => ("textures/enemy.png", "prefabs/enemy.ron"),
+            AssetType::Prop => ("textures/prop.png", "prefabs/prop.ron"),
         };
         let sprite_sheet_handle = get_sprite_sheet_handle(world, texture_path, ron_path, &mut progress_counter);
         sprite_sheet_list.insert(asset_type, sprite_sheet_handle);
