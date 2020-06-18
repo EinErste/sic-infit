@@ -31,6 +31,7 @@ pub fn load_forest_path(init_x: f32, init_y: f32, ground_width: f32,ground_heigh
         rb_desc.collide_with = vec![CollisionGroup::new(CollisionGroupType::Player.into()),
                                     CollisionGroup::new(CollisionGroupType::NPC.into()),
                                     CollisionGroup::new(CollisionGroupType::Collectable.into()),
+                                    CollisionGroup::new(CollisionGroupType::Prop.into()),
                                     CollisionGroup::new(CollisionGroupType::Enemy.into()),];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
@@ -81,6 +82,7 @@ fn load_world_wall(init_x: f32, init_y: f32,world: &mut World) {
             CollisionGroup::new(CollisionGroupType::NPC.into()),
             CollisionGroup::new(CollisionGroupType::Collectable.into()),
             CollisionGroup::new(CollisionGroupType::Enemy.into()),
+            CollisionGroup::new(CollisionGroupType::Prop.into()),
             CollisionGroup::new(CollisionGroupType::LinearMovable.into()),
         ];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
@@ -164,6 +166,7 @@ fn load_platform(init_x: f32, init_y: f32, init_z: f32, platform_width: f32, wor
         rb_desc.collide_with = vec![CollisionGroup::new(CollisionGroupType::Player.into()),
                                     CollisionGroup::new(CollisionGroupType::NPC.into()),
                                     CollisionGroup::new(CollisionGroupType::Collectable.into()),
+                                    CollisionGroup::new(CollisionGroupType::Prop.into()),
                                     CollisionGroup::new(CollisionGroupType::Enemy.into()),];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
         physics_world.rigid_body_server().create(&rb_desc)
@@ -316,6 +319,7 @@ fn load_moving_platform(init_x: f32, init_y: f32, speed: f32, init_directions: (
             CollisionGroup::new(CollisionGroupType::Enemy.into()),
             CollisionGroup::new(CollisionGroupType::Collectable.into()),
             CollisionGroup::new(CollisionGroupType::WorldWall.into()),
+            CollisionGroup::new(CollisionGroupType::Prop.into()),
             CollisionGroup::new(CollisionGroupType::SupportGround.into()),
         ];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
@@ -444,6 +448,53 @@ fn  load_exit(world: &mut World) {
         .build();
 }
 
+fn load_box(init_x: f32, init_y: f32, world: &mut World) {
+    let box_width = 30.;
+    let box_height = 30.;
+    let sprite_sheet_handle = {
+        let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
+        sprite_sheet_list.get(AssetType::Prop).unwrap().clone()
+    };
+
+    let sprite = SpriteRender {
+        sprite_sheet: sprite_sheet_handle.clone(),
+        sprite_number: 0,
+    };
+
+    let cube = create_cube(init_x,init_y,0.2,box_width,box_height,40.,world);
+
+    let rb = {
+        let mut rb_desc = RigidBodyDesc::default();
+        rb_desc.mode = BodyMode::Dynamic;
+        rb_desc.lock_translation_z = true;
+        rb_desc.lock_rotation_y = true;
+        rb_desc.lock_rotation_x = true;
+        //rb_desc.lock_rotation_z = true;
+        rb_desc.friction = 0.5;
+        rb_desc.bounciness = 0.2;
+        rb_desc.belong_to = vec![
+            CollisionGroup::new(CollisionGroupType::Prop.into()),
+        ];
+        rb_desc.collide_with = vec![
+            CollisionGroup::new(CollisionGroupType::Player.into()),
+            CollisionGroup::new(CollisionGroupType::LinearMovable.into()),
+            CollisionGroup::new(CollisionGroupType::Ground.into()),
+            CollisionGroup::new(CollisionGroupType::Enemy.into()),
+            CollisionGroup::new(CollisionGroupType::Prop.into()),
+        ];
+        let physics_world = world.fetch::<PhysicsWorld<f32>>();
+        physics_world.rigid_body_server().create(&rb_desc)
+    };
+
+    world
+        .create_entity()
+        .with(cube.0)
+        .with(cube.1)
+        .with(sprite.clone())
+        .with(rb)
+        .build();
+}
+
 //For ground entities - top point
 //For other entities - bottom point
 #[repr(u32)]
@@ -510,7 +561,7 @@ fn load_obstacles(world: &mut World){
     //10
     load_platform(2700.,mid*3.,d6,400.,world);
     //13
-    load_moving_platform_x(1200.,high,300.,100., world);
+    load_moving_platform_x(1200.,high - 50.,300.,100., world);
     //21
     load_moving_platform_x(900.,mid*2.,325.,100., world);
     //22
@@ -520,6 +571,10 @@ fn load_obstacles(world: &mut World){
     //12
     load_moving_platform_x(1970.,high*2.,500.,100., world);
 
+    load_box(400.,mid*3.,world);
+    load_box(800.,mid*2.,world);
+    load_box(1900.,mid*2.,world);
+    load_box(3000.,mid*3.,world);
     let mut rng = rand::thread_rng();
     let mut coins = 0u8;
     let world_max = 3300.;
@@ -589,7 +644,7 @@ fn load_obstacles(world: &mut World){
 
 
     load_npc(400., Altitude::Ground.into(), Directions::Left, AssetType::HoboNPC,"You need to collect 30 coins. May the gods be in your favour", world);
-    load_npc(950., mid + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am local guard. Watch your back, it's not safe here.", world);
+    load_npc(950., mid + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am local guard. Watch your back, thugs are common in this area.", world);
     load_npc(3400., Altitude::Ground.into(),Directions::Left, AssetType::GuardianNPC,"You need to prove you're worthy. Collect all coins first!", world);
     load_npc(3000., mid*3. -20.,Directions::Right, AssetType::WizardNPC,"Ah... Stars show that you are a hero...", world);
 

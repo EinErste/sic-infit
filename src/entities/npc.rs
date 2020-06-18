@@ -55,6 +55,7 @@ pub fn load_player(world: &mut World) -> Entity {
                                     CollisionGroup::new(CollisionGroupType::WorldWall.into()),
                                     CollisionGroup::new(CollisionGroupType::Collectable.into()),
                                     CollisionGroup::new(CollisionGroupType::Enemy.into()),
+                                    CollisionGroup::new(CollisionGroupType::Prop.into()),
                                     CollisionGroup::new(CollisionGroupType::Exit.into()),
         ];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();
@@ -110,6 +111,7 @@ pub fn load_enemy(init_x: f32, init_y: f32,speed: f32, dir: Directions,world: &m
             CollisionGroup::new(CollisionGroupType::NPC.into()),
             CollisionGroup::new(CollisionGroupType::Player.into()),
             CollisionGroup::new(CollisionGroupType::WorldWall.into()),
+            CollisionGroup::new(CollisionGroupType::Prop.into()),
             CollisionGroup::new(CollisionGroupType::InvisibleArea.into()),
         ];
         let physics_world = world.fetch::<PhysicsWorld<f32>>();

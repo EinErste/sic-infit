@@ -46,7 +46,6 @@ impl<'s> System<'s> for PlayerSoundSystem {
             match event {
                 SoundEffect::Running => {
                     self.DJ.set_volume(1.);
-                    // self.DJ.play();
                     if self.DJ.empty(){
                         if let Some(handle) = &sounds.steps_sfx {
                             if let Some(sound) = storage.get(handle) {
@@ -57,7 +56,6 @@ impl<'s> System<'s> for PlayerSoundSystem {
                 }
                 SoundEffect::Idle => {
                     self.DJ.set_volume(0.);
-                    //self.DJ.pause();
                 }
             }
         }
