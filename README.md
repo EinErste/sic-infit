@@ -8,4 +8,4 @@ Credits:
 
   developer https://github.com/chddr
   
-  artist reizdorfff@gmail.com
+  artist    reizdorfff@gmail.com
