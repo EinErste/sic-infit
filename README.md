@@ -2,6 +2,8 @@
 
 2D Platformer game written in Rust for university project.
 
+https://www.youtube.com/watch?v=qMLzUUH8mYE
+
 Credits:
 
   developer https://github.com/EinErste
