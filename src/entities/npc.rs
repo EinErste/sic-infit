@@ -147,7 +147,7 @@ pub  fn load_npc(init_x: f32, init_y: f32, dir: Directions, asset_type: AssetTyp
         sprite_sheet: sprite_sheet_handle,
         sprite_number: 0,
     };
-    let cube = create_cube(init_x,init_y,0.1,width,height,20.,world);
+    let cube = create_cube(init_x,init_y,0.03,width,height,20.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();

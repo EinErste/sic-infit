@@ -17,9 +17,16 @@ impl<'s> System<'s> for CameraSystem {
     fn run(&mut self, mut transforms: Self::SystemData) {
         let char = transforms.get(self.character).unwrap().translation().clone();
         let cam = transforms.get_mut(self.camera).unwrap();
-        cam.translation_mut().x = char.x;
-        if 180. - char.y > 0.{
-            cam.translation_mut().y = 180.;
+        if char.x<600. {
+            cam.translation_mut().x = 600.;
+        } else if char.x>3240.{
+            cam.translation_mut().x = 3240.;
+        }
+        else{
+            cam.translation_mut().x = char.x;
+        }
+        if char.y < 302.{
+            cam.translation_mut().y = 302.;
         } else{
             cam.translation_mut().y = char.y;
         }

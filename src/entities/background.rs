@@ -102,34 +102,31 @@ pub fn load_world_forest(world: &mut World){
     //Main sprites
     let width = 3840.;
     let height = 360.;
-    let distances:Vec<f32> = vec![-1500.,-1400.,-1300.,-1000.,-900.,0.0,80.];
+    let distances:Vec<f32> = vec![-1400.,-1300.,-1250.,-1000.,-900.,0.0,80.];
     let sprite_sheet_handle = {
         let sprite_sheet_list = world.read_resource::<SpriteSheetList>();
         sprite_sheet_list.get(AssetType::BackgroundForest).unwrap().clone()
     };
-
-    for j in 1..3{
-        for i in 0..7 {
-            let sprite = SpriteRender {
-                sprite_sheet: sprite_sheet_handle.clone(),
-                sprite_number: i,
-            };
-            let mut transform = Transform::default();
-            if i != 6{
-                transform.adjust_to_distance(-distances[i], width,height);
-                transform.set_translation_xyz(width/2., height/2., distances[i]);
-            } else{
-                //Hardcoded as fuck due to imprecision of adjust_to_distance()
-                transform.set_translation_xyz(width/2., 230., distances[i]);
-            }
-
-            world
-                .create_entity()
-                .with(sprite.clone())
-                .with(transform)
-                .build();
-
+    for i in 0..7 {
+        let sprite = SpriteRender {
+            sprite_sheet: sprite_sheet_handle.clone(),
+            sprite_number: i,
+        };
+        let mut transform = Transform::default();
+        if i != 6{
+            transform.adjust_to_distance(-distances[i], width,height);
+            transform.set_translation_xyz(width/2., height/2., distances[i]);
+        } else{
+            //Hardcoded as fuck due to imprecision of adjust_to_distance()
+            transform.set_translation_xyz(width/2., 210., distances[i]);
         }
+
+        world
+            .create_entity()
+            .with(sprite.clone())
+            .with(transform)
+            .build();
+
     }
     load_forest_path(Latitude::WorldStart.into(),Altitude::Ground.into(),width,65.,100.,world);
     load_world_wall(Latitude::WorldStart.into(),Altitude::Zero.into(),world);
@@ -461,7 +458,7 @@ fn load_box(init_x: f32, init_y: f32, world: &mut World) {
         sprite_number: 0,
     };
 
-    let cube = create_cube(init_x,init_y,0.2,box_width,box_height,40.,world);
+    let cube = create_cube(init_x,init_y,0.15,box_width,box_height,40.,world);
 
     let rb = {
         let mut rb_desc = RigidBodyDesc::default();
@@ -571,10 +568,6 @@ fn load_obstacles(world: &mut World){
     //12
     load_moving_platform_x(1970.,high*2.,500.,100., world);
 
-    load_box(400.,mid*3.,world);
-    load_box(800.,mid*2.,world);
-    load_box(1900.,mid*2.,world);
-    load_box(3000.,mid*3.,world);
     let mut rng = rand::thread_rng();
     let mut coins = 0u8;
     let world_max = 3300.;
@@ -642,11 +635,15 @@ fn load_obstacles(world: &mut World){
         load_enemy(x,height*mult as f32, speed,dir,world);
     }
 
+    load_box(410.,mid*3.,world);
+    load_box(800.,mid*2.,world);
+    load_box(1900.,mid*2.,world);
+    load_box(2950.,mid*3.,world);
 
     load_npc(400., Altitude::Ground.into(), Directions::Left, AssetType::HoboNPC,"You need to collect 30 coins. May the gods be in your favour", world);
     load_npc(950., mid + 64.0f32, Directions::Right, AssetType::GuardianNPC, "I am local guard. Watch your back, thugs are common in this area.", world);
     load_npc(3400., Altitude::Ground.into(),Directions::Left, AssetType::GuardianNPC,"You need to prove you're worthy. Collect all coins first!", world);
-    load_npc(3000., mid*3. -20.,Directions::Right, AssetType::WizardNPC,"Ah... Stars show that you are a hero...", world);
+    load_npc(3000., mid*3. -17.,Directions::Right, AssetType::WizardNPC,"Ah... Stars show that you are a hero...", world);
 
 
     load_exit(world);
