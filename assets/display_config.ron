@@ -7,5 +7,4 @@
   fullscreen: Some(MonitorIdent(0, "default")),
   multisampling: 0,
   visibility: true,
-  vsync: true
 )

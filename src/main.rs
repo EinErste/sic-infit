@@ -42,7 +42,7 @@ fn main() -> amethyst::Result<()> {
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
         .with_bundle(PhysicsBundle::<f32, NPhysicsBackend>::new()
-            .with_frames_per_seconds(80)
+            .with_frames_per_seconds(120)
             .with_max_sub_steps(8)
             .with_pre_physics(PhysicsSystem::default(), String::from("physics_system"), vec![])
             .with_pre_physics(PlayerSystem::default(), String::from("player_system"), vec![String::from("physics_system")])
